@@ -14,7 +14,7 @@ services:
   servidor-tomcat:
     image: tomcat:latest
     ports:
-      - "8080:8080"
+      - "80:8080"
     volumes:
       - ./EjemploBD1/build/web:/usr/local/tomcat/webapps/EjemploBD1
       - ./Proyecto/Cita_Hospitales/build/web:/usr/local/tomcat/webapps/Cita_Hospitales

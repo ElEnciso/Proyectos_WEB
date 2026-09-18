@@ -22,7 +22,7 @@ public class Base {
         // Agregar datos para conectarse
         this.usrBD = "root";
         this.passBD = "root";
-        this.urlBD = "jdbc:mysql://localhost:3306/ejemploBD?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        this.urlBD = "jdbc:mysql://base-datos:3306/ejemploBD?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
         this.driverClassName = "com.mysql.cj.jdbc.Driver"; 
     }
