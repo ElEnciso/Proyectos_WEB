@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel><title>nginx news</title><link>http://nginx.org</link><description/><item><title>nginx-1.31.5
+mainline version has been released, featuring
+control API,
+predicate locations,
+and the
+ngx_http_json_module
+module.
+</title><guid>http://nginx.org/#2026-09-02</guid><link>http://nginx.org/#2026-09-02</link><pubDate>Wed, 02 Sep 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-09-02<p><a href="en/download.html">nginx-1.31.5</a>
+mainline version has been released, featuring
+<a href="https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control#control-api">control API</a>,
+<a href="en/docs/http/ngx_http_core_module.html#location">predicate locations</a>,
+and the
+<a href="en/docs/http/ngx_http_json_module.html">ngx_http_json_module</a>
+module.
+</p>]]></description></item><item><title>njs-1.0.1
+version has been
+released,
+with fixes for
+access control bypass
+vulnerability in
+js_access
+(CVE-2026-18329),
+worker process crash
+vulnerability in
+ngx.fetch()
+(CVE-2026-78222), and
+heap buffer overflow
+vulnerability in
+
+xml.exclusiveC14n()
+(CVE-2026-78689).
+</title><guid>http://nginx.org/#2026-09-02</guid><link>http://nginx.org/#2026-09-02</link><pubDate>Wed, 02 Sep 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-09-02<p><a href="en/docs/njs/index.html">njs-1.0.1</a>
+version has been
+<a href="en/docs/njs/changes.html#njs1.0.1">released</a>,
+with fixes for
+<a href="en/docs/njs/security.html#advisories">access control bypass</a>
+vulnerability in
+<a href="en/docs/http/ngx_http_js_module.html#js_access">js_access</a>
+(CVE-2026-18329),
+<a href="en/docs/njs/security.html#advisories">worker process crash</a>
+vulnerability in
+<a href="en/docs/njs/reference.html#ngx_fetch">ngx.fetch()</a>
+(CVE-2026-78222), and
+<a href="en/docs/njs/security.html#advisories">heap buffer overflow</a>
+vulnerability in
+<a href="en/docs/njs/reference.html#xml_exclusivec14n">
+xml.exclusiveC14n()</a>
+(CVE-2026-78689).
+</p>]]></description></item><item><title>nginx-1.31.4
+mainline version has been released.
+</title><guid>http://nginx.org/#2026-08-19</guid><link>http://nginx.org/#2026-08-19</link><pubDate>Wed, 19 Aug 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-08-19<p><a href="en/download.html">nginx-1.31.4</a>
+mainline version has been released.
+</p>]]></description></item><item><title>nginx-1.30.4
+stable and
+nginx-1.31.3
+mainline versions have been released,
+with fixes for
+buffer overflow
+vulnerability when using map with regex (CVE-2026-42533),
+memory disclosure
+vulnerability when using ngx_http_slice_module (CVE-2026-60005), and
+use-after-free
+vulnerability when using ngx_http_ssi_module (CVE-2026-56434).
+</title><guid>http://nginx.org/#2026-07-15</guid><link>http://nginx.org/#2026-07-15</link><pubDate>Wed, 15 Jul 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-07-15<p><a href="en/download.html">nginx-1.30.4</a>
+stable and
+<a href="en/download.html">nginx-1.31.3</a>
+mainline versions have been released,
+with fixes for
+<a href="en/security_advisories.html">buffer overflow</a>
+vulnerability when using map with regex (CVE-2026-42533),
+<a href="en/security_advisories.html">memory disclosure</a>
+vulnerability when using ngx_http_slice_module (CVE-2026-60005), and
+<a href="en/security_advisories.html">use-after-free</a>
+vulnerability when using ngx_http_ssi_module (CVE-2026-56434).
+</p>]]></description></item><item><title>njs-1.0.0
+version has been
+released,
+deprecating the
+njs
+engine in favor of QuickJS,
+aligning exception classes between the engines,
+and hardening
+ngx.fetch()
+request validation.
+</title><guid>http://nginx.org/#2026-06-23</guid><link>http://nginx.org/#2026-06-23</link><pubDate>Tue, 23 Jun 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-06-23<p><a href="en/docs/njs/index.html">njs-1.0.0</a>
+version has been
+<a href="en/docs/njs/changes.html#njs1.0.0">released</a>,
+deprecating the
+<a href="en/docs/njs/engine.html">njs</a>
+engine in favor of QuickJS,
+aligning exception classes between the engines,
+and hardening
+<a href="en/docs/njs/reference.html#ngx_fetch">ngx.fetch()</a>
+request validation.
+</p>]]></description></item><item><title>nginx-1.30.3
+stable and
+nginx-1.31.2
+mainline versions have been released,
+with fixes for
+buffer overflow
+vulnerability in the ngx_http_proxy_v2_module
+and ngx_http_grpc_module (CVE-2026-42055), and
+buffer overread
+vulnerability in the ngx_http_charset_module (CVE-2026-48142).
+Additionally, nginx-1.31.2
+includes a fix for
+use-after-free
+vulnerability in the ngx_http_v3_module (CVE-2026-42530).
+</title><guid>http://nginx.org/#2026-06-17</guid><link>http://nginx.org/#2026-06-17</link><pubDate>Wed, 17 Jun 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-06-17<p><a href="en/download.html">nginx-1.30.3</a>
+stable and
+<a href="en/download.html">nginx-1.31.2</a>
+mainline versions have been released,
+with fixes for
+<a href="en/security_advisories.html">buffer overflow</a>
+vulnerability in the ngx_http_proxy_v2_module
+and ngx_http_grpc_module (CVE-2026-42055), and
+<a href="en/security_advisories.html">buffer overread</a>
+vulnerability in the ngx_http_charset_module (CVE-2026-48142).
+Additionally, <a href="en/download.html">nginx-1.31.2</a>
+includes a fix for
+<a href="en/security_advisories.html">use-after-free</a>
+vulnerability in the ngx_http_v3_module (CVE-2026-42530).
+</p>]]></description></item><item><title>nginx-1.30.2
+stable and
+nginx-1.31.1
+mainline versions have been released,
+with a fix for
+buffer overflow
+vulnerability in the ngx_http_rewrite_module (CVE-2026-9256).
+</title><guid>http://nginx.org/#2026-05-22</guid><link>http://nginx.org/#2026-05-22</link><pubDate>Fri, 22 May 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-05-22<p><a href="en/download.html">nginx-1.30.2</a>
+stable and
+<a href="en/download.html">nginx-1.31.1</a>
+mainline versions have been released,
+with a fix for
+<a href="en/security_advisories.html">buffer overflow</a>
+vulnerability in the ngx_http_rewrite_module (CVE-2026-9256).
+</p>]]></description></item><item><title>njs-0.9.9
+version has been
+released,
+with a fix for
+heap buffer overflow
+vulnerability in
+
+js_fetch_proxy
+(CVE-2026-8711), featuring
+js_access,
+
+r.readRequestText()
+and friends,
+
+r.readRequestForm(),
+and
+jsVarNames().
+</title><guid>http://nginx.org/#2026-05-19</guid><link>http://nginx.org/#2026-05-19</link><pubDate>Tue, 19 May 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-05-19<p><a href="en/docs/njs/index.html">njs-0.9.9</a>
+version has been
+<a href="en/docs/njs/changes.html#njs0.9.9">released</a>,
+with a fix for
+<a href="en/docs/njs/security.html#advisories">heap buffer overflow</a>
+vulnerability in
+<a href="en/docs/http/ngx_http_js_module.html#js_fetch_proxy">
+js_fetch_proxy</a>
+(CVE-2026-8711), featuring
+<a href="en/docs/http/ngx_http_js_module.html#js_access">js_access</a>,
+<a href="en/docs/njs/reference.html#r_read_request_text">
+r.readRequestText()</a>
+and friends,
+<a href="en/docs/njs/reference.html#r_read_request_form">
+r.readRequestForm()</a>,
+and
+<a href="en/docs/njs/reference.html#r_js_var_names">jsVarNames()</a>.
+</p>]]></description></item><item><title>nginx-1.30.1
+stable and
+nginx-1.31.0
+mainline versions have been released,
+with fixes for
+HTTP/2 request injection
+vulnerability in the ngx_http_proxy_module (CVE-2026-42926),
+buffer overflow
+vulnerability in the ngx_http_rewrite_module (CVE-2026-42945),
+buffer overread
+vulnerabilities in the ngx_http_scgi_module
+and ngx_http_uwsgi_module (CVE-2026-42946),
+buffer overread
+vulnerability in the ngx_http_charset_module (CVE-2026-42934),
+address spoofing vulnerability
+in HTTP/3 (CVE-2026-40460), and
+use-after-free
+vulnerability in OCSP requests to resolver (CVE-2026-40701).
+Additionally, nginx-1.31.0
+mainline version features support for HTTP
+forward proxy.
+</title><guid>http://nginx.org/#2026-05-13</guid><link>http://nginx.org/#2026-05-13</link><pubDate>Wed, 13 May 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-05-13<p><a href="en/download.html">nginx-1.30.1</a>
+stable and
+<a href="en/download.html">nginx-1.31.0</a>
+mainline versions have been released,
+with fixes for
+<a href="en/security_advisories.html">HTTP/2 request injection</a>
+vulnerability in the ngx_http_proxy_module (CVE-2026-42926),
+<a href="en/security_advisories.html">buffer overflow</a>
+vulnerability in the ngx_http_rewrite_module (CVE-2026-42945),
+<a href="en/security_advisories.html">buffer overread</a>
+vulnerabilities in the ngx_http_scgi_module
+and ngx_http_uwsgi_module (CVE-2026-42946),
+<a href="en/security_advisories.html">buffer overread</a>
+vulnerability in the ngx_http_charset_module (CVE-2026-42934),
+<a href="en/security_advisories.html">address spoofing vulnerability
+in HTTP/3</a> (CVE-2026-40460), and
+<a href="en/security_advisories.html">use-after-free</a>
+vulnerability in OCSP requests to resolver (CVE-2026-40701).
+Additionally, <a href="en/download.html">nginx-1.31.0</a>
+mainline version features support for HTTP
+<a href="en/docs/http/ngx_http_tunnel_module.html">forward proxy</a>.
+</p>]]></description></item><item><title>njs-0.9.8
+bugfix version has been
+released.
+</title><guid>http://nginx.org/#2026-04-23</guid><link>http://nginx.org/#2026-04-23</link><pubDate>Thu, 23 Apr 2026 00:00:00 +0300</pubDate><description><![CDATA[2026-04-23<p><a href="en/docs/njs/index.html">njs-0.9.8</a>
+bugfix version has been
+<a href="en/docs/njs/changes.html#njs0.9.8">released</a>.
+</p>]]></description></item></channel></rss>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 2: mayor de tres números</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 2: JavaScript</h1>
+        <p>Mayor de tres números</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para calcular el mayor de tres números.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    document.write('Hola mundo.<br><br>');
+                    document.write('Valores asignados:<br>');
+                    document.write('a = 3 <br>');
+                    document.write('b = 9 <br>');
+                    document.write('c = 5 <br><br>');
+
+                    var a = 3, b = 9, c = 5;
+
+                    document.write('El mayor entre a, b y c es: <strong style="color: var(--primary-color);">');
+                    if(a > b && a > c){
+                        document.write('a = ', a, '</strong>');
+                    }if(b > a && b > c){
+                        document.write('b = ', b, '</strong>');
+                    } if(c > a && c > b){
+                        document.write('c = ', c, '</strong>');
+                    }
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_limit_req_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_limit_req_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_limit_req_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#limit_req">limit_req</a><br>     <a href="#limit_req_dry_run">limit_req_dry_run</a><br>     <a href="#limit_req_log_level">limit_req_log_level</a><br>     <a href="#limit_req_status">limit_req_status</a><br>     <a href="#limit_req_zone">limit_req_zone</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_limit_req_module</code> (0.7.21) позволяет
+ограничить скорость обработки запросов по заданному ключу или,
+как частный случай, скорость обработки запросов, поступающих
+с одного IP-адреса.
+Ограничение обеспечивается с помощью метода “leaky bucket”.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+http {
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+
+    ...
+
+    server {
+
+        ...
+
+        location /search/ {
+            limit_req zone=one burst=5;
+        }
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="limit_req"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_req</strong> 
+    <code>zone</code>=<code><i>название</i></code>
+    [<code>burst</code>=<code><i>число</i></code>]
+    [<code>nodelay</code> |
+     <code>delay</code>=<code><i>число</i></code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт зону разделяемой памяти (<code>zone</code>)
+и максимальный размер всплеска запросов (<code>burst</code>).
+Если скорость поступления запросов превышает описанную в зоне,
+то их обработка задерживается так, чтобы запросы обрабатывались
+с заданной скоростью.
+Избыточные запросы задерживаются до тех пор, пока их число
+не превысит максимальный размер всплеска.
+При превышении запрос завершается с
+<a href="#limit_req_status">ошибкой</a>.
+По умолчанию максимальный размер всплеска равен нулю.
+Например, директивы
+</p> <blockquote class="example"><pre>
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+
+server {
+    location /search/ {
+        limit_req zone=one burst=5;
+    }
+</pre></blockquote><p> 
+позволяют в среднем не более 1 запроса в секунду
+со всплесками не более 5 запросов.
+</p><p>
+Если же избыточные запросы в пределах лимита всплесков задерживать
+не требуется, то следует использовать параметр <code>nodelay</code>:
+</p> <blockquote class="example"><pre>
+limit_req zone=one burst=5 nodelay;
+</pre></blockquote><p> 
+</p><a name="limit_req_delay"></a><p>
+Параметр <code>delay</code> (1.15.7) задаёт лимит,
+по достижении которого избыточные запросы задерживаются.
+Значение по умолчанию равно нулю и означает,
+что задерживаются все избыточные запросы.
+</p><p>
+Директив <code>limit_req</code> может быть несколько.
+Например, следующая конфигурация ограничивает скорость обработки запросов,
+поступающих с одного IP-адреса, и в то же время ограничивает
+скорость обработки запросов одним виртуальным сервером:
+</p> <blockquote class="example"><pre>
+limit_req_zone $binary_remote_addr zone=perip:10m rate=1r/s;
+limit_req_zone $server_name zone=perserver:10m rate=10r/s;
+
+server {
+    ...
+    limit_req zone=perip burst=5 nodelay;
+    limit_req zone=perserver burst=10;
+}
+</pre></blockquote><p> 
+
+</p><p>
+Директивы наследуются с предыдущего уровня конфигурации при условии, что
+на данном уровне не описаны свои директивы <code>limit_req</code>.
+</p><a name="limit_req_dry_run"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_req_dry_run</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>limit_req_dry_run off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.17.1.
+            </p></div><p>
+Включает режим пробного запуска.
+В данном режиме скорость обработки запросов не ограничивается, однако
+в зоне разделяемой памяти текущее число избыточных запросов учитывается
+как обычно.
+</p><a name="limit_req_log_level"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_req_log_level</strong> 
+<code>info</code> |
+<code>notice</code> |
+<code>warn</code> |
+<code>error</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>limit_req_log_level error;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 0.8.18.
+            </p></div><p>
+Задаёт желаемый уровень записи в лог
+случаев отказа в обработке запросов при превышении скорости
+и случаев задержек при обработке запроса.
+Задержки записываются в лог с уровнем на единицу меньшим, чем отказы,
+например, если указано “<code>limit_req_log_level notice</code>”,
+то задержки будут записываться в лог на уровне <code>info</code>.
+</p><a name="limit_req_status"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_req_status</strong> <code><i>код</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>limit_req_status 503;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.3.15.
+            </p></div><p>
+Позволяет переопределить код ответа, используемый при отклонении запросов.
+</p><a name="limit_req_zone"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_req_zone</strong> 
+    <code><i>ключ</i></code>
+    <code>zone</code>=<code><i>название</i></code>:<code><i>размер</i></code>
+    <code>rate</code>=<code><i>скорость</i></code>
+    [<code>sync</code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт параметры зоны разделяемой памяти,
+которая хранит состояние для разных значений ключа.
+Состояние в частности хранит текущее число избыточных запросов.
+В качестве ключа можно использовать текст, переменные и их комбинации.
+Запросы с пустым значением ключа не учитываются.
+</p> <blockquote class="note">
+До версии 1.7.6 в качестве ключа можно было задать ровно одну переменную.
+</blockquote><p> 
+Пример использования:
+</p> <blockquote class="example"><pre>
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+</pre></blockquote><p> 
+</p><p>
+В данном случае состояния хранятся в зоне “one” размером 10 мегабайт,
+и средняя скорость обработки запросов для этой зоны не может превышать
+1 запроса в секунду.
+</p><p>
+В качестве ключа используется IP-адрес клиента.
+Обратите внимание, что вместо переменной <code>$remote_addr</code> используется
+переменная <code>$binary_remote_addr</code>.
+Длина значения переменной <code>$binary_remote_addr</code> всегда
+равна 4 байтам для IPv4-адресов или 16 байтам для IPv6-адресов.
+При этом размер состояния всегда равен
+64 байтам на 32-битных платформах и 128 байтам на 64-битных платформах.
+В зоне размером 1 мегабайт может разместиться около 16 тысяч состояний
+размером 64 байта или около 8 тысяч состояний размером 128 байт.
+</p><p>
+При переполнении зоны удаляется наименее востребованное состояние.
+Если и это не позволяет создать новое состояние, запрос завершается с
+<a href="#limit_req_status">ошибкой</a>.
+</p><p>
+Скорость задаётся в запросах в секунду (r/s).
+Если же нужна скорость меньше одного запроса в секунду,
+то она задаётся в запросах в минуту (r/m), например,
+ползапроса в секунду — это 30r/m.
+</p><p>
+Дополнительно, как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>,
+доступна следующая функциональность:
+
+</p> <ul class="compact">
+
+<li id="limit_req_zone_rate">
+<p>
+Параметр <code>rate</code> может содержать переменные (1.31.3).
+Скорость вычисляется для каждого запроса во время его выполнения.
+Пример:
+</p> <blockquote class="example"><pre>
+map $uri $rate {
+    default       10r/s;
+    /api/slow     1r/s;
+    /api/fast     100r/s;
+}
+
+limit_req_zone $binary_remote_addr zone=one:10m rate=$rate;
+</pre></blockquote><p> 
+</p>
+</li>
+
+<li id="limit_req_zone_sync">
+<p>
+Параметр <code>sync</code> (1.15.3) разрешает
+<a href="../stream/ngx_stream_zone_sync_module.html#zone_sync">синхронизацию</a>
+данной зоны разделяемой памяти.
+</p>
+</li>
+
+<li>
+<p>
+<a href="ngx_http_api_module.html#http_limit_reqs_">Информацию о состоянии</a>
+каждой такой зоны разделяемой памяти можно
+<a href="ngx_http_api_module.html#getHttpLimitReqZone">получить</a> или
+<a href="ngx_http_api_module.html#deleteHttpLimitReqZoneStat">сбросить</a>
+при помощи <a href="ngx_http_api_module.html">API</a>
+начиная с версии 1.17.7.
+</p>
+</li>
+
+</ul><p> 
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl class="compact">
+
+<dt id="var_limit_req_status"><code>$limit_req_status</code></dt>
+<dd>
+хранит результат ограничения скорости поступления запросов (1.17.6):
+<code>PASSED</code>,
+<code>DELAYED</code>,
+<code>REJECTED</code>,
+<code>DELAYED_DRY_RUN</code> или
+<code>REJECTED_DRY_RUN</code>
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

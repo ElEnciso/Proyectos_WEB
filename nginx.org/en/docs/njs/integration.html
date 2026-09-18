@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Execution model and integration points</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_en.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li>english<br></li><li><a href="../../../ru/docs/njs/integration.html">русский</a></li><li><br></li><li><a href="../../../news.html">news</a></li><li><a href="../../../en/">about</a></li><li><a href="../../../en/download.html">download</a></li><li><a href="../../../en/security_advisories.html">security</a></li><li><a href="../../../en/docs/">documentation</a></li><li><a href="../../../en/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">books</a></li><li><a href="../../../en/community.html">community</a></li><li><a href="../../../en/enterprise.html">enterprise</a></li><li><br></li><li><a href="https://community.nginx.org">community forum (new)</a></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Execution model and integration points</h2><table width="100%"><tr><td align="left"><a href="#model">Execution model</a><br><a href="#http">HTTP integration points</a><br><a href="#stream">Stream integration points</a><br><a href="#choosing">Choosing an integration point</a><br><a href="#state">State and lifetime</a><br><a href="#outside">Using njs outside of nginx</a><br></td></tr></table><a name="summary"></a><p>
+JavaScript code in <a href="index.html">njs</a> never runs on its own.
+nginx calls it at a fixed set of integration points,
+each bound to a handler by a configuration directive.
+There is no start-up script, no background thread,
+and no event loop of its own:
+nginx invokes a handler, the handler runs, and control returns to nginx.
+</p><p>
+This article describes when handlers are called
+and how to choose the right one.
+The exact contract of each directive is documented in
+<a href="../http/ngx_http_js_module.html">ngx_http_js_module</a>
+and
+<a href="../stream/ngx_stream_js_module.html">ngx_stream_js_module</a>.
+</p><a name="model"></a><center><h4>Execution model</h4></center><p>
+</p> <ol class="compact">
+
+<li>
+When the configuration is loaded, the
+<a href="../http/ngx_http_js_module.html#js_import">js_import</a>
+directive compiles the JavaScript modules.
+Syntax errors are reported at this point,
+before nginx starts serving traffic.
+</li>
+
+<li>
+When a request or a stream session reaches one of the integration
+points, a JavaScript context is created,
+the imported modules are evaluated in it,
+and the configured handlers are called.
+</li>
+
+<li>
+When the request or session is finished, the context is destroyed or,
+with the <a href="engine.html#quickjs_engine">QuickJS</a> engine,
+returned to a pool of reusable contexts.
+Nothing survives it except the data explicitly stored
+in a <a href="reference.html#ngx_shared">shared dictionary</a>
+or sent elsewhere.
+</li>
+
+</ol><p> 
+</p><p>
+The only integration point not driven by a client request is
+<code>js_periodic</code>, which is driven by an nginx timer.
+JavaScript code cannot create an integration point of its own:
+it cannot open a listening socket, spawn a thread,
+or arrange to be called back outside of the handlers
+enabled by the configuration.
+</p><a name="http"></a><center><h4>HTTP integration points</h4></center><p>
+Handlers receive the
+<a href="reference.html#http">HTTP Request</a> object
+as the first argument, except for
+<code>js_periodic</code>, which receives a
+<a href="reference.html#periodic_session">Periodic Session</a>
+object.
+
+<table width="100%">
+
+<tr>
+<td width="27%"><b>Directive</b></td>
+<td width="38%"><b>When it runs</b></td>
+<td width="35%"><b>Asynchronous operations</b></td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_access">
+<code>js_access</code></a></td>
+<td>access phase, before the request is passed further</td>
+<td>supported</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_content">
+<code>js_content</code></a></td>
+<td>content phase, instead of an upstream or a static file</td>
+<td>supported</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_header_filter">
+<code>js_header_filter</code></a></td>
+<td>once, when the response header is ready to be sent</td>
+<td>not supported</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_body_filter">
+<code>js_body_filter</code></a></td>
+<td>for every chunk of the response body</td>
+<td>not supported</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_set">
+<code>js_set</code></a></td>
+<td>when the variable is referenced for the first time,
+at whatever phase that happens,
+or on every reference with <code>nocache</code></td>
+<td>not supported</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_periodic">
+<code>js_periodic</code></a></td>
+<td>at a regular interval, without a client request</td>
+<td>supported</td>
+</tr>
+
+</table>
+</p><p>
+Handlers marked as not supporting asynchronous operations
+must produce their result before returning:
+they cannot wait for a subrequest, a fetch, or a timer.
+Such a handler may still be declared <code>async</code>
+as long as everything it awaits settles immediately.
+</p><p>
+There is no handler for the rewrite or log phases.
+A <code>js_set</code> variable referenced from a directive
+of the corresponding phase is evaluated at that phase,
+which is the usual way to run code at the end of a request.
+</p><a name="stream"></a><center><h4>Stream integration points</h4></center><p>
+Handlers receive the
+<a href="reference.html#stream">Stream Session</a> object
+as the first argument, except for
+<code>js_periodic</code>, which receives a
+<a href="reference.html#periodic_session">Periodic Session</a>
+object.
+
+<table width="100%">
+
+<tr>
+<td width="27%"><b>Directive</b></td>
+<td width="38%"><b>When it runs</b></td>
+<td width="35%"><b>Asynchronous operations</b></td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_access">
+<code>js_access</code></a></td>
+<td>access phase</td>
+<td>in
+<a href="reference.html#s_on"><code>s.on()</code></a>
+callbacks</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_preread">
+<code>js_preread</code></a></td>
+<td>preread phase, before the connection to the upstream is made</td>
+<td>in
+<a href="reference.html#s_on"><code>s.on()</code></a>
+callbacks</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_filter">
+<code>js_filter</code></a></td>
+<td>content phase, to register data filters for both directions</td>
+<td>not supported</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_set">
+<code>js_set</code></a></td>
+<td>when the variable is referenced for the first time,
+at whatever phase that happens,
+or on every reference with <code>nocache</code></td>
+<td>not supported</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_periodic">
+<code>js_periodic</code></a></td>
+<td>at a regular interval, without a client session</td>
+<td>supported</td>
+</tr>
+
+</table>
+</p><p>
+The <code>js_access</code>, <code>js_preread</code>,
+and <code>js_filter</code> handlers are called once,
+and are expected to register
+<a href="reference.html#s_on"><code>s.on()</code></a>
+callbacks for the data that arrives later.
+The handler itself must return immediately.
+</p><a name="choosing"></a><center><h4>Choosing an integration point</h4></center><p>
+</p> <dl class="compact">
+
+<dt>generate a response instead of proxying it</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_content">
+<code>js_content</code></a>
+</dd>
+
+<dt>allow or deny a request or a connection,
+possibly after asking an external service</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_access">
+<code>js_access</code></a>
+for requests,
+<a href="../stream/ngx_stream_js_module.html#js_access">
+<code>js_access</code></a>
+for connections, or
+<a href="../stream/ngx_stream_js_module.html#js_preread">
+<code>js_preread</code></a>
+when the decision depends on the data sent by the client
+</dd>
+
+<dt>compute a value for another nginx directive</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_set">
+<code>js_set</code></a>
+binds a handler to a variable,
+which is how a computed value reaches
+<code>proxy_pass</code>, <code>log_format</code>,
+and other directives that accept variables.
+A handler called earlier can also assign a variable declared with
+<a href="../http/ngx_http_js_module.html#js_var">
+<code>js_var</code></a>
+through
+<a href="reference.html#r_variables"><code>r.variables</code></a>
+</dd>
+
+<dt>change the response of an upstream server</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_header_filter">
+<code>js_header_filter</code></a>
+for the header,
+<a href="../http/ngx_http_js_module.html#js_body_filter">
+<code>js_body_filter</code></a>
+for the body
+</dd>
+
+<dt>rewrite the byte stream of a proxied connection</dt>
+<dd>
+<a href="../stream/ngx_stream_js_module.html#js_filter">
+<code>js_filter</code></a>
+</dd>
+
+<dt>refresh a cache, poll an API, or report metrics
+without a client request</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_periodic">
+<code>js_periodic</code></a>
+</dd>
+
+</dl><p> 
+</p><p>
+Several handlers may be combined for the same request,
+for example an access check followed by a body filter.
+Each of them is a separate call with its own constraints.
+</p><a name="state"></a><center><h4>State and lifetime</h4></center><p>
+Module top-level code is evaluated for each new JavaScript context,
+that is, for each request or stream session that invokes JavaScript.
+With the
+<a href="engine.html#quickjs_engine">QuickJS</a> engine,
+a context may instead be taken from a pool of reusable contexts,
+see
+<a href="../http/ngx_http_js_module.html#js_context_reuse">
+js_context_reuse</a>,
+in which case the modules are not evaluated again
+and the changes previously made to the module scope are inherited.
+</p><p>
+</p> <blockquote class="note">
+Module-level variables therefore cannot be used to pass data
+between requests or to cache results:
+depending on the engine and on context reuse,
+such data is either lost or inherited from an unrelated request.
+Expensive initialization in the module scope
+is also paid for on every new context.
+</blockquote><p> 
+</p><p>
+nginx runs several worker processes
+that do not share memory by default.
+The njs mechanism for sharing state across workers is a
+<a href="reference.html#ngx_shared">shared dictionary</a>
+specified with the
+<a href="../http/ngx_http_js_module.html#js_shared_dict_zone">
+js_shared_dict_zone</a>
+directive.
+</p><p>
+Asynchronous operations such as
+<a href="reference.html#ngx_fetch"><code>ngx.fetch()</code></a>,
+<a href="reference.html#r_subrequest">
+<code>r.subrequest()</code></a>,
+and
+<a href="reference.html#settimeout"><code>setTimeout()</code></a>
+are driven by the nginx event loop.
+There are no threads: a handler that computes for a long time
+blocks the whole worker process, and with it every other connection
+this worker serves.
+</p><a name="outside"></a><center><h4>Using njs outside of nginx</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+The <a href="cli.html">command-line utility</a>
+runs njs without nginx, which is convenient
+for developing and debugging the parts of a script
+that do not depend on the request.
+</li>
+
+<li>
+njs is not Node.js.
+It implements the ECMAScript language,
+a set of <a href="reference.html">built-in modules</a>,
+and the nginx objects,
+but not the Node.js API and not package resolution.
+Libraries can still be used if they are bundled beforehand, see
+<a href="node_modules.html">Using node modules with njs</a>.
+</li>
+
+<li>
+<a href="native_modules.html">Native modules</a>
+extend njs with code written in C.
+The shared library is loaded when the configuration is parsed,
+and the module it registers is then imported
+like any other module.
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

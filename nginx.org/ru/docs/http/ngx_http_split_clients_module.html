@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_split_clients_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_split_clients_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_split_clients_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#split_clients">split_clients</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_split_clients_module</code> создаёт переменные для
+A/B тестирования (также известного как “split-тестирование”).
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+http {
+    split_clients "${remote_addr}AAA" $variant {
+                   0.5%               .one;
+                   2.0%               .two;
+                   *                  "";
+    }
+
+    server {
+        location / {
+            index index${variant}.html;
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="split_clients"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>split_clients</strong> 
+    <code><i>строка</i></code>
+    <code><i>$переменная</i></code> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Создаёт переменную для A/B тестирования, например:
+</p> <blockquote class="example"><pre>
+split_clients "${remote_addr}AAA" $variant {
+               0.5%               .one;
+               2.0%               .two;
+               *                  "";
+}
+</pre></blockquote><p> 
+Значение исходной строки хэшируется с помощью MurmurHash2.
+В приведённом примере при значениях хэша от 0 до 21474835 (0.5%)
+переменная <code>$variant</code> получит значение <code>".one"</code>.
+При значениях хэша от 21474836 до 107374180 (2%) — <code>".two"</code>.
+И при значениях хэша от 107374181 до 4294967295 — <code>""</code>
+(пустая строка).
+</p>
+
+</div></div></body></html>

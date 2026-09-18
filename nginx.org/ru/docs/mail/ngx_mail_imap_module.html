@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_mail_imap_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/mail/ngx_mail_imap_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_mail_imap_module</h2><table width="100%"><tr><td align="left"><a href="#directives">Директивы</a><br>     <a href="#imap_auth">imap_auth</a><br>     <a href="#imap_capabilities">imap_capabilities</a><br>     <a href="#imap_client_buffer">imap_client_buffer</a><br></td></tr></table>
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="imap_auth"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>imap_auth</strong> <code><i>метод</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>imap_auth plain;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт разрешённые методы аутентификации IMAP-клиентов.
+Поддерживаемые методы:
+</p> <dl class="compact">
+
+<dt><code>plain</code></dt>
+<dd>
+<a href="https://datatracker.ietf.org/doc/html/rfc3501">LOGIN</a>,
+<a href="https://datatracker.ietf.org/doc/html/rfc4616">AUTH=PLAIN</a>
+</dd>
+
+<dt><code>login</code></dt>
+<dd>
+<a href="https://datatracker.ietf.org/doc/html/draft-murchison-sasl-login-00">AUTH=LOGIN</a>
+</dd>
+
+<dt><code>cram-md5</code></dt>
+<dd>
+<a href="https://datatracker.ietf.org/doc/html/rfc2195">AUTH=CRAM-MD5</a>.
+Для работы этого метода пароль должен храниться в незашифрованном виде.
+</dd>
+
+<dt><code>external</code></dt>
+<dd>
+<a href="https://datatracker.ietf.org/doc/html/rfc4422">AUTH=EXTERNAL</a> (1.11.6).
+</dd>
+
+</dl><p> 
+</p><p>
+Методы аутентификации с передачей пароля открытым текстом
+(команда <code>LOGIN</code>, <code>AUTH=PLAIN</code>
+и <code>AUTH=LOGIN</code>) включены всегда,
+однако если методы <code>plain</code> и <code>login</code>
+не указаны, то
+<code>AUTH=PLAIN</code> и <code>AUTH=LOGIN</code>
+не будут автоматически добавляться в <a href="#imap_capabilities">imap_capabilities</a>.
+</p><a name="imap_capabilities"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>imap_capabilities</strong> <code><i>расширение</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>imap_capabilities IMAP4 IMAP4rev1 UIDPLUS;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Позволяет указать список расширений
+<a href="https://datatracker.ietf.org/doc/html/rfc3501">протокола IMAP</a>,
+выдаваемый клиенту по команде
+<code>CAPABILITY</code>.
+В зависимости от значения директивы
+<a href="ngx_mail_ssl_module.html#starttls">starttls</a>
+к этому списку автоматически добавляются
+методы аутентификации, указанные в директиве <a href="#imap_auth">imap_auth</a>, и
+<a href="https://datatracker.ietf.org/doc/html/rfc2595">STARTTLS</a>.
+</p><p>
+В данной директиве имеет смысл указать расширения,
+поддерживаемые IMAP-бэкендами,
+на которые проксируются клиенты (если эти расширения относятся к командам,
+используемым после аутентификации, когда nginx прозрачно проксирует подключение
+клиента на бэкенд).
+</p><p>
+Текущий список стандартизованных расширений опубликован на
+<a href="http://www.iana.org/assignments/imap4-capabilities">www.iana.org</a>.
+</p><a name="imap_client_buffer"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>imap_client_buffer</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>imap_client_buffer 4k|8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>размер</i></code> буфера для чтения IMAP-команд.
+По умолчанию размер одного буфера равен размеру страницы.
+В зависимости от платформы это или 4K, или 8K.
+</p>
+
+</div></div></body></html>

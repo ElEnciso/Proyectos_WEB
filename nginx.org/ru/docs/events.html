@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Методы обработки соединений</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/events.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Методы обработки соединений</h2><p>
+nginx поддерживает различные методы обработки соединений.
+Наличие того или иного метода зависит от используемой платформы.
+Если на платформе доступно сразу несколько методов, nginx обычно
+сам выбирает наиболее эффективный метод.
+Однако при необходимости можно явно выбрать метод обработки
+соединений с помощью директивы
+<a href="ngx_core_module.html#use">use</a>.
+</p><p>
+Поддерживаются следующие методы обработки соединений:
+</p> <ul class="compact">
+
+<li id="select">
+<p>
+<code>select</code> — стандартный метод.
+Модуль для поддержки этого метода собирается автоматически,
+если на платформе не обнаружено более эффективного метода.
+Можно принудительно разрешить или запретить сборку этого модуля
+с помощью параметров <code>--with-select_module</code> и
+<code>--without-select_module</code>.
+</p>
+</li>
+
+<li id="poll">
+<p>
+<code>poll</code> — стандартный метод.
+Модуль для поддержки этого метода собирается автоматически,
+если на платформе не обнаружено более эффективного метода.
+Можно принудительно разрешить или запретить сборку этого модуля
+с помощью параметров <code>--with-poll_module</code> и
+<code>--without-poll_module</code>.
+</p>
+</li>
+
+<li id="kqueue">
+<p>
+<code>kqueue</code> — эффективный метод, используемый
+во FreeBSD 4.1+, OpenBSD 2.9+, NetBSD 2.0 и macOS.
+</p>
+</li>
+
+<li id="epoll">
+<p>
+<code>epoll</code> — эффективный метод, используемый
+в Linux 2.6+.
+</p> <blockquote class="note">
+Флаги <code>EPOLLRDHUP</code> (Linux 2.6.17, glibc 2.8)
+и <code>EPOLLEXCLUSIVE</code> (Linux 4.5, glibc 2.24)
+поддерживаются начиная с 1.11.3.
+</blockquote><p> 
+</p> <blockquote class="note">
+В некоторых старых дистрибутивах, например SuSE 8.2,
+есть патчи для поддержки epoll ядром 2.4.
+</blockquote><p> 
+</p>
+</li>
+
+<li id="devpoll">
+<p>
+<code>/dev/poll</code> — эффективный метод, используемый
+в Solaris 7 11/99+, HP/UX 11.22+ (eventport), IRIX 6.5.15+
+и Tru64 UNIX 5.1A+.
+</p>
+</li>
+
+<li id="eventport">
+<p>
+<code>eventport</code> — event ports, метод,
+используемый в Solaris 10+ (из-за имеющихся проблем вместо него
+рекомендуется использовать метод <code>/dev/poll</code>).
+</p>
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

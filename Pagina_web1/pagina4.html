@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 4: Ejemplo switch</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 4: JavaScript</h1>
+        <p>Ejemplo de switch</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: ejemplo de switch en JavaScript.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    var nombre = prompt("Ingrese su nombre:");
+                    switch (nombre) {
+                        case "Juan":
+                            document.write("Hola Juan, bienvenido!");
+                            break;
+                        case "María":
+                            document.write("Hola María, bienvenido!");
+                            break;
+                        case "Pedro":
+                            document.write("Hola Pedro, bienvenido!");
+                            break;
+                        default:
+                            document.write("Error: Nombre no reconocido.");
+                    }
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

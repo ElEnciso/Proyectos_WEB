@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_stream_limit_conn_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/stream/ngx_stream_limit_conn_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_stream_limit_conn_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#limit_conn">limit_conn</a><br>     <a href="#limit_conn_dry_run">limit_conn_dry_run</a><br>     <a href="#limit_conn_log_level">limit_conn_log_level</a><br>     <a href="#limit_conn_zone">limit_conn_zone</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_stream_limit_conn_module</code> (1.9.3) позволяет
+ограничить
+число соединений по заданному ключу, в частности, число соединений с одного
+IP-адреса.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+stream {
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+    ...
+
+    server {
+
+        ...
+
+        limit_conn           addr 1;
+        limit_conn_log_level error;
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="limit_conn"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_conn</strong> <code><i>зона</i></code> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт зону разделяемой памяти и максимально допустимое число соединений
+для одного значения ключа.
+При превышении этого числа сервер закроет соединение.
+Например, директивы
+</p> <blockquote class="example"><pre>
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+server {
+    ...
+    limit_conn addr 1;
+}
+</pre></blockquote><p> 
+разрешают одновременно обрабатывать не более одного соединения с одного
+IP-адреса.
+</p><p>
+Допустимо одновременное указание нескольких директив
+<code>limit_conn</code>,
+при этом будет срабатывать любое из ограничений.
+</p><p>
+Директивы наследуются с предыдущего уровня конфигурации при условии, что
+на данном уровне не описаны свои директивы <code>limit_conn</code>.
+</p><a name="limit_conn_dry_run"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_conn_dry_run</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>limit_conn_dry_run off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.17.6.
+            </p></div><p>
+Включает режим пробного запуска.
+В данном режиме число соединений не ограничивается, однако
+в зоне разделяемой памяти текущее число избыточных соединений учитывается
+как обычно.
+</p><a name="limit_conn_log_level"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_conn_log_level</strong> 
+<code>info</code> |
+<code>notice</code> |
+<code>warn</code> |
+<code>error</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>limit_conn_log_level error;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт желаемый уровень записи в лог случаев ограничения
+числа соединений.
+</p><a name="limit_conn_zone"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>limit_conn_zone</strong> 
+    <code><i>ключ</i></code>
+    <code>zone</code>=<code><i>название</i></code>:<code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт параметры зоны разделяемой памяти, которая хранит состояние
+для разных значений ключа.
+Состояние в частности содержит текущее число соединений.
+В качестве <code><i>ключа</i></code> может использоваться текст, переменные
+и их комбинации (1.11.2).
+Запросы с пустым значением ключа не учитываются.
+Пример использования:
+</p> <blockquote class="example"><pre>
+limit_conn_zone $binary_remote_addr zone=addr:10m;
+</pre></blockquote><p> 
+Здесь в качестве ключа используется IP-адрес клиента,
+задаваемый переменной <code>$binary_remote_addr</code>.
+Длина значения <code>$binary_remote_addr</code>
+равна 4 байтам для IPv4-адресов или 16 байтам для IPv6-адресов.
+При этом размер состояния всегда равен 32 или 64 байтам
+на 32-битных платформах и 64 байтам на 64-битных.
+В зоне размером 1 мегабайт может разместиться около 32 тысяч состояний
+размером 32 байта или 16 тысяч состояний размером 64 байта.
+При переполнении зоны сервер закроет соединение.
+</p><p>
+</p> <blockquote class="note">
+Дополнительно, как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>,
+<a href="../http/ngx_http_api_module.html#stream_limit_conns_">информацию о состоянии</a>
+каждой такой зоны разделяемой памяти можно
+<a href="../http/ngx_http_api_module.html#getStreamLimitConnZone">получить</a> или
+<a href="../http/ngx_http_api_module.html#deleteStreamLimitConnZoneStat">сбросить</a>
+при помощи <a href="../http/ngx_http_api_module.html">API</a>
+начиная с версии 1.17.7.
+</blockquote><p> 
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl class="compact">
+
+<dt id="var_limit_conn_status"><code>$limit_conn_status</code></dt>
+<dd>
+хранит результат ограничения числа соединений (1.17.6):
+<code>PASSED</code>,
+<code>REJECTED</code> или
+<code>REJECTED_DRY_RUN</code>
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

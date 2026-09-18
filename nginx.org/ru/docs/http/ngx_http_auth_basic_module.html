@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_auth_basic_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_auth_basic_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_auth_basic_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#auth_basic">auth_basic</a><br>     <a href="#auth_basic_user_file">auth_basic_user_file</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_auth_basic_module</code> позволяет
+ограничить доступ к ресурсам с проверкой имени и пароля пользователя
+по протоколу “HTTP Basic Authentication”.
+</p><p>
+Ограничить доступ можно также по
+<a href="ngx_http_access_module.html">адресу</a>, по
+<a href="ngx_http_auth_request_module.html">результату подзапроса</a>
+или по <a href="ngx_http_auth_jwt_module.html">JWT</a>.
+Одновременное ограничение доступа по адресу и паролю управляется
+директивой <a href="ngx_http_core_module.html#satisfy">satisfy</a>.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+location / {
+    auth_basic           "closed site";
+    auth_basic_user_file conf/htpasswd;
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="auth_basic"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_basic</strong> <code><i>строка</i></code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_basic off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Включает проверку имени и пароля пользователя по протоколу
+“HTTP Basic Authentication”.
+Заданный параметр используется в качестве <code><i>realm</i></code>.
+В значении параметра допустимо использование переменных (1.3.10, 1.2.7).
+Специальное значение <code>off</code> отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>auth_basic</code>.
+</p><a name="auth_basic_user_file"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_basic_user_file</strong> <code><i>файл</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт файл, в котором хранятся имена и пароли пользователей.
+Формат файла следующий:
+</p> <blockquote class="example"><pre>
+# комментарий
+имя1:пароль1
+имя2:пароль2:комментарий
+имя3:пароль3
+</pre></blockquote><p> 
+В имени файла можно использовать переменные.
+</p><p>
+Поддерживаются следующие типы паролей:
+</p> <ul class="compact">
+
+<li>
+зашифрованные функцией <code>crypt()</code>; могут быть созданы
+с помощью утилиты “<code>htpasswd</code>” из дистрибутива HTTP-сервера
+Apache или команды “<code>openssl passwd</code>”;
+</li>
+
+<li>
+хэшированные с помощью алгоритма, основанного на MD5, по версии Apache (apr1);
+могут быть созданы теми же инструментами;
+</li>
+
+<li>
+заданные согласно синтаксису
+“<code>{</code><code><i>схема</i></code><code>}</code><code><i>данные</i></code>”
+(1.0.3+) как описано в
+<a href="https://datatracker.ietf.org/doc/html/rfc2307#section-5.3">RFC 2307</a>;
+в настоящий момент реализованы схемы <code>PLAIN</code> (в качестве
+примера, не следует применять), <code>SHA</code> (1.3.13) (простое SHA-1
+хэширование, не следует применять) и <code>SSHA</code> (SHA-1 хэширование
+с солью, используется в некоторых программах, в частности OpenLDAP
+и Dovecot).
+<blockquote class="note">
+Поддержка схемы <code>SHA</code> была добавлена лишь для облегчения
+процесса миграции файлов паролей с других веб-серверов.
+Её не следует применять для новых паролей, т.к. используемое при этом
+SHA-1 хэширование без соли уязвимо к взлому при помощи
+<a href="http://en.wikipedia.org/wiki/Rainbow_attack">радужных таблиц</a>.
+</blockquote>
+</li>
+
+</ul><p> 
+</p>
+
+</div></div></body></html>

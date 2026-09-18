@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Regular expression captures</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_en.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li>english<br></li><li><a href="../../ru/docs/regex_captures.html">русский</a></li><li><br></li><li><a href="../../news.html">news</a></li><li><a href="../../en/">about</a></li><li><a href="../../en/download.html">download</a></li><li><a href="../../en/security_advisories.html">security</a></li><li><a href="./">documentation</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">books</a></li><li><a href="../../en/community.html">community</a></li><li><a href="../../en/enterprise.html">enterprise</a></li><li><br></li><li><a href="https://community.nginx.org">community forum (new)</a></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Regular expression captures</h2><table width="100%"><tr><td align="left"><a href="#positional">Positional captures</a><br><a href="#named">Named captures</a><br><a href="#preserving">Preserving a positional capture</a><br></td></tr></table><a name="summary"></a><p>
+Regular expressions used in the
+<a href="http/ngx_http_core_module.html#location">location</a>,
+<a href="http/ngx_http_core_module.html#server_name">server_name</a>,
+<a href="http/ngx_http_rewrite_module.html#if">if</a>,
+<a href="http/ngx_http_map_module.html#map">map</a>,
+and several other directives can contain captures.
+A captured substring is referred to either positionally, as
+“<code>$1</code>”...“<code>$9</code>”, or by name.
+The two forms differ in how long the captured value stays available.
+</p><p>
+Everything described below also applies to the
+<a href="stream/ngx_stream_core_module.html#server_name">server_name</a> and
+<a href="stream/ngx_stream_map_module.html#map">map</a>
+directives of the stream module.
+</p><a name="positional"></a><center><h4>Positional captures</h4></center><p>
+Positional captures are numbered in the order the capturing groups
+appear in a regular expression:
+
+</p> <blockquote class="example"><pre>
+location ~ ^/images/(.*)\.([a-z]+)$ {
+    # for the "/images/cats/tom.jpg" request
+    # $1 is "cats/tom" and $2 is "jpg"
+}
+</pre></blockquote><p> 
+</p><p>
+Positional captures are not variables.
+They form a single set of values shared by all these directives
+while a request or a connection is processed.
+A successful match replaces the whole set, and an unsuccessful match
+may clear it.
+The values therefore remain available only until the next match,
+which may happen in an unrelated directive.
+</p><p>
+A match may also happen implicitly.
+Since variables are evaluated only when they are used, referring to a
+<a href="http/ngx_http_map_module.html#map">map</a> variable
+with regular expressions in source values matches them at that moment,
+and a successful match replaces the positional captures:
+
+</p> <blockquote class="example"><pre>
+map $uri $mapped {
+    ~^/(?&lt;first&gt;[^/]+)/  $first;
+}
+
+location ~ ^/images/(.*)$ {
+    set $name   <b>$1</b>;   # "cats/tom.jpg"
+    set $m      $mapped;     # "images"
+    set $name2  <b>$1</b>;   # "images", not "cats/tom.jpg"
+}
+</pre></blockquote><p> 
+</p><a name="named"></a><center><h4>Named captures</h4></center><p>
+A capture can be given a name:
+
+</p> <blockquote class="example"><pre>
+location ~ ^/images/(?&lt;name&gt;.*)\.(?&lt;ext&gt;[a-z]+)$ {
+    ...
+}
+</pre></blockquote><p> 
+
+Named captures create ordinary nginx variables, in this case
+<code>$name</code> and <code>$ext</code>.
+Their values are not replaced when another regular expression is matched,
+unless it uses the same capture name.
+This makes named captures the preferred way to pass a captured value
+to a directive other than the one that has performed the match.
+</p><p>
+The PCRE library supports named captures using the following syntax:
+
+<blockquote><table width="100%">
+
+<tr>
+<td><code>?&lt;<code><i>name</i></code>&gt;</code></td>
+<td>Perl compatible syntax</td>
+</tr>
+
+<tr>
+<td><code>?'<code><i>name</i></code>'</code></td>
+<td>Perl compatible syntax</td>
+</tr>
+
+<tr>
+<td><code>?P&lt;<code><i>name</i></code>&gt;</code></td>
+<td>Python compatible syntax</td>
+</tr>
+
+</table></blockquote>
+</p><a name="preserving"></a><center><h4>Preserving a positional capture</h4></center><p>
+If a positional capture is needed later and cannot be replaced with
+a named one, its value should be copied into a variable right after
+the match, using the
+<a href="http/ngx_http_rewrite_module.html#set">set</a> directive
+(<a href="stream/ngx_stream_set_module.html#set">set</a>
+in the stream module):
+
+</p> <blockquote class="example"><pre>
+location ~ ^/images/(.*)$ {
+    set $name $1;
+}
+</pre></blockquote><p> 
+</p></div></div></body></html>

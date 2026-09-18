@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>nginx под Windows</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/windows.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>nginx под Windows</h2><table width="100%"><tr><td align="left"><a href="#known_issues">Известные проблемы</a><br><a href="#possible_future_enhancements">Возможные усовершенствования в будущем</a><br></td></tr></table><p>
+Версия nginx под Windows использует “родной” Win32 API (не эмуляцию Cygwin).
+В настоящий момент в качестве методов обработки соединений используются
+<code>select()</code> и <code>poll()</code> (1.15.9),
+поэтому не стоит ожидать высокой производительности и масштабируемости.
+В силу этого и ряда других известных проблем версия nginx под Windows
+рассматривается пока как <i>бета</i>-версия.
+На данный момент в ней доступна практически вся функциональность, что и
+в версии nginx под UNIX, за исключением
+XSLT-фильтра, фильтра изображений, модуля GeoIP и встроенного языка Perl.
+</p><p>
+Чтобы установить nginx/Windows, <a href="../download.html">скачайте</a>
+дистрибутив последней основной версии (1.31.5),
+поскольку основная ветвь nginx содержит все известные исправления.
+Затем распакуйте дистрибутив, перейдите в каталог
+nginx-1.31.5
+и запустите <code>nginx</code>.
+Вот пример для корневого каталога на диске C:
+
+</p> <blockquote class="example"><pre>
+cd c:\
+unzip nginx-1.31.5.zip
+cd nginx-1.31.5
+start nginx
+</pre></blockquote><p> 
+
+Чтобы увидеть процессы nginx, запустите утилиту командной строки
+<code>tasklist</code>:
+
+</p> <blockquote class="example"><pre>
+C:\nginx-1.31.5&gt;tasklist /fi "imagename eq nginx.exe"
+
+Image Name           PID Session Name     Session#    Mem Usage
+=============== ======== ============== ========== ============
+nginx.exe            652 Console                 0      2 780 K
+nginx.exe           1332 Console                 0      3 112 K
+</pre></blockquote><p> 
+
+Один из процессов главный, другой — рабочий.
+Если nginx не запускается, нужно искать причину в
+в файле лога ошибок <code>logs\error.log</code>.
+Если же лог-файл не создался, то причину этого следует искать
+в Windows Event Log.
+Если вместо ожидаемой страницы выводится страница с ошибкой, нужно также
+искать причины ошибки в файле <code>logs\error.log</code>.
+</p><p>
+nginx/Windows использует каталог, в котором он был запущен, в качестве
+префикса для относительных путей в конфигурации.
+В вышеприведённом примере префиксом является
+<code>C:\nginx-1.31.5\</code>.
+Пути в конфигурационном файле должны задаваться в UNIX-стиле с использованием
+прямых слэшей:
+
+</p> <blockquote class="example"><pre>
+access_log   logs/site.log;
+root         C:/web/html;
+</pre></blockquote><p> 
+</p><p>
+nginx/Windows работает как стандартное консольное приложение (не сервис)
+и управляется при помощи следующих команд:
+
+<blockquote><table width="100%">
+
+<tr>
+<td width="20%">nginx -s stop</td>
+<td>быстрое завершение</td>
+</tr>
+
+<tr>
+<td>nginx -s quit</td>
+<td>плавное завершение</td>
+</tr>
+
+<tr>
+<td>nginx -s reload</td>
+<td>
+изменение конфигурации,
+запуск новых рабочих процессов с новой конфигурацией,
+плавное завершение старых рабочих процессов
+</td>
+</tr>
+
+<tr>
+<td>nginx -s reopen</td>
+<td>переоткрытие лог-файлов</td>
+</tr>
+
+</table></blockquote>
+</p><a name="known_issues"></a><center><h4>Известные проблемы</h4></center><ul class="compact">
+
+<li>
+Хоть и возможен запуск нескольких рабочих процессов, только один из них
+реально работает.
+</li>
+
+<li>
+UDP (и, как следствие, QUIC) не поддерживается.
+</li>
+
+</ul><a name="possible_future_enhancements"></a><center><h4>Возможные усовершенствования в будущем</h4></center><ul class="compact">
+
+<li>
+Запуск в виде сервиса.
+</li>
+
+<li>
+Использование портов завершения ввода-вывода (I/O completion ports)
+в качестве метода обработки соединений.
+</li>
+
+<li>
+Использование нескольких рабочих нитей внутри одного рабочего процесса.
+</li>
+
+</ul></div></div></body></html>

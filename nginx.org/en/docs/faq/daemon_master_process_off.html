@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Can I run nginx with “daemon off” or                “master_process off” settings                in a production environment?</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_en.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li>english<br></li><li><a class="notrans">русский</a></li><li><br></li><li><a href="../../../news.html">news</a></li><li><a href="../../../en/">about</a></li><li><a href="../../../en/download.html">download</a></li><li><a href="../../../en/security_advisories.html">security</a></li><li><a href="../../../en/docs/">documentation</a></li><li><a href="../../../en/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">books</a></li><li><a href="../../../en/community.html">community</a></li><li><a href="../../../en/enterprise.html">enterprise</a></li><li><br></li><li><a href="https://community.nginx.org">community forum (new)</a></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../en/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Can I run nginx with “daemon off” or                “master_process off” settings                in a production environment?</h2><p>
+<span class="initial"><b>Q:</b></span>
+Can I run nginx with "daemon off" or "master_process off" settings
+in a production environment?
+</p><p>
+ 
+</p><p>
+<span class="initial"><b>A:</b></span>
+First of all, both "daemon on|off" and "master_process on|off" directives were
+intended to be used primarily for nginx code development.
+</p><p>
+While many people use "daemon off" in production it wasn’t really meant for
+that. Since version 1.0.9 it is now quite safe to run nginx in production
+with "daemon off", though. Bear in mind that non-stop upgrade is not an
+option with "daemon off".
+</p><p>
+In a development environment, using "master_process off", nginx can run in
+the foreground without the master process and can be terminated simply
+with ^C (SIGINT). This is somewhat similar to running Apache with
+an 'X' command-line option. However you should NEVER run nginx in production
+with "master_process off".
+</p></div></div></body></html>

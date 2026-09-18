@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_auth_request_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_auth_request_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_auth_request_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#auth_request">auth_request</a><br>     <a href="#auth_request_set">auth_request_set</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_auth_request_module</code> (1.5.4+) предоставляет
+возможность авторизации клиента, основанной на результате подзапроса.
+Если подзапрос возвращает код ответа 2xx, доступ разрешается.
+Если 401 или 403 — доступ запрещается с соответствующим кодом ошибки.
+Любой другой код ответа, возвращаемый подзапросом, считается ошибкой.
+</p><p>
+При ошибке 401 клиенту также передаётся заголовок
+“WWW-Authenticate” из ответа подзапроса.
+</p><p>
+По умолчанию этот модуль не собирается, его сборку необходимо
+разрешить с помощью конфигурационного параметра
+<code>--with-http_auth_request_module</code>.
+</p><p>
+Модуль может быть
+скомбинирован с другими модулями доступа, такими как
+<a href="ngx_http_access_module.html">ngx_http_access_module</a>,
+<a href="ngx_http_auth_basic_module.html">ngx_http_auth_basic_module</a>
+и
+<a href="ngx_http_auth_jwt_module.html">ngx_http_auth_jwt_module</a>,
+с помощью директивы <a href="ngx_http_core_module.html#satisfy">satisfy</a>.
+</p> <blockquote class="note">
+До версии 1.7.3 ответы на авторизационные подзапросы не могли быть закэшированы
+(с использованием директив
+<a href="ngx_http_proxy_module.html#proxy_cache">proxy_cache</a>,
+<a href="ngx_http_proxy_module.html#proxy_store">proxy_store</a> и т.п.).
+</blockquote><p> 
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+location /private/ {
+    auth_request /auth;
+    ...
+}
+
+location = /auth {
+    proxy_pass ...
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="auth_request"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_request</strong> <code><i>uri</i></code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_request off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Включает авторизацию, основанную на результате выполнения подзапроса,
+и задаёт URI, на который будет отправлен подзапрос.
+</p><a name="auth_request_set"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_request_set</strong> <code><i>$переменная</i></code> <code><i>значение</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает <code><i>переменную</i></code> в запросе в заданное
+<code><i>значение</i></code> после завершения запроса авторизации.
+Значение может содержать переменные из запроса авторизации,
+например, <code>$upstream_http_*</code>.
+</p>
+
+</div></div></body></html>

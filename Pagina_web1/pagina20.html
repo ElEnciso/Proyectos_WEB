@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ejercicio 20: Dada una secuencia de números leídos y almacenados en un arreglo A mostrar dichos numeros en orden.">
+    <title>Ejercicio 20: Números en orden</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 20: JavaScript</h1>
+        <p>Números en orden</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para mostrar una secuencia de números en orden.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    var numeros = [];
+                    var cantidad = parseInt(prompt("Ingrese la cantidad de números a leer:"));
+
+                    for (var i = 0; i < cantidad; i++) {
+                        var numero = parseFloat(prompt("Ingrese el número " + (i + 1) + ":"));
+                        numeros.push(numero);
+                    }
+
+                    numeros.sort(function(a, b) {
+                        return a - b;
+                    });
+
+                    document.write("<br><strong style='color: var(--primary-color);'>Los números ingresados en orden son: </strong>" + numeros.join(", "));
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

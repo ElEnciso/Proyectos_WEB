@@ -1,0 +1,3 @@
+[submodule "Proyecto/Cita_Hospitales"]
+    path = Proyecto/Cita_Hospitales
+    url = https://github.com/ElEnciso/ESCOMIA_AyDS.git

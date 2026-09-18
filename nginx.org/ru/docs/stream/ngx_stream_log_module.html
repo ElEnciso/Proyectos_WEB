@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_stream_log_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/stream/ngx_stream_log_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_stream_log_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#access_log">access_log</a><br>     <a href="#log_format">log_format</a><br>     <a href="#open_log_file_cache">open_log_file_cache</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_stream_log_module</code> (1.11.4) записывает логи сессий
+в указанном формате.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+log_format basic '$remote_addr [$time_local] '
+                 '$protocol $status $bytes_sent $bytes_received '
+                 '$session_time';
+
+access_log /spool/logs/nginx-access.log basic buffer=32k;
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="access_log"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>access_log</strong> 
+    <code><i>путь</i></code>
+    <code><i>формат</i></code>
+    [<code>buffer</code>=<code><i>размер</i></code>]
+    [<code>gzip[=<code><i>степень</i></code>]</code>]
+    [<code>flush</code>=<code><i>время</i></code>]
+    [<code>if</code>=<code><i>условие</i></code>];</code><br><code><strong>access_log</strong> <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>access_log off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт путь, <a href="#log_format">формат</a>
+и настройки буферизованной записи в лог.
+На одном уровне конфигурации может использоваться несколько логов.
+Запись в <a href="../syslog.html">syslog</a>
+настраивается указанием префикса
+“<code>syslog:</code>” в первом параметре.
+Специальное значение <code>off</code> отменяет все директивы
+<code>access_log</code> для текущего уровня.
+</p><p>
+Если задан размер буфера с помощью параметра <code>buffer</code> или
+указан параметр <code>gzip</code>, то запись будет
+буферизованной.
+</p> <blockquote class="note">
+Размер буфера должен быть не больше размера атомарной записи в дисковый файл.
+Для FreeBSD этот размер неограничен.
+</blockquote><p> 
+</p><p>
+При включённой буферизации данные записываются в файл:
+</p> <ul class="compact">
+
+<li>
+если очередная строка лога не помещается в буфер;
+</li>
+
+<li>
+если данные в буфере находятся дольше интервала времени, заданного
+параметром <code>flush</code>;
+</li>
+
+<li>
+при <a href="../control.html">переоткрытии</a> лог-файла или
+завершении рабочего процесса.
+</li>
+
+</ul><p> 
+</p><p>
+Если задан параметр <code>gzip</code>, то буфер будет сжиматься перед
+записью в файл.
+Степень сжатия может быть задана в диапазоне от 1 (быстрее, но хуже сжатие)
+до 9 (медленнее, но лучше сжатие).
+По умолчанию используются буфер размером 64К байт и степень сжатия 1.
+Данные сжимаются атомарными блоками, и в любой момент времени лог-файл может
+быть распакован или прочитан с помощью утилиты “<code>zcat</code>”.
+</p><p>
+Пример:
+</p> <blockquote class="example"><pre>
+access_log /path/to/log.gz basic gzip flush=5m;
+</pre></blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Для поддержки gzip-сжатия логов nginx должен быть собран с библиотекой zlib.
+</blockquote><p> 
+</p><p>
+В пути файла можно использовать переменные,
+но такие логи имеют некоторые ограничения:
+</p> <ul class="compact">
+
+<li>
+<a href="../ngx_core_module.html#user">пользователь</a>,
+с правами которого работают рабочие процессы, должен
+иметь права на создание файлов в каталоге с такими логами;
+</li>
+
+<li>
+не работает буферизация;
+</li>
+
+<li>
+файл открывается для каждой записи в лог и сразу же после записи закрывается.
+Следует однако иметь в виду, что поскольку дескрипторы часто используемых файлов
+могут храниться в <a href="#open_log_file_cache">кэше</a>,
+то при вращении логов в течение времени, заданного параметром
+<code>valid</code> директивы <a href="#open_log_file_cache">open_log_file_cache</a>,
+запись может продолжаться в старый файл.
+</li>
+
+</ul><p> 
+</p><p>
+Параметр <code>if</code> включает условную запись в лог.
+Сессия не будет записываться в лог, если результатом вычисления
+<code><i>условия</i></code> является “0” или пустая строка.
+</p><a name="log_format"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>log_format</strong> 
+    <code><i>название</i></code>
+    [<code>escape</code>=<code>default</code>|<code>json</code>|<code>none</code>]
+    <code><i>строка</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт формат лога, например:
+</p> <blockquote class="example"><pre>
+log_format proxy '$remote_addr [$time_local] '
+                 '$protocol $status $bytes_sent $bytes_received '
+                 '$session_time "$upstream_addr" '
+                 '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+</pre></blockquote><p> 
+</p><a name="log_format_escape"></a><p>
+Параметр <code>escape</code> (1.11.8) позволяет задать
+экранирование символов <code>json</code> или <code>default</code>
+в переменных, по умолчанию используется <code>default</code>.
+Параметр <code>none</code> (1.13.10) отключает
+экранирование символов.
+</p><a name="log_format_escape_default"></a><p>
+При использовании <code>default</code>
+символы “<code>"</code>”, “<code>\</code>”,
+a также символы со значениями меньше 32 или больше 126
+экранируются как “<code>\xXX</code>”.
+Если значение переменной не найдено,
+то в качестве значения в лог будет записываться дефис (“<code>-</code>”).
+</p><a name="log_format_escape_json"></a><p>
+При использовании <code>json</code>
+экранируются все символы, недопустимые
+в JSON <a href="https://datatracker.ietf.org/doc/html/rfc8259#section-7">строках</a>:
+символы “<code>"</code>” и
+“<code>\</code>” экранируются как
+“<code>\"</code>” и “<code>\\</code>”,
+символы со значениями меньше 32 экранируются как
+“<code>\n</code>”,
+“<code>\r</code>”,
+“<code>\t</code>”,
+“<code>\b</code>”,
+“<code>\f</code>” или
+“<code>\u00XX</code>”.
+</p><a name="open_log_file_cache"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>open_log_file_cache</strong> 
+<code>max</code>=<code><i>N</i></code>
+[<code>inactive</code>=<code><i>время</i></code>]
+[<code>min_uses</code>=<code><i>N</i></code>]
+[<code>valid</code>=<code><i>время</i></code>];</code><br><code><strong>open_log_file_cache</strong> <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>open_log_file_cache off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт кэш, в котором хранятся дескрипторы файлов часто используемых
+логов, имена которых заданы с использованием переменных.
+Параметры директивы:
+</p> <dl class="compact">
+
+<dt><code>max</code></dt>
+<dd>
+задаёт максимальное число дескрипторов в кэше;
+при переполнении кэша наименее востребованные (LRU)
+дескрипторы закрываются
+</dd>
+
+<dt><code>inactive</code></dt>
+<dd>
+задаёт время, после которого закэшированный дескриптор закрывается,
+если к нему не было обращений в течение этого времени;
+по умолчанию 10 секунд
+</dd>
+
+<dt><code>min_uses</code></dt>
+<dd>
+задаёт минимальное число использований файла в течение
+времени, заданного параметром <code>inactive</code>,
+после которого дескриптор файла будет оставаться открытым в кэше;
+по умолчанию 1
+</dd>
+
+<dt><code>valid</code></dt>
+<dd>
+задаёт, через какое время нужно проверять, что файл ещё
+существует под тем же именем;
+по умолчанию 60 секунд
+</dd>
+
+<dt><code>off</code></dt>
+<dd>
+запрещает кэш
+</dd>
+
+</dl><p> 
+</p><p>
+Пример использования:
+</p> <blockquote class="example"><pre>
+open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
+</pre></blockquote><p> 
+</p>
+
+</div></div></body></html>

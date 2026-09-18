@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_auth_jwt_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_auth_jwt_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_auth_jwt_module</h2><table width="100%"><tr><td align="left"><a href="#algorithms">Поддерживаемые алгоритмы</a><br><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#auth_jwt">auth_jwt</a><br>     <a href="#auth_jwt_claim_set">auth_jwt_claim_set</a><br>     <a href="#auth_jwt_header_set">auth_jwt_header_set</a><br>     <a href="#auth_jwt_key_cache">auth_jwt_key_cache</a><br>     <a href="#auth_jwt_key_file">auth_jwt_key_file</a><br>     <a href="#auth_jwt_key_request">auth_jwt_key_request</a><br>     <a href="#auth_jwt_leeway">auth_jwt_leeway</a><br>     <a href="#auth_jwt_type">auth_jwt_type</a><br>     <a href="#auth_jwt_require">auth_jwt_require</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_auth_jwt_module</code> (1.11.3)
+предоставляет возможность авторизации клиента с проверкой предоставляемого
+<a href="https://datatracker.ietf.org/doc/html/rfc7519">JSON Web Token</a> (JWT)
+при помощи указанных ключей.
+Модуль поддерживает
+<a href="https://datatracker.ietf.org/doc/html/rfc7515">JSON Web Signature</a> (JWS),
+<a href="https://datatracker.ietf.org/doc/html/rfc7516">JSON Web Encryption</a> (JWE)
+(1.19.7) и Nested JWT (1.21.0).
+Модуль может использоваться для настройки аутентификации
+<a href="http://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect</a>.
+</p><p>
+Модуль может быть скомбинирован с
+другими модулями доступа, такими как
+<a href="ngx_http_access_module.html">ngx_http_access_module</a>,
+<a href="ngx_http_auth_basic_module.html">ngx_http_auth_basic_module</a>
+и
+<a href="ngx_http_auth_request_module.html">ngx_http_auth_request_module</a>
+с помощью директивы <a href="ngx_http_core_module.html#satisfy">satisfy</a>.
+</p><p>
+</p> <blockquote class="note">
+Модуль доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+
+
+<a name="algorithms"></a><center><h4>Поддерживаемые алгоритмы</h4></center><p>
+Модуль поддерживает следующие криптографические
+<a href="https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms">алгоритмы</a>.
+</p><p>
+Алгоритмы JWS:
+</p> <ul class="compact">
+
+<li>
+HS256, HS384, HS512
+</li>
+
+<li>
+RS256, RS384, RS512
+</li>
+
+<li>
+ES256, ES384, ES512
+</li>
+
+<li>
+EdDSA (подписи Ed25519 и Ed448) (1.15.7)
+</li>
+
+<li>
+PS256, PS384, PS512 (1.29.0)
+</li>
+
+</ul><p> 
+
+</p> <blockquote class="note">
+До версии 1.13.7
+поддерживались только алгоритмы HS256, RS256 и ES256.
+</blockquote><p> 
+</p><p>
+Алгоритмы JWE для шифрования содержимого (1.19.7):
+</p> <ul class="compact">
+
+<li>
+A128CBC-HS256, A192CBC-HS384, A256CBC-HS512
+</li>
+
+<li>
+A128GCM, A192GCM, A256GCM
+</li>
+
+</ul><p> 
+</p><p>
+Алгоритмы JWE для управления ключом (1.19.9):
+</p> <ul class="compact">
+
+<li>
+A128KW, A192KW, A256KW
+</li>
+
+<li>
+A128GCMKW, A192GCMKW, A256GCMKW
+</li>
+
+<li>
+dir - прямое использование симметричного ключа
+в качестве ключа шифрования содержимого
+</li>
+
+<li>
+RSA-OAEP, RSA-OAEP-256, RSA-OAEP-384, RSA-OAEP-512 (1.21.0)
+</li>
+
+</ul><p> 
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+location / {
+    auth_jwt          "closed site";
+    auth_jwt_key_file conf/keys.json;
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="auth_jwt"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt</strong> 
+    <code><i>строка</i></code>
+    [<code>token=</code><code><i>$переменная</i></code>] |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_jwt off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Включает проверку JSON Web Token.
+Заданная <code><i>строка</i></code> используется в качестве <code>realm</code>.
+В значении параметра допустимо использование переменных.
+</p><p>
+Необязательный параметр <code>token</code> задаёт переменную,
+содержащую JSON Web Token.
+По умолчанию JWT передаётся в заголовке “Authorization”
+в качестве
+<a href="https://datatracker.ietf.org/doc/html/rfc6750">Bearer Token</a>.
+JWT может также передаваться как кука или часть строки запроса:
+</p> <blockquote class="example"><pre>
+auth_jwt "closed site" token=$cookie_auth_token;
+</pre></blockquote><p> 
+</p><p>
+Специальное значение <code>off</code> отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>auth_jwt</code>.
+</p><a name="auth_jwt_claim_set"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_claim_set</strong> <code><i>$переменная</i></code> <code><i>имя</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.10.
+            </p></div><p>
+Устанавливает <code><i>переменную</i></code> в параметр JWT claim,
+определяемый именами ключей.
+Сопоставление имён начинается с верхнего уровня дерева JSON.
+Для массива переменная хранит список его элементов, разделяемых запятыми.
+</p> <blockquote class="example"><pre>
+auth_jwt_claim_set $email info e-mail;
+auth_jwt_claim_set $job info "job title";
+</pre></blockquote><p> 
+</p> <blockquote class="note">
+До версии 1.13.7 можно было указать лишь одно имя,
+результат для массивов был не определён.
+</blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Значения переменных для tokens, зашифрованных при помощи JWE,
+доступны только после дешифрования, которое происходит в
+<a href="../dev/development_guide.html#http_phases">Access</a>-фазе.
+</blockquote><p> 
+</p><a name="auth_jwt_header_set"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_header_set</strong> <code><i>$переменная</i></code> <code><i>имя</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.10.
+            </p></div><p>
+Устанавливает <code><i>переменную</i></code> в параметр заголовка JOSE,
+определяемый именами ключей.
+Сопоставление имён начинается с верхнего уровня дерева JSON.
+Для массива переменная хранит список его элементов, разделяемых запятыми.
+</p> <blockquote class="note">
+До версии 1.13.7 можно было указать лишь одно имя,
+результат для массивов был не определён.
+</blockquote><p> 
+</p><a name="auth_jwt_key_cache"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_key_cache</strong> <code><i> время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_jwt_key_cache 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.21.4.
+            </p></div><p>
+Разрешает или запрещает кэширование ключей,
+полученных из <a href="#auth_jwt_key_file">файла</a> или из
+<a href="#auth_jwt_key_request">подзапроса</a>,
+и задаёт время их кэширования.
+Кэширование ключей, полученных из переменных, не поддерживается.
+По умолчанию кэширование ключей выключено.
+</p><a name="auth_jwt_key_file"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_key_file</strong> <code><i>файл</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>файл</i></code> в формате
+<a href="https://datatracker.ietf.org/doc/html/rfc7517#section-5">JSON Web Key Set</a>
+для проверки подписи JWT.
+В значении параметра допустимо использование переменных.
+</p><p>
+На одном уровне может быть указано
+несколько директив <code>auth_jwt_key_file</code> (1.21.1):
+</p> <blockquote class="example"><pre>
+auth_jwt_key_file conf/keys.json;
+auth_jwt_key_file conf/key.jwk;
+</pre></blockquote><p> 
+Если хотя бы один из указанных ключей не может быть загружен или обработан,
+nginx вернёт ошибку
+500 (Internal Server Error).
+</p><a name="auth_jwt_key_request"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_key_request</strong> <code><i>uri</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.15.6.
+            </p></div><p>
+Позволяет получать файл в формате
+<a href="https://datatracker.ietf.org/doc/html/rfc7517#section-5">JSON Web Key Set</a>
+из подзапроса для проверки подписи JWT и
+задаёт URI, на который будет отправлен подзапрос.
+В значении параметра допустимо использование переменных.
+Для предотвращения дополнительных затрат на проверку
+файл рекомендутеся кэшировать.
+</p> <blockquote class="example"><pre>
+proxy_cache_path /data/nginx/cache levels=1 keys_zone=foo:10m;
+
+server {
+    ...
+
+    location / {
+        auth_jwt             "closed site";
+        auth_jwt_key_request /jwks_uri;
+    }
+
+    location = /jwks_uri {
+        internal;
+        proxy_cache foo;
+        proxy_pass  http://idp.example.com/keys;
+    }
+}
+</pre></blockquote><p> 
+На одном уровне может быть указано
+несколько директив <code>auth_jwt_key_request</code> (1.21.1):
+</p> <blockquote class="example"><pre>
+auth_jwt_key_request /jwks_uri;
+auth_jwt_key_request /jwks2_uri;
+</pre></blockquote><p> 
+Если хотя бы один из указанных ключей не может быть загружен или обработан,
+nginx вернёт ошибку
+500 (Internal Server Error).
+</p><a name="auth_jwt_leeway"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_leeway</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_jwt_leeway 0s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.13.10.
+            </p></div><p>
+Задаёт максимально допустимое отклонение времени для компенсации
+расхождения часов при проверке JWT claims
+<a href="https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4">exp</a>
+и
+<a href="https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5">nbf</a>.
+</p><a name="auth_jwt_type"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_type</strong> <code>signed</code> |
+        <code>encrypted</code> |
+        <code>nested</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_jwt_type signed;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.19.7.
+            </p></div><p>
+Задаёт ожидаемый тип JSON Web Token:
+JWS (<code>signed</code>),
+JWE (<code>encrypted</code>)
+или подписанный и затем зашифрованный
+Nested JWT (<code>nested</code>) (1.21.0).
+</p><a name="auth_jwt_require"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_jwt_require</strong> 
+    <code><i>$значение</i></code> ...
+    [<code>error</code>=<code>401</code> |
+                              <code>403</code>]
+;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>limit_except</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.21.2.
+            </p></div><p>
+Задаёт дополнительные условия для проверки JWT.
+В качестве значения можно использовать текст, переменные и их комбинации,
+значение должно начинаться c переменной (1.21.7).
+Для успешной аутентификации необходимо, чтобы
+значение всех строковых параметров было непустое или не равно “0”.
+</p> <blockquote class="example"><pre>
+map $jwt_claim_iss $valid_jwt_iss {
+    "good" 1;
+}
+...
+
+auth_jwt_require $valid_jwt_iss;
+</pre></blockquote><p> 
+</p><p>
+При невыполнении любого из условий
+возвращается код ответа <code>401</code>.
+Необязательный параметр <code>error</code> (1.21.7)
+позволяет переопределить код ответа на <code>403</code>.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+Модуль <code>ngx_http_auth_jwt_module</code>
+поддерживает встроенные переменные:
+</p><p>
+</p> <dl class="compact">
+<dt id="var_jwt_header_"><code>$jwt_header_</code><code><i>имя</i></code></dt>
+<dd>
+возвращает значение указанного
+<a href="https://datatracker.ietf.org/doc/html/rfc7515#section-4">заголовка JOSE</a>
+</dd>
+
+<dt id="var_jwt_claim_"><code>$jwt_claim_</code><code><i>имя</i></code></dt>
+<dd>
+возвращает значение указанной
+<a href="https://datatracker.ietf.org/doc/html/rfc7519#section-4">JWT claim</a>
+
+<p>
+Для вложенных claim, а также claim, содержащих точку (“.”),
+значение переменной вычислить невозможно,
+следует использовать директиву <a href="#auth_jwt_claim_set">auth_jwt_claim_set</a>.
+</p>
+
+<p>
+Значения переменных для tokens, зашифрованных при помощи JWE,
+доступны только после дешифрования, которое происходит в
+<a href="../dev/development_guide.html#http_phases">Access</a>-фазе.
+</p>
+</dd>
+
+<dt id="var_jwt_payload"><code>$jwt_payload</code></dt>
+<dd>
+возвращает расшифрованную полезную нагрузку (payload) верхнего уровня
+для <code>вложенных</code>
+или <code>зашифрованных</code> токенов (1.21.2).
+Для вложенных токенов возвращает внутренний JWS токен.
+Для зашифрованных токенов возвращает JSON с claims.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

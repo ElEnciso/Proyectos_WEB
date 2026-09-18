@@ -1,0 +1,593 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_memcached_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_memcached_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_memcached_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#memcached_allow_upstream">memcached_allow_upstream</a><br>     <a href="#memcached_bind">memcached_bind</a><br>     <a href="#memcached_bind_dynamic">memcached_bind_dynamic</a><br>     <a href="#memcached_buffer_size">memcached_buffer_size</a><br>     <a href="#memcached_connect_timeout">memcached_connect_timeout</a><br>     <a href="#memcached_gzip_flag">memcached_gzip_flag</a><br>     <a href="#memcached_next_upstream">memcached_next_upstream</a><br>     <a href="#memcached_next_upstream_timeout">memcached_next_upstream_timeout</a><br>     <a href="#memcached_next_upstream_tries">memcached_next_upstream_tries</a><br>     <a href="#memcached_pass">memcached_pass</a><br>     <a href="#memcached_read_timeout">memcached_read_timeout</a><br>     <a href="#memcached_send_timeout">memcached_send_timeout</a><br>     <a href="#memcached_socket_keepalive">memcached_socket_keepalive</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_memcached_module</code> позволяет получать
+ответ из сервера memcached.
+Ключ задаётся в переменной <code>$memcached_key</code>.
+Ответ в memcached должен быть предварительно помещён внешним по отношению
+к nginx’у способом.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+server {
+    location / {
+        set            $memcached_key "$uri?$args";
+        memcached_pass host:11211;
+        error_page     404 502 504 = @fallback;
+    }
+
+    location @fallback {
+        proxy_pass     http://backend;
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="memcached_allow_upstream"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_allow_upstream</strong> <code><i>строка</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.29.3.
+            </p></div><p>
+Задаёт условия, при которых доступ к серверу memcached
+будет разрешён или <a href="#denied">запрещён</a>.
+Если все значения строковых параметров непустые
+и не равны “0”, то доступ разрешён.
+Условия проверяются каждый раз
+перед установлением соединения с сервером memcached.
+В значении параметров допустимо использование переменных:
+</p> <blockquote class="example"><pre>
+geo $upstream_last_addr $allow {
+    volatile;
+    10.10.0.0/24        1;
+}
+
+server {
+    listen 127.0.0.1:8080;
+
+    location / {
+        memcached_pass           host:11211;
+        memcached_allow_upstream $allow;
+        ...
+    }
+}
+</pre></blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Директива доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="memcached_bind"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_bind</strong> 
+    <code><i>адрес</i></code>
+    [<code>transparent </code>] |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 0.8.22.
+            </p></div><p>
+Задаёт локальный IP-адрес с необязательным портом (1.11.2),
+который будет использоваться в исходящих соединениях с сервером memcached.
+В значении параметра допустимо использование переменных (1.3.12).
+Специальное значение <code>off</code> (1.3.12) отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>memcached_bind</code>, позволяя системе
+самостоятельно выбирать локальный IP-адрес и порт.
+</p><a name="memcached_bind_transparent"></a><p>
+Параметр <code>transparent</code> (1.11.0) позволяет
+задать нелокальный IP-aдрес, который будет использоваться в
+исходящих соединениях с сервером memcached,
+например, реальный IP-адрес клиента:
+</p> <blockquote class="example"><pre>
+memcached_bind $remote_addr transparent;
+</pre></blockquote><p> 
+Для работы параметра
+обычно требуется
+запустить рабочие процессы nginx с привилегиями
+<a href="../ngx_core_module.html#user">суперпользователя</a>.
+В Linux этого не требуется (1.13.8), так как если
+указан параметр <code>transparent</code>, то рабочие процессы
+наследуют capability <code>CAP_NET_RAW</code> из главного процесса.
+Также необходимо настроить таблицу маршрутизации ядра
+для перехвата сетевого трафика с сервера memcached.
+</p><a name="memcached_bind_dynamic"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_bind_dynamic</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_bind_dynamic off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.29.3.
+            </p></div><p>
+Если включено, операция <a href="#memcached_bind">bind</a> осуществляется
+при каждой попытке соединения.
+</p><p>
+</p> <blockquote class="note">
+Директива доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="memcached_buffer_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_buffer_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_buffer_size 4k|8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>размер</i></code> буфера, в который будет читаться ответ,
+получаемый от сервера memcached.
+Ответ синхронно передаётся клиенту сразу же по мере его поступления.
+</p><a name="memcached_connect_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_connect_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_connect_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут для установления соединения с сервером memcached.
+Необходимо иметь в виду, что этот таймаут обычно не может превышать 75 секунд.
+</p><a name="memcached_gzip_flag"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_gzip_flag</strong> <code><i>флаг</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.3.6.
+            </p></div><p>
+Включает проверку указанного <code><i>флага</i></code> в ответе
+сервера memcached и установку поля “<code>Content-Encoding</code>”
+заголовка ответа в “<code>gzip</code>”, если этот флаг установлен.
+</p><a name="memcached_next_upstream"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_next_upstream</strong> 
+    <code>error</code> |
+    <code>timeout</code> |
+    <code>denied</code> |
+    <code>invalid_response</code> |
+    <code>not_found</code> |
+    <code>off</code>
+    ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_next_upstream error timeout;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Определяет, в каких случаях запрос будет передан следующему серверу:
+</p> <dl class="compact">
+
+<dt><code>error</code></dt>
+<dd>произошла ошибка соединения с сервером, передачи ему запроса или
+чтения заголовка ответа сервера;</dd>
+
+<dt><code>timeout</code></dt>
+<dd>произошёл таймаут во время соединения с сервером,
+передачи ему запроса или чтения заголовка ответа сервера;</dd>
+
+<dt id="denied"><code>denied</code></dt>
+<dd>сервер <a href="#proxy_allow_upstream">отклонил</a>
+соединение (1.29.3);
+<p>
+</p> <blockquote class="note">
+Параметр доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+</dd>
+
+<dt><code>invalid_response</code></dt>
+<dd>сервер вернул пустой или неверный ответ;</dd>
+
+<dt><code>not_found</code></dt>
+<dd>сервер не нашёл ответ;</dd>
+
+<dt><code>off</code></dt>
+<dd>запрещает передачу запроса следующему серверу.</dd>
+
+</dl><p> 
+</p><p>
+Необходимо понимать, что передача запроса следующему серверу возможна
+только при условии, что клиенту ещё ничего не передавалось.
+То есть, если ошибка или таймаут возникли в середине передачи ответа,
+то исправить это уже невозможно.
+</p><p>
+Директива также определяет, что считается
+<a href="ngx_http_upstream_module.html#max_fails">неудачной
+попыткой</a> работы с сервером.
+Случаи <code>error</code>, <code>timeout</code>,
+<code>denied</code> и
+<code>invalid_response</code>
+всегда считаются неудачными попытками, даже если они не указаны в директиве.
+Случай <code>not_found</code>
+никогда не считается неудачной попыткой.
+</p><p>
+Передача запроса следующему серверу может быть ограничена по
+<a href="#memcached_next_upstream_tries">количеству попыток</a>
+и по <a href="#memcached_next_upstream_timeout">времени</a>.
+</p><a name="memcached_next_upstream_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_next_upstream_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_next_upstream_timeout 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.7.5.
+            </p></div><p>
+Ограничивает время, в течение которого возможна передача запроса
+<a href="#memcached_next_upstream">следующему серверу</a>.
+Значение <code>0</code> отключает это ограничение.
+</p><a name="memcached_next_upstream_tries"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_next_upstream_tries</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_next_upstream_tries 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.7.5.
+            </p></div><p>
+Ограничивает число допустимых попыток для передачи запроса
+<a href="#memcached_next_upstream">следующему серверу</a>.
+Значение <code>0</code> отключает это ограничение.
+</p><a name="memcached_pass"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_pass</strong> <code><i>адрес</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт адрес сервера memcached.
+Адрес может быть указан в виде доменного имени или IP-адреса,
+и порта:
+</p> <blockquote class="example"><pre>
+memcached_pass localhost:11211;
+</pre></blockquote><p> 
+или в виде пути UNIX-сокета:
+</p> <blockquote class="example"><pre>
+memcached_pass unix:/tmp/memcached.socket;
+</pre></blockquote><p> 
+</p><p>
+Если доменному имени соответствует несколько адресов, то все они будут
+использоваться по очереди (round-robin).
+И, кроме того, адрес может быть
+<a href="ngx_http_upstream_module.html">группой серверов</a>.
+</p><a name="memcached_read_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_read_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_read_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут при чтении ответа сервера memcached.
+Таймаут устанавливается не на всю передачу ответа,
+а только между двумя операциями чтения.
+Если по истечении этого времени сервер memcached ничего не передаст,
+соединение закрывается.
+</p><a name="memcached_send_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_send_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_send_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут при передаче запроса серверу memcached.
+Таймаут устанавливается не на всю передачу запроса,
+а только между двумя операциями записи.
+Если по истечении этого времени сервер memcached не примет новых данных,
+соединение закрывается.
+</p><a name="memcached_socket_keepalive"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>memcached_socket_keepalive</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>memcached_socket_keepalive off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.15.6.
+            </p></div><p>
+Конфигурирует поведение “TCP keepalive”
+для исходящих соединений к серверу memcached.
+По умолчанию для сокета действуют настройки операционной системы.
+Если указано значение “<code>on</code>”, то
+для сокета включается параметр <code>SO_KEEPALIVE</code>.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl class="compact">
+
+<dt id="var_memcached_key"><code>$memcached_key</code></dt>
+<dd>
+Задаёт ключ для получения ответа из сервера memcached.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

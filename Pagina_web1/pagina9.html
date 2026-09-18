@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ejercicio 9: Suma de los primeros 100 números con do-while">
+    <title>Ejercicio 9: Suma de los primeros 100 números con do-while</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 9: JavaScript</h1>
+        <p>Suma de los primeros 100 numeros con do-while</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para calcular los primeros 100 números con do-while.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    let suma = 0;
+                    let i = 1;
+                    do {
+                        suma += i;
+                        i++;
+                    } while (i <= 100);
+                    document.write('La suma de los primeros 100 números es: <strong style="color: var(--primary-color);">', suma, '</strong>');
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

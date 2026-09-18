@@ -1,0 +1,606 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_mail_core_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/mail/ngx_mail_core_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_mail_core_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#listen">listen</a><br>     <a href="#mail">mail</a><br>     <a href="#max_errors">max_errors</a><br>     <a href="#protocol">protocol</a><br>     <a href="#resolver">resolver</a><br>     <a href="#resolver_timeout">resolver_timeout</a><br>     <a href="#server">server</a><br>     <a href="#server_name">server_name</a><br>     <a href="#timeout">timeout</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+По умолчанию этот модуль не собирается, его сборку необходимо
+разрешить с помощью конфигурационного параметра
+<code>--with-mail</code>.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+worker_processes auto;
+
+error_log /var/log/nginx/error.log info;
+
+events {
+    worker_connections  1024;
+}
+
+mail {
+    server_name       mail.example.com;
+    auth_http         localhost:9000/cgi-bin/nginxauth.cgi;
+
+    imap_capabilities IMAP4rev1 UIDPLUS IDLE LITERAL+ QUOTA;
+
+    pop3_auth         plain apop cram-md5;
+    pop3_capabilities LAST TOP USER PIPELINING UIDL;
+
+    smtp_auth         login plain cram-md5;
+    smtp_capabilities "SIZE 10485760" ENHANCEDSTATUSCODES 8BITMIME DSN;
+    xclient           off;
+
+    server {
+        listen   25;
+        protocol smtp;
+    }
+    server {
+        listen   110;
+        protocol pop3;
+        proxy_pass_error_message on;
+    }
+    server {
+        listen   143;
+        protocol imap;
+    }
+    server {
+        listen   587;
+        protocol smtp;
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="listen"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>listen</strong> 
+    <code><i>адрес</i></code>:<code><i>порт</i></code>
+    [<code>ssl</code>]
+    [<code>proxy_protocol</code>]
+    [<code>backlog</code>=<code><i>число</i></code>]
+    [<code>rcvbuf</code>=<code><i>размер</i></code>]
+    [<code>sndbuf</code>=<code><i>размер</i></code>]
+    [<code>bind</code>]
+    [<code>ipv6only</code>=<code>on</code>|<code>off</code>]
+    [<code>multipath</code>]
+    [<code>so_keepalive</code>=<code>on</code>|<code>off</code>|[<code><i>keepidle</i></code>]:[<code><i>keepintvl</i></code>]:[<code><i>keepcnt</i></code>]];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>адрес</i></code> и <code><i>порт</i></code> сокета, на котором сервер
+будет принимать запросы.
+Можно указать только порт.
+Кроме того, адрес может быть именем сервера, например:
+</p> <blockquote class="example"><pre>
+listen 127.0.0.1:110;
+listen *:110;
+listen 110;     # то же, что и *:110
+listen localhost:110;
+</pre></blockquote><p> 
+IPv6-адреса (0.7.58) задаются в квадратных скобках:
+</p> <blockquote class="example"><pre>
+listen [::1]:110;
+listen [::]:110;
+</pre></blockquote><p> 
+UNIX-сокеты (1.3.5) задаются при помощи префикса “<code>unix:</code>”:
+</p> <blockquote class="example"><pre>
+listen unix:/var/run/nginx.sock;
+</pre></blockquote><p> 
+
+</p><p>
+Разные серверы должны слушать на разных парах
+<code><i>адрес</i></code>:<code><i>порт</i></code>.
+</p><p>
+Параметр <code>ssl</code> указывает на то, что все соединения,
+принимаемые на данном порту, должны работать в режиме SSL.
+</p><a name="proxy_protocol"></a><p>
+Параметр <code>proxy_protocol</code> (1.19.8)
+указывает на то, что все соединения, принимаемые на данном порту,
+должны использовать
+<a href="http://www.haproxy.org/download/1.8/doc/proxy-protocol.txt">протокол
+PROXY</a>.
+Полученная информация передаётся
+<a href="ngx_mail_auth_http_module.html#proxy_protocol">серверу аутентификации</a>
+и может быть использована для
+<a href="ngx_mail_realip_module.html">изменения адреса клиента</a>.
+</p><p>
+В директиве <code>listen</code> можно также указать несколько
+дополнительных параметров, специфичных для связанных с сокетами
+системных вызовов.
+</p> <dl class="compact">
+
+<dt>
+<code>backlog</code>=<code><i>число</i></code>
+</dt>
+<dd>
+задаёт параметр <code>backlog</code> в вызове
+<code>listen()</code>, который ограничивает
+максимальный размер очереди ожидающих приёма соединений (1.9.2).
+По умолчанию <code>backlog</code> устанавливается равным -1 для
+FreeBSD, DragonFly BSD и macOS, и 511 для других платформ.
+</dd>
+
+<dt>
+<code>rcvbuf</code>=<code><i>размер</i></code>
+</dt>
+<dd>
+задаёт размер буфера приёма
+(параметр <code>SO_RCVBUF</code>) для слушающего сокета (1.11.13).
+</dd>
+
+<dt>
+<code>sndbuf</code>=<code><i>размер</i></code>
+</dt>
+<dd>
+задаёт размер буфера передачи
+(параметр <code>SO_SNDBUF</code>) для слушающего сокета (1.11.13).
+</dd>
+
+<dt>
+<code>bind</code>
+</dt>
+<dd>
+указывает, что для данной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code> нужно делать
+<code>bind()</code> отдельно.
+Это нужно потому, что если описаны несколько директив <code>listen</code>
+с одинаковым портом, но разными адресами, и одна из директив
+<code>listen</code> слушает на всех адресах для данного порта
+(<code>*:</code><code><i>порт</i></code>), то nginx сделает
+<code>bind()</code> только на <code>*:</code><code><i>порт</i></code>.
+Необходимо заметить, что в этом случае для определения адреса, на который
+пришло соединение, делается системный вызов <code>getsockname()</code>.
+Если же используются параметры <code>backlog</code>,
+<code>rcvbuf</code>, <code>sndbuf</code>,
+<code>ipv6only</code>, <code>multipath</code>
+или <code>so_keepalive</code>,
+то для данной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code> всегда делается
+отдельный вызов <code>bind()</code>.
+</dd>
+
+<dt>
+<code>ipv6only</code>=<code>on</code>|<code>off</code>
+</dt>
+<dd>
+этот параметр определяет
+(через параметр сокета <code>IPV6_V6ONLY</code>),
+будет ли слушающий на wildcard-адресе <code>[::]</code> IPv6-сокет
+принимать только IPv6-соединения, или же одновременно IPv6- и IPv4-соединения.
+По умолчанию параметр включён.
+Установить его можно только один раз на старте.
+</dd>
+
+<dt id="multipath">
+<code>multipath</code>
+</dt>
+<dd>
+этот параметр (1.29.7) конфигурирует для слушающего сокета протокол
+<a href="https://datatracker.ietf.org/doc/html/rfc8684">Multipath TCP</a>
+(<code>IPPROTO_MPTCP</code>).
+В настоящий момент это работает только на Linux 5.6+.
+<blockquote class="note">
+Добавление или удаление этого параметра также включает
+параметр сокета <code>SO_REUSEPORT</code>, что может быть
+<a href="http://man7.org/linux/man-pages/man7/socket.7.html">небезопасно</a>.
+</blockquote>
+</dd>
+
+<dt>
+<code>so_keepalive</code>=<code>on</code>|<code>off</code>|[<code><i>keepidle</i></code>]:[<code><i>keepintvl</i></code>]:[<code><i>keepcnt</i></code>]
+</dt>
+<dd>
+этот параметр конфигурирует для слушающего сокета
+поведение “TCP keepalive”.
+Если этот параметр опущен, то для сокета будут действовать
+настройки операционной системы.
+Если он установлен в значение “<code>on</code>”, то для сокета
+включается параметр <code>SO_KEEPALIVE</code>.
+Если он установлен в значение “<code>off</code>”, то для сокета
+параметр <code>SO_KEEPALIVE</code> выключается.
+Некоторые операционные системы поддерживают настройку параметров
+“TCP keepalive” на уровне сокета посредством параметров
+<code>TCP_KEEPIDLE</code>, <code>TCP_KEEPINTVL</code> и
+<code>TCP_KEEPCNT</code>.
+На таких системах
+(в настоящий момент это Linux, NetBSD, Dragonfly, FreeBSD и macOS)
+их можно сконфигурировать с помощью параметров <code><i>keepidle</i></code>,
+<code><i>keepintvl</i></code> и <code><i>keepcnt</i></code>.
+Один или два параметра могут быть опущены, в таком случае для
+соответствующего параметра сокета будут действовать стандартные
+системные настройки.
+Например,
+<blockquote class="example"><pre>so_keepalive=30m::10</pre></blockquote>
+установит таймаут бездействия (<code>TCP_KEEPIDLE</code>) в 30 минут,
+для интервала проб (<code>TCP_KEEPINTVL</code>) будет действовать
+стандартная системная настройка, а счётчик проб (<code>TCP_KEEPCNT</code>)
+будет равен 10.
+</dd>
+
+</dl><p> 
+</p><a name="mail"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mail</strong> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>main</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Предоставляет контекст конфигурационного файла, в котором указываются
+директивы почтового сервера.
+</p><a name="max_errors"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>max_errors</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>max_errors 5;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.21.0.
+            </p></div><p>
+Задаёт число ошибок протокола, по достижении которого соединение закрывается.
+</p><a name="protocol"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>protocol</strong> 
+  <code>imap</code> |
+  <code>pop3</code> |
+  <code>smtp</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт протокол проксируемого сервера.
+Поддерживаются протоколы
+<a href="ngx_mail_imap_module.html">IMAP</a>,
+<a href="ngx_mail_pop3_module.html">POP3</a> и
+<a href="ngx_mail_smtp_module.html">SMTP</a>.
+</p><p>
+Если директива не указана, то протокол может быть определён автоматически
+по общеизвестному порту, указанному в директиве <a href="#listen">listen</a>:
+</p> <ul class="compact">
+
+<li>
+<code>imap</code>: 143, 993
+</li>
+
+<li>
+<code>pop3</code>: 110, 995
+</li>
+
+<li>
+<code>smtp</code>: 25, 587, 465
+</li>
+
+</ul><p> 
+</p><p>
+Поддержку ненужных протоколов можно отключить с помощью
+<a href="../configure.html">конфигурационных</a>
+параметров <code>--without-mail_imap_module</code>,
+<code>--without-mail_pop3_module</code> и
+<code>--without-mail_smtp_module</code>.
+</p><a name="resolver"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>resolver</strong> 
+    <code><i>адрес</i></code> ...
+    [<code>valid</code>=<code><i>time</i></code>]
+    [<code>ipv4</code>=<code>on</code>|<code>off</code>]
+    [<code>ipv6</code>=<code>on</code>|<code>off</code>]
+    [<code>status_zone</code>=<code><i>зона</i></code>];</code><br><code><strong>resolver</strong> <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>resolver off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт серверы DNS, используемые для определения имени хоста клиента
+для передачи его на
+<a href="ngx_mail_auth_http_module.html">сервер аутентификации</a>
+и в команде
+<a href="ngx_mail_proxy_module.html#xclient">XCLIENT</a>
+при проксировании SMTP.
+Например:
+</p> <blockquote class="example"><pre>
+resolver 127.0.0.1 [::1]:5353;
+</pre></blockquote><p> 
+Адрес может быть указан в виде доменного имени или IP-адреса,
+и необязательного порта (1.3.1, 1.2.2).
+Если порт не указан, используется порт 53.
+Серверы DNS опрашиваются циклически.
+</p> <blockquote class="note">
+До версии 1.1.7 можно было задать лишь один DNS-сервер.
+Задание DNS-серверов с помощью IPv6-адресов поддерживается
+начиная с версий 1.3.1 и 1.2.2.
+</blockquote><p> 
+</p><a name="resolver_ipv6"></a><p>
+По умолчанию nginx будет искать как IPv4-, так и IPv6-адреса
+при преобразовании имён в адреса.
+Если поиск IPv4- или IPv6-адресов нежелателен,
+можно указать параметр <code>ipv4=off</code> (1.23.1) или
+<code>ipv6=off</code>.
+</p> <blockquote class="note">
+Преобразование имён в IPv6-адреса поддерживается
+начиная с версии 1.5.8.
+</blockquote><p> 
+</p><a name="resolver_valid"></a><p>
+По умолчанию nginx кэширует ответы, используя значение TTL из ответа.
+Необязательный параметр <code>valid</code> позволяет это
+переопределить:
+</p> <blockquote class="example"><pre>
+resolver 127.0.0.1 [::1]:5353 valid=30s;
+</pre></blockquote><p> 
+</p> <blockquote class="note">
+До версии 1.1.9 настройка времени кэширования была невозможна
+и nginx всегда кэшировал ответы на срок в 5 минут.
+</blockquote><p> 
+</p> <blockquote class="note">
+Для предотвращения DNS-спуфинга рекомендуется
+использовать DNS-серверы в защищённой доверенной локальной сети.
+</blockquote><p> 
+</p><a name="resolver_status_zone"></a><p>
+Необязательный параметр <code>status_zone</code> (1.17.1)
+включает
+<a href="../http/ngx_http_api_module.html#resolvers_">сбор информации</a>
+о запросах и ответах сервера DNS
+в указанной <code><i>зоне</i></code>.
+Параметр доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</p><a name="resolver_off"></a><p>
+Специальное значение <code>off</code> запрещает использование DNS.
+</p><a name="resolver_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>resolver_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>resolver_timeout 30s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут для операций DNS, например:
+</p> <blockquote class="example"><pre>
+resolver_timeout 5s;
+</pre></blockquote><p> 
+</p><a name="server"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server</strong> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт конфигурацию для сервера.
+</p><a name="server_name"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server_name</strong> <code><i>имя</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>server_name hostname;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт имя сервера, используемое:
+</p> <ul class="compact">
+
+<li>
+в начальном приветствии POP3/SMTP-сервера;
+</li>
+
+<li>
+в salt при аутентификации SASL-методом CRAM-MD5;
+</li>
+
+<li>
+в команде <code>EHLO</code> при подключении к SMTP-бэкенду,
+если разрешена передача команды
+<a href="ngx_mail_proxy_module.html#xclient">XCLIENT</a>.
+</li>
+
+</ul><p> 
+</p><p>
+Если директива не указана, используется имя хоста (hostname) машины.
+</p><a name="timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут, который используется до начала проксирования на бэкенд.
+</p>
+
+</div></div></body></html>

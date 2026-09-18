@@ -1,0 +1,659 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_tunnel_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_tunnel_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#tunnel_allow_upstream">tunnel_allow_upstream</a><br>     <a href="#tunnel_bind">tunnel_bind</a><br>     <a href="#tunnel_bind_dynamic">tunnel_bind_dynamic</a><br>     <a href="#tunnel_buffer_size">tunnel_buffer_size</a><br>     <a href="#tunnel_connect_timeout">tunnel_connect_timeout</a><br>     <a href="#tunnel_next_upstream">tunnel_next_upstream</a><br>     <a href="#tunnel_next_upstream_timeout">tunnel_next_upstream_timeout</a><br>     <a href="#tunnel_next_upstream_tries">tunnel_next_upstream_tries</a><br>     <a href="#tunnel_pass">tunnel_pass</a><br>     <a href="#tunnel_read_timeout">tunnel_read_timeout</a><br>     <a href="#tunnel_send_lowat">tunnel_send_lowat</a><br>     <a href="#tunnel_send_timeout">tunnel_send_timeout</a><br>     <a href="#tunnel_socket_keepalive">tunnel_socket_keepalive</a><br>     <a href="#tunnel_socket_rcvbuf">tunnel_socket_rcvbuf</a><br>     <a href="#tunnel_socket_sndbuf">tunnel_socket_sndbuf</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_tunnel_module</code> (1.31.0) выполняет
+обработку запросов HTTP/1.1
+<a href="https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.6">CONNECT</a>
+для установки сквозного виртуального соединения с другим сервером.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+http {
+
+    map $request_port $allow_port {
+        443            1;
+    }
+
+    map $host $allow_host {
+        hostnames;
+
+        example.org    1;
+        *.example.org  1;
+    }
+
+    server {
+        listen 8000;
+
+        resolver dns.example.com;
+
+        if ($allow_port != 1) {
+            return 502;
+        }
+
+        if ($allow_host != 1) {
+            return 502;
+        }
+
+        tunnel_pass;
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="tunnel_allow_upstream"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_allow_upstream</strong> <code><i>строка</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт условия, при которых доступ к проксируемому серверу
+будет разрешён или <a href="#denied">запрещён</a>.
+Если все значения строковых параметров непустые
+и не равны “0”, то доступ разрешён.
+Условия проверяются каждый раз
+перед установлением соединения с проксируемым сервером.
+В значении параметров допустимо использование переменных:
+</p> <blockquote class="example"><pre>
+geo $upstream_last_addr $allow {
+    volatile;
+    10.10.0.0/24        1;
+}
+
+server {
+    listen 127.0.0.1:8080;
+
+    tunnel_pass;
+    tunnel_allow_upstream $allow;
+}
+</pre></blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Директива доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="tunnel_bind"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_bind</strong> 
+    <code><i>адрес</i></code> |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт локальный IP-адрес с необязательным портом,
+который будет использоваться в исходящих соединениях с проксируемым сервером.
+В значении параметра допустимо использование переменных.
+Специальное значение <code>off</code> отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>tunnel_bind</code>, позволяя системе
+самостоятельно выбирать локальный IP-адрес и порт.
+</p><a name="tunnel_bind_dynamic"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_bind_dynamic</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_bind_dynamic off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Если включено, операция <a href="#tunnel_bind">bind</a> осуществляется
+при каждой попытке соединения.
+</p> <blockquote class="example"><pre>
+geo $upstream_last_addr $bind_addr {
+    volatile;
+    10.0.0.0/24    10.0.0.1;
+    192.168.0.0/24  192.168.0.1;
+}
+
+tunnel_bind         $bind_addr;
+tunnel_bind_dynamic on;
+</pre></blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Директива доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="tunnel_buffer_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_buffer_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_buffer_size 4k|8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>размер</i></code> буфера, в который будут читаться данные,
+получаемые от проксируемого сервера.
+Также задаёт <code><i>размер</i></code> буфера, в который будут читаться данные,
+получаемые от клиента.
+</p><a name="tunnel_connect_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_connect_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_connect_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут для установления соединения с проксированным сервером.
+Необходимо иметь в виду, что этот таймаут обычно не может превышать 75 секунд.
+</p><a name="tunnel_next_upstream"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_next_upstream</strong> 
+    <code>error</code> |
+    <code>timeout</code> |
+    <code>denied</code> |
+    <code>off</code>
+    ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_next_upstream error timeout;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Определяет, в каких случаях запрос будет передан следующему серверу:
+</p> <dl class="compact">
+
+<dt><code>error</code></dt>
+<dd>произошла ошибка соединения с сервером или
+чтения данных от сервера;</dd>
+
+<dt><code>timeout</code></dt>
+<dd>произошёл таймаут во время соединения с сервером,
+передачи ему запроса или чтения заголовка ответа сервера;</dd>
+
+<dt id="denied"><code>denied</code></dt>
+<dd>сервер <a href="#tunnel_allow_upstream">отклонил</a>
+соединение;
+<p>
+</p> <blockquote class="note">
+Параметр доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+</dd>
+
+<dt><code>off</code></dt>
+<dd>запрещает передачу запроса следующему серверу.</dd>
+
+</dl><p> 
+</p><p>
+Необходимо понимать, что передача запроса следующему серверу возможна
+только при условии, что клиенту ещё ничего не передавалось.
+То есть, если ошибка или таймаут возникли в середине передачи ответа
+клиенту, то исправить это уже невозможно.
+</p><p>
+Директива также определяет, что считается
+<a href="ngx_http_upstream_module.html#max_fails">неудачной
+попыткой</a> работы с сервером.
+Случаи <code>error</code>, <code>timeout</code> и
+<code>denied</code>
+всегда считаются неудачными попытками, даже если они не указаны в директиве.
+</p><p>
+Передача запроса следующему серверу может быть ограничена по
+<a href="#tunnel_next_upstream_tries">количеству попыток</a>
+и по <a href="#tunnel_next_upstream_timeout">времени</a>.
+</p><a name="tunnel_next_upstream_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_next_upstream_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_next_upstream_timeout 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Ограничивает время, в течение которого возможна передача запроса
+<a href="#tunnel_next_upstream">следующему серверу</a>.
+Значение <code>0</code> отключает это ограничение.
+</p><a name="tunnel_next_upstream_tries"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_next_upstream_tries</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_next_upstream_tries 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Ограничивает число допустимых попыток для передачи запроса
+<a href="#tunnel_next_upstream">следующему серверу</a>.
+Значение <code>0</code> отключает это ограничение.
+</p><a name="tunnel_pass"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_pass</strong> [<code><i>адрес</i></code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает обработку запросов CONNECT и задаёт адрес проксируемого сервера.
+По умолчанию в качестве <code>адрес</code>'а используется
+<code><i>$host:$request_port</i></code> со значениями из запроса клиента.
+В большинстве случаев указывать параметры для <code>tunnel_pass</code>
+не требуется.
+</p><p>
+Адрес может быть указан в виде доменного имени или IP-адреса,
+и порта:
+</p> <blockquote class="example"><pre>
+tunnel_pass localhost:9000;
+</pre></blockquote><p> 
+или в виде пути UNIX-сокета:
+</p> <blockquote class="example"><pre>
+tunnel_pass unix:/tmp/backend.socket;
+</pre></blockquote><p> 
+</p><p>
+Если доменному имени соответствует несколько адресов, то все они будут
+использоваться по очереди (round-robin).
+Кроме того, в качестве адреса можно указать
+<a href="ngx_http_upstream_module.html">группу серверов</a>.
+</p><p>
+В значении параметра можно использовать переменные.
+В этом случае, если адрес указан в виде доменного имени,
+имя ищется среди описанных групп серверов
+и если не найдено, то определяется с помощью
+<a href="ngx_http_core_module.html#resolver">resolver</a>’а.
+</p><a name="tunnel_read_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_read_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_read_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут между двумя идущими подряд операциями чтения или записи
+на клиентском соединении или соединении с проксируемым сервером.
+Если по истечении этого времени данные не передавались,
+соединение закрывается.
+</p><a name="tunnel_send_lowat"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_send_lowat</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_send_lowat 0;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+При установке директивы в ненулевое значение nginx будет пытаться минимизировать
+число операций отправки на исходящих соединениях с проксируемым сервером либо
+при помощи флага <code>NOTE_LOWAT</code> метода
+<a href="../events.html#kqueue">kqueue</a>,
+либо при помощи параметра сокета <code>SO_SNDLOWAT</code>,
+с указанным <code><i>размером</i></code>.
+</p><p>
+Эта директива игнорируется на Linux, Solaris и Windows.
+</p><a name="tunnel_send_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_send_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_send_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут при передаче запроса проксированному серверу.
+Таймаут устанавливается не на всю передачу запроса,
+а только между двумя операциями записи.
+Если по истечении этого времени проксируемый сервер не примет новых данных,
+соединение закрывается.
+</p><a name="tunnel_socket_keepalive"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_socket_keepalive</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tunnel_socket_keepalive off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Конфигурирует поведение “TCP keepalive”
+для исходящих соединений к проксируемому серверу.
+По умолчанию для сокета действуют настройки операционной системы.
+Если указано значение “<code>on</code>”, то
+для сокета включается параметр <code>SO_KEEPALIVE</code>.
+</p><a name="tunnel_socket_rcvbuf"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_socket_rcvbuf</strong> <code><i>size</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.31.3.
+            </p></div><p>
+Задаёт размер буфера приёма
+(параметр <code>SO_RCVBUF</code>)
+для исходящих соединений к проксируемому серверу.
+Специальное значение <code>0</code> отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>tunnel_socket_rcvbuf</code>, позволяя
+использовать настройки операционной системы.
+</p><a name="tunnel_socket_sndbuf"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tunnel_socket_sndbuf</strong> <code><i>size</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.31.3.
+            </p></div><p>
+Задаёт размер буфера передачи
+(параметр <code>SO_SNDBUF</code>)
+для исходящих соединений к проксируемому серверу.
+Специальное значение <code>0</code> отменяет действие
+унаследованной с предыдущего уровня конфигурации
+директивы <code>tunnel_socket_sndbuf</code>, позволяя
+использовать настройки операционной системы.
+</p>
+
+</div></div></body></html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_referer_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_referer_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_referer_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#referer_hash_bucket_size">referer_hash_bucket_size</a><br>     <a href="#referer_hash_max_size">referer_hash_max_size</a><br>     <a href="#valid_referers">valid_referers</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_referer_module</code> позволяет блокировать доступ
+к сайту для запросов с неверными значениями поля “Referer” в
+заголовке.
+Следует иметь в виду, что подделать запрос с нужным значением поля
+“Referer” не составляет большого труда, поэтому цель
+использования данного модуля заключается не в стопроцентном блокировании
+подобных запросов, а в блокировании массового потока запросов, сделанных
+обычными браузерами.
+Нужно также учитывать, что обычные браузеры могут не передавать поле
+“Referer” даже для верных запросов.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+valid_referers none blocked server_names
+               *.example.com example.* www.example.org/galleries/
+               ~\.google\.;
+
+if ($invalid_referer) {
+    return 403;
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="referer_hash_bucket_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>referer_hash_bucket_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>referer_hash_bucket_size 64;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.0.5.
+            </p></div><p>
+Задаёт размер корзины хэш-таблиц со значениями “Referer”.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p><a name="referer_hash_max_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>referer_hash_max_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>referer_hash_max_size 2048;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.0.5.
+            </p></div><p>
+Задаёт максимальный <code><i>размер</i></code> хэш-таблиц со значениями
+“Referer”.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p><a name="valid_referers"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>valid_referers</strong> 
+    <code>none</code> |
+    <code>blocked</code> |
+    <code>server_names</code> |
+    <code><i>строка</i></code>
+    ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт значения поля “Referer” заголовка запроса, при
+которых встроенная переменная <code>$invalid_referer</code> будет иметь
+пустую строку в качестве значения.
+В противном случае значение переменной равно “<code>1</code>”.
+Поиск совпадения производится без учёта регистра символов.
+</p><p>
+Параметры могут быть следующие:
+</p> <dl class="compact">
+
+<dt><code>none</code></dt>
+<dd>
+поле “Referer” в заголовке запроса отсутствует;
+</dd>
+
+<dt><code>blocked</code></dt>
+<dd>
+поле “Referer” в заголовке запроса присутствует,
+но его значение удалено межсетевым экраном (firewall) или прокси-сервером;
+к таким значениям относятся строки, не начинающиеся на
+“<code>http://</code>” или “<code>https://</code>”;
+</dd>
+
+<dt><code>server_names</code></dt>
+<dd>
+в поле “Referer” заголовка запроса указано одно
+из имён сервера;
+</dd>
+
+<dt>произвольная строка</dt>
+<dd>
+задаёт имя сервера и необязательное начало URI.
+В начале или конце имени сервера может быть “<code>*</code>”.
+При проверке порт сервера в поле “Referer” игнорируется;
+</dd>
+
+<dt>регулярное выражение</dt>
+<dd>
+в начале должен быть символ “<code>~</code>”.
+Необходимо учитывать, что на совпадение с выражением будет проверяться
+текст, начинающийся после “<code>http://</code>”
+или “<code>https://</code>”.
+</dd>
+
+</dl><p> 
+</p><p>
+Пример:
+</p> <blockquote class="example"><pre>
+valid_referers none blocked server_names
+               *.example.com example.* www.example.org/galleries/
+               ~\.google\.;
+</pre></blockquote><p> 
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl class="compact">
+
+<dt id="var_invalid_referer"><code>$invalid_referer</code></dt>
+<dd>
+Пустая строка, если значение поля “Referer” заголовка запроса
+считается
+<a href="#valid_referers">правильным</a>, иначе “<code>1</code>”.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

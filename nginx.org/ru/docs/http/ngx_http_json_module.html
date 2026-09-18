@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_json_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_json_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_json_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#json_max_depth">json_max_depth</a><br>     <a href="#json_set">json_set</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_json_module</code> (1.31.5)
+извлекает значения из документа JSON, находящегося в переменной,
+и делает их доступными в виде переменных.
+</p><p>
+Документ разбирается только один раз за запрос, независимо от того,
+сколько переменных из него извлекается.
+Разбор выполняется при первом обращении к любой из этих переменных.
+</p><p>
+По умолчанию этот модуль не собирается, его сборку необходимо
+разрешить с помощью конфигурационного параметра
+<code>--with-http_json_module</code>.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+http {
+    json_set $user_name $arg_data user.name;
+    json_set $user_age  $arg_data user.age;
+    json_set $tag0      $arg_data tags[0];
+
+    server {
+        listen 8080;
+
+        location / {
+            return 200 "name=$user_name age=$user_age tag0=$tag0\n";
+        }
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="json_max_depth"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>json_max_depth</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>json_max_depth 32;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт максимальную глубину вложенности документов JSON.
+Документ с более глубокой вложенностью считается некорректным.
+Допустимые значения находятся в диапазоне от 1 до 256.
+</p><a name="json_set"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>json_set</strong> 
+    <code><i>$переменная</i></code>
+    <code><i>$источник</i></code>
+    <code><i>путь</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает <code><i>переменную</i></code> в значение, которое извлекается
+по заданному <code><i>пути</i></code> из документа JSON,
+находящегося в переменной <code><i>источник</i></code>.
+</p><p>
+В пути члены объекта разделяются точкой,
+а элементы массива задаются индексом в квадратных скобках,
+начинающимся с нуля:
+</p> <blockquote class="example"><pre>
+client_body_early_read on;
+
+json_set $req_id     $request_body request.id;
+json_set $enabled    $request_body settings.enabled;
+json_set $first_item $request_body items[0];
+</pre></blockquote><p> 
+Имя члена, которое является пустым или содержит
+“<code>.</code>”,
+“<code>[</code>” или
+“<code>]</code>”,
+записывается в квадратных скобках в виде строки JSON.
+Так как такой путь содержит двойные кавычки,
+весь параметр нужно взять в кавычки в конфигурационном файле:
+</p> <blockquote class="example"><pre>
+json_set $domain $request_body '["a.b.com"]';
+json_set $nested $request_body 'obj["a.b"].c[2]';
+</pre></blockquote><p> 
+</p><p>
+Значение строки JSON сохраняется без экранирования.
+Значения чисел, логических значений и <code>null</code>
+сохраняются в том виде, в котором они присутствуют в документе.
+Если путь указывает на объект или массив,
+то сохраняется весь его текст, включая
+объемлющие фигурные или квадратные скобки.
+</p><p>
+Если указанный член или элемент отсутствует,
+то переменная не найдена.
+Если переменная <code><i>источник</i></code> пустая или не найдена,
+либо её значение не является корректным полным документом JSON,
+то все переменные, извлекаемые из этого источника, не найдены.
+</p>
+
+</div></div></body></html>

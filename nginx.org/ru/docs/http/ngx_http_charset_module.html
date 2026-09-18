@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_charset_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_charset_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_charset_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#charset">charset</a><br>     <a href="#charset_map">charset_map</a><br>     <a href="#charset_types">charset_types</a><br>     <a href="#override_charset">override_charset</a><br>     <a href="#source_charset">source_charset</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_charset_module</code> добавляет указанную
+кодировку в поле “Content-Type” заголовка ответа.
+Кроме того, модуль может перекодировать данные из одной кодировки в другую
+с некоторыми ограничениями:
+</p> <ul class="compact">
+
+<li>
+перекодирование осуществляется только в одну сторону — от сервера к клиенту,
+</li>
+
+<li>
+перекодироваться могут только однобайтные кодировки
+</li>
+
+<li>
+или однобайтные кодировки в UTF-8 и обратно.
+</li>
+
+</ul><p> 
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+include        conf/koi-win;
+
+charset        windows-1251;
+source_charset koi8-r;
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="charset"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>charset</strong> <code><i>кодировка</i></code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>charset off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Добавляет указанную кодировку в поле “Content-Type”
+заголовка ответа.
+Если эта кодировка отличается от указанной в директиве
+<a href="#source_charset">source_charset</a>, то выполняется перекодирование.
+</p><p>
+Параметр <code>off</code> отменяет добавление кодировки
+в поле “Content-Type” заголовка ответа.
+</p><p>
+Кодировка может быть задана с помощью переменной:
+</p> <blockquote class="example"><pre>
+charset $charset;
+</pre></blockquote><p> 
+В этом случае необходимо, чтобы все возможные значения переменной
+присутствовали хотя бы один раз в любом месте конфигурации в виде
+директив <a href="#charset_map">charset_map</a>, <a href="#charset">charset</a> или
+<a href="#source_charset">source_charset</a>.
+Для кодировок <code>utf-8</code>, <code>windows-1251</code>
+и <code>koi8-r</code> для этого достаточно включить в конфигурацию
+файлы <code>conf/koi-win</code>, <code>conf/koi-utf</code> и
+<code>conf/win-utf</code>.
+Для других кодировок можно просто сделать фиктивную таблицу перекодировки,
+например:
+</p> <blockquote class="example"><pre>
+charset_map iso-8859-5 _ { }
+</pre></blockquote><p> 
+</p><p>
+Кроме того, кодировка может быть задана в поле “X-Accel-Charset”
+заголовка ответа.
+Эту возможность можно запретить с помощью директив
+<a href="ngx_http_proxy_module.html#proxy_ignore_headers">proxy_ignore_headers</a>,
+<a href="ngx_http_fastcgi_module.html#fastcgi_ignore_headers">fastcgi_ignore_headers</a>,
+<a href="ngx_http_uwsgi_module.html#uwsgi_ignore_headers">uwsgi_ignore_headers</a>,
+<a href="ngx_http_scgi_module.html#scgi_ignore_headers">scgi_ignore_headers</a>
+и
+<a href="ngx_http_grpc_module.html#grpc_ignore_headers">grpc_ignore_headers</a>.
+</p><a name="charset_map"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>charset_map</strong> <code><i>кодировка1</i></code> <code><i>кодировка2</i></code> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Описывает таблицу перекодирования из одной кодировки в другую.
+Таблица для обратного перекодирования строится на основании тех же данных.
+Коды символов задаются в шестнадцатеричном виде.
+Неописанные символы в пределах 80-FF заменяются на “<code>?</code>”.
+При перекодировании из UTF-8 символы, отсутствующие в однобайтной кодировке,
+заменяются на “<code>&amp;#XXXX;</code>”.
+</p><p>
+Пример:
+</p> <blockquote class="example"><pre>
+charset_map koi8-r windows-1251 {
+    C0 FE ; # small yu
+    C1 E0 ; # small a
+    C2 E1 ; # small b
+    C3 F6 ; # small ts
+    ...
+}
+</pre></blockquote><p> 
+</p><p>
+При описании таблицы перекодирования в UTF-8, коды кодировки UTF-8 должны
+быть указаны во второй колонке, например:
+</p> <blockquote class="example"><pre>
+charset_map koi8-r utf-8 {
+    C0 D18E ; # small yu
+    C1 D0B0 ; # small a
+    C2 D0B1 ; # small b
+    C3 D186 ; # small ts
+    ...
+}
+</pre></blockquote><p> 
+</p><p>
+Полные таблицы преобразования из <code>koi8-r</code> в
+<code>windows-1251</code> и из <code>koi8-r</code> и
+<code>windows-1251</code> в <code>utf-8</code>
+входят в дистрибутив и находятся в файлах <code>conf/koi-win</code>,
+<code>conf/koi-utf</code> и <code>conf/win-utf</code>.
+</p><a name="charset_types"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>charset_types</strong> <code><i>mime-тип</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>charset_types text/html text/xml text/plain text/vnd.wap.wml
+application/javascript application/rss+xml;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 0.7.9.
+            </p></div><p>
+Разрешает работу модуля в ответах с указанными MIME-типами
+в дополнение к “<code>text/html</code>”.
+Специальное значение “<code>*</code>” соответствует любому MIME-типу
+(0.8.29).
+</p><p>
+</p> <blockquote class="note">
+До версии 1.5.4 по умолчанию вместо MIME-типа
+“<code>application/javascript</code>” использовался
+“<code>application/x-javascript</code>”.
+</blockquote><p> 
+</p><a name="override_charset"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>override_charset</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>override_charset off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Определяет, выполнять ли перекодирование для ответов,
+полученных от проксированного сервера или от FastCGI/uwsgi/SCGI/gRPC-сервера,
+если в ответах уже указана кодировка в поле “Content-Type”
+заголовка ответа.
+Если перекодирование разрешено, то в качестве исходной кодировки
+используется кодировка, указанная в полученном ответе.
+</p> <blockquote class="note">
+Необходимо отметить, что если ответ был получен в подзапросе,
+то, независимо от значения директивы <code>override_charset</code>,
+всегда выполняется перекодирование из кодировки ответа в кодировку
+основного запроса.
+</blockquote><p> 
+</p><a name="source_charset"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>source_charset</strong> <code><i>кодировка</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт исходную кодировку ответа.
+Если эта кодировка отличается от указанной в директиве
+<a href="#charset">charset</a>, то выполняется перекодирование.
+</p>
+
+</div></div></body></html>

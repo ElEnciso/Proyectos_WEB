@@ -1,0 +1,193 @@
+body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 40px; 
+            background-color: #92a8d1; 
+            color: #1a1a1a; 
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #000000; 
+            margin-top: 30px; 
+            margin-bottom: 5px;
+        }
+
+        .panel-control {
+            margin-bottom: 20px;
+            background: #92a8d1;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-cargar { background-color: #454D5F; color: white; }
+        .btn-cargar:hover { background-color: #2c313d; }
+        
+        .btn-borrar { background-color: #454D5F; color: white; }
+        .btn-borrar:hover { background-color: #2c313d; }
+        
+        .btn-actualizar { background-color: #454D5F; color: white; }
+        .btn-actualizar:hover { background-color: #2c313d; }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background-color: #FFF3E0; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-bottom: 20px;
+        }
+        
+        th { 
+            font-size: 16px; 
+            font-weight: bold; 
+            background-color: #34495e; 
+            color: white; 
+            padding: 14px; 
+            text-align: left; 
+        }
+        
+        td { 
+            font-size: 15px; 
+            color: #333333; 
+            border-bottom: 1px solid #e0e0e0; 
+            padding: 12px; 
+            text-align: left; 
+        }
+
+        tr:hover {
+            background-color: #fefefd;
+            cursor: pointer; 
+        }
+
+        .contenedor-formulario {
+            display: none; 
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 40px;
+            border-top: 5px solid #34495e;
+        }
+
+        .contenedor-formulario h3 {
+            margin-top: 0;
+        }
+
+        .grupo-formulario {
+            margin-bottom: 15px;
+        }
+
+        .grupo-formulario label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .grupo-formulario input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-guardar { background-color: #3498db; color: white; }
+        .btn-guardar:hover { background-color: #2980b9; }
+        
+        .btn-cancelar { background-color: #95a5a6; color: white; }
+        .btn-cancelar:hover { background-color: #7f8c8d; }
+        
+        /* Nueva clase para que este formulario específico se quede visible */
+        .contenedor-formulario-fijo {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 30px;
+            border-top: 5px solid #34495e; /* Mantiene la coherencia con tu th de la tabla */
+            max-width: 500px; /* Evita que el formulario se estire feo en pantallas grandes */
+            margin-left: auto;
+            margin-right: auto; /* Centra el bloque del formulario en la pantalla */
+        }
+
+        .contenedor-formulario-fijo h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #34495e;
+            font-size: 22px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        /* Efecto de enfoque (Focus) para tus inputs */
+        .grupo-formulario input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+            transition: all 0.3s ease-index;
+        }
+
+        /* Espaciado para el botón */
+        .acciones-formulario {
+            margin-top: 20px;
+            text-align: right; /* Alinea el botón a la derecha para un look más moderno */
+        }
+
+        .acciones-formulario .btn {
+            width: auto; /* Evita que el botón ocupe el 100% si no lo deseas */
+        }
+        /* Pequeño ajuste para que los inputs tipo texto ocupen el espacio correcto dentro de la tabla */
+            table input[type="text"] {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            /* Estilo para que las etiquetas resalten de forma limpia */
+            table label {
+                font-weight: bold;
+                color: #333333;
+                display: block;
+                margin-bottom: 5px;
+            }
+            /* Sincronización de colores para las nuevas tablas */
+.btn-toggle {
+    background-color: #63AB63 !important; /* Mismo tono de tus botones originales */
+    color: white !important;
+    padding: 8px 15px !important;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-toggle:hover {
+    background-color: #2c313d !important;
+}
+
+/* Tablas con el estilo crema de tu CSS original */
+#vistaAgenda, #vistaArticulos, #vistaAlianzas, 
+#tablaEventos, #tablaClientes, #tablaEmpresas, #tablaAreas, #tablaPonentes, #tablaHistorial, #tablaEdiciones, #tablaAutores, #tablaArticulosCRUD, #tablaEscriben {
+    background-color: #FFF3E0 !important; /* Tu color crema original */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+}
+
+/* Encabezados de tablas que respeten tu estilo oscuro */
+thead {
+    background-color: #34495e !important;
+    color: white !important;
+}

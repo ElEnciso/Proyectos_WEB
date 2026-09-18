@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль nginx JavaScript</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/njs/index.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль nginx JavaScript</h2><a name="summary"></a><p>
+njs - это модуль nginx, который расширяет возможности сервера nginx с помощью
+сценариев JavaScript, позволяя создавать пользовательскую
+логику на стороне сервера и выполнять <a href="#usecases">другие задачи</a>.
+</p><p>
+nginx вызывает JavaScript-обработчики в фиксированном наборе
+<a href="integration.html">точек интеграции</a>:
+в фазах обработки HTTP-запроса и ответа, фазах stream-сессии,
+при вычислении переменных и по таймеру.
+njs не является самостоятельной средой выполнения приложений:
+стартовый сценарий и собственный цикл событий отсутствуют,
+код JavaScript выполняется исключительно в рамках настроенного обработчика,
+вызванного nginx, по завершении которого управление возвращается nginx.
+</p><p>
+</p> <blockquote class="note">
+Встроенный JavaScript-движок
+<a href="engine.html#njs_engine">njs</a>
+объявлен устаревшим
+начиная с <a href="changes.html#njs1.0.0">1.0.0</a>;
+в новых конфигурациях следует использовать движок
+<a href="engine.html#quickjs_engine">QuickJS</a>.
+</blockquote><p> 
+</p><a name="getting_started"></a><center><h4>Начало работы</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+<a href="install.html">Загрузка и установка</a>
+</li>
+
+<li>
+<a href="integration.html">Модель выполнения и точки интеграции</a>
+</li>
+
+<li>
+<a href="https://github.com/nginx/njs-examples/">Примеры использования</a>
+</li>
+
+<li>
+<a href="cli.html">Интерфейс командной строки</a>
+</li>
+
+</ul><p> 
+</p><a name="links"></a><center><h4>Справочная информация</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+<a href="reference.html">Справочник</a> [en]
+</li>
+
+<li>
+<a href="../http/ngx_http_js_module.html">
+ngx_http_js_module</a>
+</li>
+
+<li>
+<a href="../stream/ngx_stream_js_module.html">
+ngx_stream_js_module</a>
+</li>
+
+<li>
+<a href="engine.html">Движок JavaScript</a>
+</li>
+
+<li>
+<a href="compatibility.html">Совместимость</a>
+</li>
+
+<li>
+<a href="native_modules.html">Нативные модули</a>
+</li>
+
+<li>
+<a href="node_modules.html">Использование модулей Node.js в njs</a>
+</li>
+
+<li>
+<a href="typescript.html">Создание кода njs при помощи файлов деклараций TypeScript</a>
+</li>
+
+<li>
+<a href="preload_objects.html">Предзагруженные объекты</a>
+</li>
+
+</ul><p> 
+</p><a name="project"></a><center><h4>О проекте</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+<a href="changes.html">Изменения в njs</a> [en]
+</li>
+
+<li>
+<a href="security.html">Безопасность</a> [en]
+</li>
+
+<li>
+<a href="#tested_os_and_platforms">Протестированные ОС и платформы</a>
+</li>
+
+</ul><p> 
+</p><a name="usecases"></a><center><h4>Сценарии использования</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+Комплексное управление доступом и проверка защиты при помощи njs
+до получения запроса сервером группы
+</li>
+
+<li>
+Управление заголовками ответа
+</li>
+
+<li>
+Создание гибких асинхронных обработчиков содержимого и фильтров
+</li>
+
+</ul><p> 
+Подробнее о сценариях использования
+см. в <a href="https://github.com/nginx/njs-examples/">примерах</a>.
+</p><a name="example"></a><center><h4>Базовый пример HTTP</h4></center><p>
+Чтобы использовать njs в nginx, необходимо:
+</p> <ul class="compact">
+
+<li>
+<p>
+<a href="install.html">установить</a> njs
+</p>
+</li>
+
+<li id="hello_world">
+<p>
+создать файл сценария njs, например <code>http.js</code>.
+Описание свойств и методов njs
+см. в <a href="reference.html">справочнике</a>.
+</p> <blockquote class="example"><pre>
+function hello(r) {
+    r.return(200, "Hello world!");
+}
+
+export default {hello};
+</pre></blockquote><p> 
+</p>
+</li>
+
+<li>
+
+<p>
+в файле <code>nginx.conf</code> включить
+модуль <a href="../http/ngx_http_js_module.html">ngx_http_js_module</a>
+и указать директиву
+<a href="../http/ngx_http_js_module.html#js_import">js_import</a>
+с файлом сценария <code>http.js</code>:
+</p> <blockquote class="example"><pre>
+load_module modules/ngx_http_js_module.so;
+
+events {}
+
+http {
+    # начиная с 0.9.1
+    js_engine qjs;
+
+    js_import http.js;
+
+    server {
+        listen 8000;
+
+        location / {
+            js_content http.hello;
+        }
+    }
+}
+</pre></blockquote><p> 
+</p>
+</li>
+
+</ul><p> 
+Также доступна отдельная утилита <a href="cli.html">командной строки</a>,
+которая может использоваться независимо от nginx для разработки и отладки njs.
+</p><a name="tested_os_and_platforms"></a><center><h4>Протестированные ОС и платформы</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+FreeBSD / amd64;
+</li>
+
+<li>
+Linux / x86, amd64, arm64, ppc64el;
+</li>
+
+<li>
+Solaris 11 / amd64;
+</li>
+
+<li>
+macOS / x86_64;
+</li>
+
+</ul><p> 
+</p><a name="presentation"></a><center><h4>Презентация на nginx.conf 2018</h4></center><p><div class="video"><iframe type="text/html" src="https://www.youtube.com/embed/Jc_L6UffFOs?modestbranding=1&amp;rel=0&amp;showinfo=0&amp;color=white" frameborder="0" allowfullscreen="1"></iframe></div></p></div></div></body></html>

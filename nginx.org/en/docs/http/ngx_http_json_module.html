@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Module ngx_http_json_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_en.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li>english<br></li><li><a href="../../../ru/docs/http/ngx_http_json_module.html">русский</a></li><li><br></li><li><a href="../../../news.html">news</a></li><li><a href="../../../en/">about</a></li><li><a href="../../../en/download.html">download</a></li><li><a href="../../../en/security_advisories.html">security</a></li><li><a href="../../../en/docs/">documentation</a></li><li><a href="../../../en/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">books</a></li><li><a href="../../../en/community.html">community</a></li><li><a href="../../../en/enterprise.html">enterprise</a></li><li><br></li><li><a href="https://community.nginx.org">community forum (new)</a></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../en/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Module ngx_http_json_module</h2><table width="100%"><tr><td align="left"><a href="#example">Example Configuration</a><br><a href="#directives">Directives</a><br>     <a href="#json_max_depth">json_max_depth</a><br>     <a href="#json_set">json_set</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+The <code>ngx_http_json_module</code> module (1.31.5)
+extracts values from a JSON document stored in a variable
+and makes them available as variables.
+</p><p>
+A document is parsed only once per request, no matter how many
+variables are extracted from it.
+Parsing is performed on the first access to any of these variables.
+</p><p>
+This module is not built by default, it should be enabled with the
+<code>--with-http_json_module</code>
+configuration parameter.
+</p>
+
+
+<a name="example"></a><center><h4>Example Configuration</h4></center><p>
+</p> <blockquote class="example"><pre>
+http {
+    json_set $user_name $arg_data user.name;
+    json_set $user_age  $arg_data user.age;
+    json_set $tag0      $arg_data tags[0];
+
+    server {
+        listen 8080;
+
+        location / {
+            return 200 "name=$user_name age=$user_age tag0=$tag0\n";
+        }
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Directives</h4></center><a name="json_max_depth"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Syntax:
+                </th>
+                <td>
+            <code><strong>json_max_depth</strong> <code><i>number</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Default:
+                </th>
+                <td>
+            <pre>json_max_depth 32;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Context:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Sets the maximum nesting depth of JSON documents.
+A document nested deeper is considered invalid.
+Acceptable values are in the range from 1 to 256.
+</p><a name="json_set"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Syntax:
+                </th>
+                <td>
+            <code><strong>json_set</strong> 
+    <code><i>$variable</i></code>
+    <code><i>$source</i></code>
+    <code><i>path</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Default:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Context:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Sets the <code><i>variable</i></code> to the value extracted from
+the JSON document held in the <code><i>source</i></code> variable
+at the given <code><i>path</i></code>.
+</p><p>
+In a path, object members are separated by a dot,
+and array elements are addressed by a zero-based index in square
+brackets:
+</p> <blockquote class="example"><pre>
+client_body_early_read on;
+
+json_set $req_id     $request_body request.id;
+json_set $enabled    $request_body settings.enabled;
+json_set $first_item $request_body items[0];
+</pre></blockquote><p> 
+A member name that is empty or contains
+“<code>.</code>”,
+“<code>[</code>”, or
+“<code>]</code>”
+is written as a JSON string in square brackets.
+Since such a path contains double quotes, the whole argument
+needs to be quoted in the configuration file:
+</p> <blockquote class="example"><pre>
+json_set $domain $request_body '["a.b.com"]';
+json_set $nested $request_body 'obj["a.b"].c[2]';
+</pre></blockquote><p> 
+</p><p>
+The value of a JSON string is stored unescaped.
+The values of numbers, booleans, and <code>null</code>
+are stored as they appear in the document.
+If the path addresses an object or an array,
+its whole text is stored, including the enclosing
+braces or brackets.
+</p><p>
+If the addressed member or element is absent, the variable is
+not found.
+If the <code><i>source</i></code> variable is empty or not found,
+or if its value is not a valid, complete JSON document,
+then all variables extracted from this source are not found.
+</p>
+
+</div></div></body></html>

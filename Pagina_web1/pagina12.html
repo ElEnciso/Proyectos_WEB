@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ejercicio 12: Arreglos seleccion">
+    <title>Ejercicio 12: Arreglos seleccion</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 12: JavaScript</h1>
+        <p>Arreglos seleccion</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para calcular la Arreglos seleccion.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    var n = prompt("Ingrese el tamaño del arreglo:");
+                    var arreglo = [n];
+                    for (var i = 0; i < n; i++) {
+                        arreglo[i] = prompt("Ingrese el elemento " + (i + 1) + ":");
+                    }
+                    for (var i = 0; i < n - 1; i++) {
+                        var minIndex = i;
+                        for (var j = i + 1; j < n; j++) {
+                            if (arreglo[j] < arreglo[minIndex]) {
+                                minIndex = j;
+                            }
+                        }
+                        if (minIndex != i) {
+                            var temp = arreglo[i];
+                            arreglo[i] = arreglo[minIndex];
+                            arreglo[minIndex] = temp;
+                        }
+                    }
+                    document.write("El arreglo ordenado es: <strong style='color: var(--primary-color);'>" + arreglo.join(", ") + "</strong>");
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

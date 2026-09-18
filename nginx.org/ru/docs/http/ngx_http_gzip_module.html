@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_gzip_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_gzip_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_gzip_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#gzip">gzip</a><br>     <a href="#gzip_buffers">gzip_buffers</a><br>     <a href="#gzip_comp_level">gzip_comp_level</a><br>     <a href="#gzip_disable">gzip_disable</a><br>     <a href="#gzip_http_version">gzip_http_version</a><br>     <a href="#gzip_min_length">gzip_min_length</a><br>     <a href="#gzip_proxied">gzip_proxied</a><br>     <a href="#gzip_types">gzip_types</a><br>     <a href="#gzip_vary">gzip_vary</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_gzip_module</code> — это фильтр,
+сжимающий ответ методом gzip,
+что позволяет уменьшить размер передаваемых данных в 2 и более раз.
+</p> <blockquote class="note">
+При использовании протокола SSL/TLS сжатые ответы могут быть подвержены
+атакам <a href="https://en.wikipedia.org/wiki/BREACH">BREACH</a>.
+</blockquote><p> 
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+gzip            on;
+gzip_min_length 1000;
+gzip_proxied    expired no-cache no-store private auth;
+gzip_types      text/plain application/xml;
+</pre></blockquote><p> 
+</p><p>
+Для записи в лог достигнутого коэффициента сжатия можно использовать переменную
+<code>$gzip_ratio</code>.
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="gzip"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает или запрещает сжатие ответа методом gzip.
+</p><a name="gzip_buffers"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_buffers</strong> <code><i>число</i></code> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_buffers 32 4k|16 8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>число</i></code> и <code><i>размер</i></code> буферов,
+в которые будет сжиматься ответ.
+По умолчанию размер одного буфера равен размеру страницы.
+В зависимости от платформы это или 4K, или 8K.
+</p> <blockquote class="note">
+До версии 0.7.28 по умолчанию использовалось 4 буфера размером 4K или 8K.
+</blockquote><p> 
+</p><a name="gzip_comp_level"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_comp_level</strong> <code><i>степень</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_comp_level 1;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает <code><i>степень</i></code> сжатия ответа методом gzip.
+Допустимые значения находятся в диапазоне от 1 до 9.
+</p><a name="gzip_disable"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_disable</strong> <code><i>regex</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 0.6.23.
+            </p></div><p>
+Запрещает сжатие ответа методом gzip для запросов
+с полями заголовка “User-Agent”,
+совпадающими с заданными регулярными выражениями.
+</p><p>
+Специальная маска “<code>msie6</code>” (0.7.12) соответствует
+регулярному выражению “<code>MSIE [4-6]\.</code>”, но работает быстрее.
+Начиная с версии 0.8.11 из этой маски исключается
+“<code>MSIE 6.0; ... SV1</code>”.
+</p><a name="gzip_http_version"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_http_version</strong> <code>1.0</code> | <code>1.1</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_http_version 1.1;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает минимальную HTTP-версию запроса, необходимую для сжатия ответа.
+</p><a name="gzip_min_length"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_min_length</strong> <code><i>длина</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_min_length 20;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает минимальную длину ответа, который будет сжиматься методом gzip.
+Длина определяется только из поля “Content-Length”
+заголовка ответа.
+</p><a name="gzip_proxied"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_proxied</strong> 
+    <code>off</code> |
+    <code>expired</code> |
+    <code>no-cache</code> |
+    <code>no-store</code> |
+    <code>private</code> |
+    <code>no_last_modified</code> |
+    <code>no_etag</code> |
+    <code>auth</code> |
+    <code>any</code>
+    ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_proxied off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает или запрещает сжатие ответа методом gzip для проксированных
+запросов в зависимости от запроса и ответа.
+То, что запрос проксированный, определяется на основании наличия поля
+“Via” в заголовке запроса.
+В директиве можно указать одновременно несколько параметров:
+</p> <dl class="compact">
+
+<dt><code>off</code></dt>
+<dd>
+запрещает сжатие для всех проксированных запросов,
+игнорируя остальные параметры;
+</dd>
+
+<dt><code>expired</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа есть поле
+“Expires” со значением, запрещающим кэширование;
+</dd>
+
+<dt><code>no-cache</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа есть поле
+“Cache-Control” с параметром “<code>no-cache</code>”;
+</dd>
+
+<dt><code>no-store</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа есть поле
+“Cache-Control” с параметром “<code>no-store</code>”;
+</dd>
+
+<dt><code>private</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа есть поле
+“Cache-Control” с параметром “<code>private</code>”;
+</dd>
+
+<dt><code>no_last_modified</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа нет поля
+“Last-Modified”;
+</dd>
+
+<dt><code>no_etag</code></dt>
+<dd>
+разрешает сжатие, если в заголовке ответа нет поля
+“ETag”;
+</dd>
+
+<dt><code>auth</code></dt>
+<dd>
+разрешает сжатие, если в заголовке запроса есть поле
+“Authorization”;
+</dd>
+
+<dt><code>any</code></dt>
+<dd>
+разрешает сжатие для всех проксированных запросов.
+</dd>
+
+</dl><p> 
+</p><a name="gzip_types"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_types</strong> <code><i>mime-тип</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_types text/html;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает сжатие ответа методом gzip для указанных MIME-типов в дополнение
+к “<code>text/html</code>”.
+Специальное значение “<code>*</code>” соответствует любому MIME-типу
+(0.8.29).
+Ответы с типом “<code>text/html</code>” сжимаются всегда.
+</p><a name="gzip_vary"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>gzip_vary</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>gzip_vary off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает или запрещает выдавать в ответе поле заголовка
+“Vary: Accept-Encoding”, если активны директивы
+<a href="#gzip">gzip</a>,
+<a href="ngx_http_gzip_static_module.html#gzip_static">gzip_static</a> или
+<a href="ngx_http_gunzip_module.html#gunzip">gunzip</a>.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl class="compact">
+
+<dt id="var_gzip_ratio"><code>$gzip_ratio</code></dt>
+<dd>достигнутый коэффициент сжатия — отношение размера исходного
+ответа к размеру сжатого.</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

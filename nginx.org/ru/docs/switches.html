@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Параметры командной строки nginx</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/switches.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Параметры командной строки nginx</h2><p>
+nginx поддерживает следующие параметры командной строки:
+</p> <ul class="compact">
+
+<li>
+<code>-?</code> | <code>-h</code> — вывод справки
+по параметрам командной строки.
+</li>
+
+<li>
+<code>-c <code><i>файл</i></code></code> — использование альтернативного
+конфигурационного файла <code><i>файл</i></code> вместо файла по умолчанию.
+</li>
+
+<li>
+<code>-e <code><i>файл</i></code></code> — использование альтернативного
+лог-файла ошибок <code><i>файл</i></code>
+вместо файла по умолчанию (1.19.5).
+Специальное значение <code>stderr</code> выбирает стандартный файл ошибок.
+</li>
+
+<li>
+<code>-g <code><i>директивы</i></code></code> — задание
+<a href="ngx_core_module.html">глобальных директив конфигурации</a>,
+например
+<blockquote class="example"><pre>
+nginx -g "pid /var/run/nginx.pid; worker_processes `sysctl -n hw.ncpu`;"
+</pre></blockquote>
+</li>
+
+<li id="l">
+<code>-l <code><i>unix:socket</i></code> | <code><i>порт</i></code></code> — включение
+<a href="https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control#control-api">REST API управления nginx</a>
+на указанном UNIX-сокете или порту (1.31.5).
+<p>
+</p> <blockquote class="note">
+Начиная с версии 1.29.8 и до версии 1.31.5
+этот параметр был доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+</li>
+
+<li>
+<code>-p <code><i>префикс</i></code></code> — задание префикса пути nginx,
+т.е. каталога, в котором будут находиться файлы сервера
+(по умолчанию — каталог <code><i>/usr/local/nginx</i></code>).
+</li>
+
+<li>
+<code>-q</code> — вывод только сообщений об ошибках
+при тестировании конфигурации.
+</li>
+
+<li>
+<code>-s <code><i>сигнал</i></code></code> — отправка <i>сигнала</i>
+главному процессу.
+Аргументом <i>сигнал</i> может быть:
+<ul class="compact">
+<li>
+<code>stop</code> — быстрое завершение
+</li>
+<li>
+<code>quit</code> — плавное завершение
+</li>
+<li>
+<code>reload</code> — перезагрузка конфигурации,
+старт нового рабочего процесса с новой конфигурацией,
+плавное завершение старых рабочих процессов.
+</li>
+<li>
+<code>reopen</code> — переоткрытие лог-файлов
+</li>
+</ul>
+</li>
+
+<li>
+<code>-t</code> — тестирование конфигурационного файла:
+nginx проверяет
+синтаксическую правильность конфигурации, а затем пытается открыть файлы,
+описанные в конфигурации.
+</li>
+
+<li>
+<code>-T</code> — то же, что и <code>-t</code>,
+а также вывод конфигурационных файлов
+в стандартный поток вывода (1.9.2).
+</li>
+
+<li>
+<code>-v</code> — вывод версии nginx.
+</li>
+
+<li>
+<code>-V</code> — вывод версии nginx, версии компилятора
+и параметров конфигурации сборки.
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

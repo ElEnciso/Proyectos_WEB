@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica PDI</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link rel="stylesheet" href="../estilos/pdi.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame4.png">
+</head>
+<body>
+    <header>
+        <h1>Práctica 1 PDI</h1>
+        <p>Página para la practica 1 de PD1</p>
+    </header>
+
+    <main class="container">
+        <!-- Bloque 1 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se utilizó la imagen original como entrada para someterla a un algoritmo de umbralización, generando como salida el archivo una imagen binarizada oscura.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> El resultado muestra claramente cómo el algoritmo logra aislar elementos estructurales de interés. Por ejemplo, las líneas amarillas que bordean el camino quedan perfectamente definidas como líneas blancas convergentes, mientras que el "ruido" visual provocado por la textura de los árboles y los ladrillos del suelo desaparece al colapsar en color negro.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> El equipo logró comprobar empíricamente cómo la simplificación de una imagen mediante binarización facilita el análisis computacional. Al reducir la información de la imagen a solo dos estados (blanco y negro), se cumple el objetivo de preparar la imagen para etapas posteriores de visión artificial, demostrando que esta técnica es ideal para tareas de segmentación, extracción de características clave (como las líneas del camino) y detección de formas sin la interferencia de variables de color o textura.</p>
+            </div>
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto1" onclick="cambiarFoto(this.querySelector('img'), '../src/foto1.jpg', '../src/foto1_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto1.jpg" alt="foto1" style="width: 100%; display: block; border-radius: 8px;">
+                </button>
+            </div>
+        </div>
+
+        <!-- Bloque 2 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto2" onclick="cambiarFoto(this.querySelector('img'), '../src/foto2.jpg', '../src/foto2_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto2.jpg" alt="foto2" style="width: 100%; border-radius: 8px; display: block;">
+                </button>
+            </div>
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se ingresó la imagen original a un proceso de umbralización, dando como resultado la imagen binaria clara.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> El resultado destaca por la forma en que el algoritmo logra extraer características arquitectónicas. Las líneas horizontales blancas del edificio quedan fuertemente segmentadas del resto del entorno. Un detalle importante es cómo la compleja cuadrícula del suelo de piedra desaparece casi por completo al colapsar en color negro, eliminando una gran cantidad de "ruido" visual.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> El equipo concluye empíricamente que la binarización no solo simplifica la imagen, sino que es una técnica de segmentación altamente efectiva para aislar geometrías específicas basadas en su luminosidad. Al descartar información irrelevante como la textura del suelo y el color de la vegetación, la imagen queda preparada de manera óptima para algoritmos posteriores de detección de bordes, líneas o reconocimiento de estructuras arquitectónicas en el campo de la visión artificial.</p>
+            </div>
+        </div>
+
+        <!-- Bloque 3 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se ingresó la fotografía original para ser procesada mediante un algoritmo de umbralización, generando el mapa binario de una imagen semi-oscura.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> El resultado muestra un alto grado de segmentación en áreas específicas. Por ejemplo, la rampa del primer plano se aísla casi como un polígono blanco perfecto, mientras que los muros gruesos de concreto que la rodean desaparecen por completo al fundirse en color negro con el suelo del patio. Las líneas estructurales del edificio de fondo también se extraen limpiamente debido a su contraste inherente.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> El equipo concluye que la eficacia de la binarización depende fuertemente de las condiciones de iluminación natural de la escena. El experimento demuestra que esta técnica es sumamente útil para segmentar "caminos" (como la rampa iluminada) o detectar patrones arquitectónicos, permitiendo a un sistema de visión artificial enfocarse en la geometría de los objetos más brillantes y descartar por completo las áreas en sombra o con texturas complejas que podrían generar ruido en el análisis.</p>
+            </div>
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto3" onclick="cambiarFoto(this.querySelector('img'), '../src/foto3.jpg', '../src/foto3_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto3.jpg" alt="foto3" style="width: 100%; border-radius: 8px; display: block;">
+                </button>
+            </div>
+        </div>
+
+        <!-- Bloque 4 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto4" onclick="cambiarFoto(this.querySelector('img'), '../src/foto4.jpg', '../src/foto4_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto4.jpg" alt="foto4" style="width: 100%; border-radius: 8px; display: block;">
+                </button>
+            </div>
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se procesó la fotografía original mediante una técnica de umbralización (binarización), dando como resultado una imagen muy brilllante.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> El experimento ilustra perfectamente cómo la binarización simplifica la perspectiva arquitectónica. Un ejemplo notable es la línea de precaución en el piso del pasaje izquierdo: en la imagen binarizada, los contrastes entre el amarillo (claro) y el negro (oscuro) se transforman en una nítida línea punteada blanca y negra que guía el punto de fuga. Por otro lado, la geometría del edificio se reduce a un conjunto de bandas horizontales de alto contraste, mientras que la textura del césped introduce variaciones granulares (ruido visual) en la zona inferior derecha.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> El equipo concluye que la binarización es excelente para resaltar perspectivas, líneas de fuga y estructuras geométricas sólidas (como los pasillos del edificio). Sin embargo, el experimento también demuestra un nuevo hallazgo: las superficies texturizadas bajo iluminación irregular (como el pasto) pueden generar ruido indeseado. Esto nos enseña que, en sistemas de visión artificial, a veces es necesario aplicar un filtro de suavizado (como un desenfoque gaussiano) antes de binarizar si el objetivo principal es analizar formas arquitectónicas sin la interferencia de las texturas del entorno.
+            </div>
+        </div>
+
+        <!-- Bloque 5 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se utilizó la fotografía original como entrada para un proceso de umbralización, obteniendo como resultado el archivo binario de una imagen muy brillante.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> El resultado más destacado de este experimento es la perfecta extracción de la cuadrícula del piso en primer plano. Las juntas oscuras se conservan como delgadas líneas negras convergentes sobre un fondo blanco, trazando limpiamente la perspectiva de la escena. Asimismo, se observa cómo los reflejos en el suelo del pasillo central se fusionan en bloques blancos, perdiendo la información del material (cerámica) pero conservando el mapa de iluminación del espacio.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> El equipo concluye que la binarización es una técnica sumamente eficaz para aislar rejillas, patrones estructurales y líneas de perspectiva en entornos artificiales. Al eliminar las distracciones del color y las texturas complejas, el algoritmo entrega una imagen ideal para tareas de visión computacional enfocadas en la navegación espacial, la detección de puntos de fuga o el mapeo de áreas transitables dentro de pasillos y corredores.</p>
+            </div>
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto5" onclick="cambiarFoto(this.querySelector('img'), '../src/foto5.jpg', '../src/foto5_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto5.jpg" alt="foto5" style="width: 100%; border-radius: 8px; display: block;">
+                </button>
+            </div>
+        </div>
+
+        <!-- Bloque 6 -->
+        <div class="card" style="flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 2rem;">
+            <div style="width: 40%; transition: var(--transition); cursor: pointer;">
+                <button type="button" aria-label="Alternar imagen de foto6" onclick="cambiarFoto(this.querySelector('img'), '../src/foto6.jpg', '../src/foto6_a.jpg')" style="display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer;">
+                    <img src="../src/foto6.jpg" alt="foto6" style="width: 100%; border-radius: 8px; display: block;">
+                </button>
+            </div>
+            <div style="text-align: justify; flex: 1;">
+                <p><strong>Registro del experimento:</strong> Se ingresó la foto original para su procesamiento mediante un algoritmo de umbralización, generando el mapa binario final.</p>
+                <br>
+                <p><strong>Ejemplos y observaciones:</strong> Este último experimento ilustra la sensibilidad del algoritmo al valor del umbral elegido. El ejemplo más claro es cómo las sombrillas y mesas logran "sobrevivir" a la binarización destacando en blanco, mientras que el cielo nublado —que el ojo humano percibe como un área iluminada— desaparece en negro. Adicionalmente, el pavimento húmedo genera un patrón fragmentado (ruido visual) debido a que solo los reflejos especulares del agua logran superar el corte.</p>
+                <br>
+                <p><strong>Conclusión del objetivo de aprendizaje:</strong> A modo de cierre del trabajo en equipo, se concluye que la binarización es una técnica de preprocesamiento fundamental en visión artificial, altamente efectiva para segmentar características estructurales, reducir la complejidad de la imagen y aislar objetos de interés (como el mobiliario o las líneas de un pasillo). Sin embargo, la serie de experimentos también nos enseñó empíricamente que el éxito del algoritmo depende críticamente de las condiciones de iluminación (sombras, reflejos) y de la correcta calibración del umbral, ya que un valor fijo puede descartar información del entorno o generar ruido indeseado en superficies texturizadas. Con esto, el equipo da por alcanzado el objetivo de comprender el impacto y funcionamiento de los algoritmos de cambio de estado en imágenes digitales.
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+            <a href="../index.html" class="btn">
+                ⬅ Regresar al Menú Principal
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+    <script>
+        function cambiarFoto(imgElement, fotoOriginal, fotoVariante) {
+            if (imgElement.src.includes(fotoOriginal.replace('../', ''))) {
+                imgElement.src = fotoVariante;
+            } else {
+                imgElement.src = fotoOriginal;
+            }
+        }
+    </script>
+</body>
+</html>

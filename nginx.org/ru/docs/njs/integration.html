@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модель выполнения и точки интеграции</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/njs/integration.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модель выполнения и точки интеграции</h2><table width="100%"><tr><td align="left"><a href="#model">Модель выполнения</a><br><a href="#http">Точки интеграции HTTP</a><br><a href="#stream">Точки интеграции stream</a><br><a href="#choosing">Выбор точки интеграции</a><br><a href="#state">Состояние и время жизни</a><br><a href="#outside">Использование njs вне nginx</a><br></td></tr></table><a name="summary"></a><p>
+Код JavaScript в <a href="index.html">njs</a> никогда
+не выполняется самостоятельно.
+nginx вызывает его в фиксированном наборе точек интеграции,
+каждая из которых связывается с обработчиком директивой конфигурации.
+Стартовый сценарий, фоновые потоки и собственный цикл событий отсутствуют:
+nginx вызывает обработчик, и по его завершении
+управление возвращается nginx.
+</p><p>
+В статье приводятся сведения о вызове обработчиков
+и рекомендации по выбору подходящего.
+Подробное описание поведения директив см. в документации модулей
+<a href="../http/ngx_http_js_module.html">ngx_http_js_module</a>
+и
+<a href="../stream/ngx_stream_js_module.html">ngx_stream_js_module</a>.
+</p><a name="model"></a><center><h4>Модель выполнения</h4></center><p>
+</p> <ol class="compact">
+
+<li>
+При загрузке конфигурации директива
+<a href="../http/ngx_http_js_module.html#js_import">js_import</a>
+компилирует модули JavaScript.
+Синтаксические ошибки обнаруживаются на этом этапе,
+до начала обработки трафика nginx.
+</li>
+
+<li>
+Когда запрос или stream-сессия достигает одной из точек интеграции,
+создаётся контекст JavaScript.
+В нём выполняются импортированные модули,
+после чего вызываются настроенные обработчики.
+</li>
+
+<li>
+По завершении запроса или сессии контекст уничтожается
+либо, при использовании движка
+<a href="engine.html#quickjs_engine">QuickJS</a>,
+возвращается в пул повторно используемых контекстов.
+Остаются только данные, явно сохранённые в
+<a href="reference.html#ngx_shared">разделяемый словарь</a>
+или отправленные наружу.
+</li>
+
+</ol><p> 
+</p><p>
+Единственная точка интеграции, не связанная с клиентским запросом, — это
+<code>js_periodic</code>, вызываемая по таймеру nginx.
+Код JavaScript не может создать собственную точку интеграции:
+он не может открыть слушающий сокет, породить поток
+или инициировать свой вызов вне обработчиков,
+заданных в конфигурации.
+</p><a name="http"></a><center><h4>Точки интеграции HTTP</h4></center><p>
+Обработчики получают первым аргументом объект
+<a href="reference.html#http">HTTP Request</a>,
+за исключением <code>js_periodic</code>,
+который получает объект
+<a href="reference.html#periodic_session">Periodic Session</a>.
+
+<table width="100%">
+
+<tr>
+<td width="27%"><b>Директива</b></td>
+<td width="38%"><b>Когда вызывается</b></td>
+<td width="35%"><b>Асинхронные операции</b></td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_access">
+<code>js_access</code></a></td>
+<td>на фазе доступа, до дальнейшей обработки запроса</td>
+<td>поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_content">
+<code>js_content</code></a></td>
+<td>на фазе содержимого, вместо проксирования
+или отдачи статического файла</td>
+<td>поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_header_filter">
+<code>js_header_filter</code></a></td>
+<td>один раз, когда заголовок ответа готов к отправке</td>
+<td>не поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_body_filter">
+<code>js_body_filter</code></a></td>
+<td>для каждого блока данных тела ответа</td>
+<td>не поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_set">
+<code>js_set</code></a></td>
+<td>при первом обращении к переменной,
+на той фазе, где это произошло,
+либо при каждом обращении с параметром <code>nocache</code></td>
+<td>не поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../http/ngx_http_js_module.html#js_periodic">
+<code>js_periodic</code></a></td>
+<td>через заданные промежутки времени, без клиентского запроса</td>
+<td>поддерживаются</td>
+</tr>
+
+</table>
+</p><p>
+Обработчики, для которых асинхронные операции не поддерживаются,
+должны получить результат до возврата управления:
+они не могут дождаться подзапроса, запроса наружу или таймера.
+Такой обработчик тем не менее может быть объявлен как
+<code>async</code>, если всё, что он ожидает,
+завершается немедленно.
+</p><p>
+Обработчиков для фаз перезаписи и логирования нет.
+Переменная <code>js_set</code>, на которую ссылается директива
+соответствующей фазы, вычисляется на этой фазе,
+что и является обычным способом выполнить код
+в самом конце обработки запроса.
+</p><a name="stream"></a><center><h4>Точки интеграции stream</h4></center><p>
+Обработчики получают первым аргументом объект
+<a href="reference.html#stream">Stream Session</a>,
+за исключением <code>js_periodic</code>,
+который получает объект
+<a href="reference.html#periodic_session">Periodic Session</a>.
+
+<table width="100%">
+
+<tr>
+<td width="27%"><b>Директива</b></td>
+<td width="38%"><b>Когда вызывается</b></td>
+<td width="35%"><b>Асинхронные операции</b></td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_access">
+<code>js_access</code></a></td>
+<td>на фазе доступа</td>
+<td>в колбэках
+<a href="reference.html#s_on"><code>s.on()</code></a></td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_preread">
+<code>js_preread</code></a></td>
+<td>на фазе предварительного чтения,
+до подключения к проксируемому серверу</td>
+<td>в колбэках
+<a href="reference.html#s_on"><code>s.on()</code></a></td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_filter">
+<code>js_filter</code></a></td>
+<td>на фазе содержимого, для установки фильтров данных
+в обоих направлениях</td>
+<td>не поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_set">
+<code>js_set</code></a></td>
+<td>при первом обращении к переменной,
+на той фазе, где это произошло,
+либо при каждом обращении с параметром <code>nocache</code></td>
+<td>не поддерживаются</td>
+</tr>
+
+<tr>
+<td><a href="../stream/ngx_stream_js_module.html#js_periodic">
+<code>js_periodic</code></a></td>
+<td>через заданные промежутки времени, без клиентской сессии</td>
+<td>поддерживаются</td>
+</tr>
+
+</table>
+</p><p>
+Обработчики <code>js_access</code>, <code>js_preread</code>
+и <code>js_filter</code> вызываются один раз
+и предназначены для установки колбэков
+<a href="reference.html#s_on"><code>s.on()</code></a>
+для данных, которые придут позже.
+Сам обработчик должен вернуть управление сразу.
+</p><a name="choosing"></a><center><h4>Выбор точки интеграции</h4></center><p>
+</p> <dl class="compact">
+
+<dt>сформировать ответ, а не проксировать его</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_content">
+<code>js_content</code></a>
+</dd>
+
+<dt>разрешить или запретить запрос или соединение,
+возможно, обратившись к внешнему сервису</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_access">
+<code>js_access</code></a>
+для запросов,
+<a href="../stream/ngx_stream_js_module.html#js_access">
+<code>js_access</code></a>
+для соединений или
+<a href="../stream/ngx_stream_js_module.html#js_preread">
+<code>js_preread</code></a>,
+если решение зависит от данных, присланных клиентом
+</dd>
+
+<dt>вычислить значение для другой директивы nginx</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_set">
+<code>js_set</code></a>
+связывает обработчик с переменной,
+и именно так вычисленное значение попадает в
+<code>proxy_pass</code>, <code>log_format</code>
+и другие директивы, принимающие переменные.
+Вызванный ранее обработчик может также присвоить значение переменной,
+объявленной директивой
+<a href="../http/ngx_http_js_module.html#js_var">
+<code>js_var</code></a>, через
+<a href="reference.html#r_variables"><code>r.variables</code></a>
+</dd>
+
+<dt>изменить ответ проксируемого сервера</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_header_filter">
+<code>js_header_filter</code></a>
+для заголовка,
+<a href="../http/ngx_http_js_module.html#js_body_filter">
+<code>js_body_filter</code></a>
+для тела
+</dd>
+
+<dt>изменить поток байт проксируемого соединения</dt>
+<dd>
+<a href="../stream/ngx_stream_js_module.html#js_filter">
+<code>js_filter</code></a>
+</dd>
+
+<dt>обновить кэш, опросить API или отправить метрики
+без клиентского запроса</dt>
+<dd>
+<a href="../http/ngx_http_js_module.html#js_periodic">
+<code>js_periodic</code></a>
+</dd>
+
+</dl><p> 
+</p><p>
+Для одного запроса можно использовать несколько обработчиков,
+например проверку доступа и вслед за ней фильтр тела ответа.
+Каждый из них является отдельным вызовом
+со своими ограничениями.
+</p><a name="state"></a><center><h4>Состояние и время жизни</h4></center><p>
+Код верхнего уровня модуля выполняется для каждого нового контекста
+JavaScript, то есть для каждого запроса или stream-сессии,
+в которых вызывается JavaScript.
+Для движка
+<a href="engine.html#quickjs_engine">QuickJS</a>
+контекст вместо этого может быть взят из пула повторно используемых
+контекстов, см.
+<a href="../http/ngx_http_js_module.html#js_context_reuse">
+js_context_reuse</a>;
+в этом случае модули заново не выполняются,
+а изменения, внесённые в область видимости модуля ранее, наследуются.
+</p><p>
+</p> <blockquote class="note">
+Поэтому переменные уровня модуля нельзя использовать
+для передачи данных между запросами или для кэширования результатов:
+в зависимости от движка и от повторного использования контекста
+такие данные либо теряются, либо наследуются от постороннего запроса.
+Дорогая инициализация в области видимости модуля
+также оплачивается для каждого нового контекста.
+</blockquote><p> 
+</p><p>
+В nginx рабочие процессы по умолчанию
+не используют совместно память.
+njs предоставляет механизм для соместного использования состояния между рабочими
+процессами —
+<a href="reference.html#ngx_shared">разделяемый словарь</a>,
+объявляемый директивой
+<a href="../http/ngx_http_js_module.html#js_shared_dict_zone">
+js_shared_dict_zone</a>.
+</p><p>
+Асинхронные операции, такие как
+<a href="reference.html#ngx_fetch"><code>ngx.fetch()</code></a>,
+<a href="reference.html#r_subrequest">
+<code>r.subrequest()</code></a>
+и
+<a href="reference.html#settimeout">
+<code>setTimeout()</code></a>,
+выполняются циклом событий nginx.
+Потоки не используются: обработчик, выполняющий длительные вычисления,
+блокирует весь рабочий процесс, а вместе с ним и любое другое соединение,
+обслуживаемое этим процессом.
+</p><a name="outside"></a><center><h4>Использование njs вне nginx</h4></center><p>
+</p> <ul class="compact">
+
+<li>
+<a href="cli.html">Утилита командной строки</a>
+запускает njs без nginx, что удобно
+для разработки и отладки частей сценария,
+не зависящих от запроса.
+</li>
+
+<li>
+njs не является Node.js.
+В нём реализованы язык ECMAScript,
+набор <a href="reference.html">встроенных модулей</a>
+и объекты nginx,
+но не API Node.js и не разрешение имён пакетов.
+Тем не менее, библиотеки  можно использовать,
+если предварительно собрать их в один файл, см.
+<a href="node_modules.html">Использование модулей Node.js в njs</a>.
+</li>
+
+<li>
+<a href="native_modules.html">Нативные модули</a>
+расширяют njs кодом на C.
+Разделяемая библиотека загружается при разборе конфигурации,
+а зарегистрированный ею модуль затем импортируется,
+как любой другой.
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

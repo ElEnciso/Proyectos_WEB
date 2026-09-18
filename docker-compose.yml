@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # 1. Servidor Apache para tus HTML/CSS estáticos
+  servidor-apache:
+    image: httpd:latest
+    ports:
+      - "80:80"
+    volumes:
+      # Monta TODA tu carpeta Proyectos_Web dentro del Apache de Docker
+      - ./:/usr/local/apache2/htdocs/
+
+  # 2. Servidor Tomcat para tu proyecto Java/JSP
+  servidor-tomcat:
+    image: tomcat:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./EjemploBD1/build/web:/usr/local/tomcat/webapps/EjemploBD1
+      - ./Proyecto/Cita_Hospitales/build/web:/usr/local/tomcat/webapps/Cita_Hospitales
+
+  # 3. Servidor MySQL para la base de datos
+  base-datos:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ejemploBD

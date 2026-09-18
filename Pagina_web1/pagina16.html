@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ejercicio 16: Leer dos numeros y realizar producto mediante suma">
+    <title>Ejercicio 16: Leer dos números y realizar producto mediante suma</title>
+    <link rel="stylesheet" href="../estilos/css.css">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 16: JavaScript</h1>
+        <p>Leer dos números y realizar producto mediante suma</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para calcular el producto de dos números ingresados por el usuario mediante sumas sucesivas.
+            </p>
+            <div style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                <script type="text/javascript">
+                    var num1 = parseInt(prompt("Ingrese el primer número:"));
+                    var num2 = parseInt(prompt("Ingrese el segundo número:"));
+                    var producto = 0;
+                    document.write("<br><strong style='color: var(--primary-color);'>Producto mediante sumas sucesivas: </strong><br>");
+
+                    for (var i = 0; i < num2; i++) {
+                        document.write(producto + " <br>");
+                        producto += num1;
+                    }
+
+                    document.write("<br><strong style='color: var(--primary-color);'>El producto de " + num1 + " y " + num2 + " mediante sumas sucesivas es: </strong><br>" + producto);
+                </script>
+            </div>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="index.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+</body>
+</html>

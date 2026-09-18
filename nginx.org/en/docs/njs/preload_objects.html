@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Understanding preloaded objects</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_en.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li>english<br></li><li><a href="../../../ru/docs/njs/preload_objects.html">русский</a></li><li><br></li><li><a href="../../../news.html">news</a></li><li><a href="../../../en/">about</a></li><li><a href="../../../en/download.html">download</a></li><li><a href="../../../en/security_advisories.html">security</a></li><li><a href="../../../en/docs/">documentation</a></li><li><a href="../../../en/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">books</a></li><li><a href="../../../en/community.html">community</a></li><li><a href="../../../en/enterprise.html">enterprise</a></li><li><br></li><li><a href="https://community.nginx.org">community forum (new)</a></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Understanding preloaded objects</h2><a name="summary"></a><p>
+</p> <blockquote class="note">
+Preloaded objects are supported only with the
+<a href="engine.html#njs_engine">njs</a> JavaScript engine
+and are not available with the
+<a href="engine.html#quickjs_engine">QuickJS</a> engine.
+</blockquote><p> 
+</p><p>
+For each incoming request njs creates a separate virtual machine.
+This brings a lot of benefits such as predictable memory consumption
+or requests isolation.
+However, as all requests are isolated,
+if a request handler needs to access some data,
+it has to read it by itself.
+This is not efficient especially when the amount of data is large.
+</p><p>
+To address this limitation,
+a preloaded shared object was introduced.
+Such objects are created immutable and do not have prototype chains:
+their values cannot be changed, properties cannot be added or removed.
+</p><a name="working_with_preload_objects"></a><center><h4>Working with preload objects</h4></center><p>
+Here are some examples of how to work with a preload object in njs:
+
+</p> <ul class="compact">
+
+<li>
+access properties by name:
+<blockquote class="example"><pre>
+preloaded_object.prop_name
+preloaded_object[prop_name]
+</pre></blockquote>
+</li>
+
+<li>
+enumerate properties:
+<blockquote class="example"><pre>
+for (i in preloaded_object_name) {
+    ...
+}
+</pre></blockquote>
+</li>
+
+<li>
+apply non-modifying built-in methods using <code>call()</code>:
+<blockquote class="example"><pre>
+Array.prototype.filter.call(preloaded_object_name, ...)
+</pre></blockquote>
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

@@ -1,0 +1,12 @@
+--- src/mail/ngx_mail_smtp_handler.c
++++ src/mail/ngx_mail_smtp_handler.c
+@@ -777,6 +777,9 @@ ngx_mail_smtp_starttls(ngx_mail_session_
+             ngx_str_null(&s->smtp_from);
+             ngx_str_null(&s->smtp_to);
+ 
++            s->buffer->pos = s->buffer->start;
++            s->buffer->last = s->buffer->start;
++
+             c->read->handler = ngx_mail_starttls_handler;
+             return NGX_OK;
+         }

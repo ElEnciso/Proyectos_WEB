@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_mail_auth_http_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/mail/ngx_mail_auth_http_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_mail_auth_http_module</h2><table width="100%"><tr><td align="left"><a href="#directives">Директивы</a><br>     <a href="#auth_http">auth_http</a><br>     <a href="#auth_http_header">auth_http_header</a><br>     <a href="#auth_http_pass_client_cert">auth_http_pass_client_cert</a><br>     <a href="#auth_http_timeout">auth_http_timeout</a><br><a href="#protocol">Протокол</a><br></td></tr></table>
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="auth_http"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_http</strong> <code><i>URL</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт URL HTTP-сервера аутентификации.
+Протокол описан <a href="#protocol">ниже</a>.
+</p><a name="auth_http_header"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_http_header</strong> <code><i>заголовок</i></code> <code><i>значение</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Добавляет указанный заголовок к запросам, посылаемым на сервер аутентификации.
+Заголовок можно использовать в качестве shared secret для проверки,
+что запрос поступил от nginx.
+Например:
+</p> <blockquote class="example"><pre>
+auth_http_header X-Auth-Key "secret_string";
+</pre></blockquote><p> 
+</p><a name="auth_http_pass_client_cert"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_http_pass_client_cert</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_http_pass_client_cert off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.7.11.
+            </p></div><p>
+Добавляет заголовок “Auth-SSL-Cert” с
+<a href="ngx_mail_ssl_module.html#ssl_verify_client">клиентским</a>
+сертификатом в формате PEM (закодирован в формате urlencode)
+к запросам, посылаемым на сервер аутентификации.
+</p><a name="auth_http_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>auth_http_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>auth_http_timeout 60s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>mail</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт таймаут общения с сервером аутентификации.
+</p>
+
+
+<a name="protocol"></a><center><h4>Протокол</h4></center><p>
+Для общения с сервером аутентификации используется протокол HTTP.
+Данные в теле ответа игнорируются, информация передаётся только в заголовках.
+</p><p>
+Примеры запросов и ответов:
+</p><p>
+Запрос:
+</p> <blockquote class="example"><pre>
+GET /auth HTTP/1.0
+Host: localhost
+Auth-Method: plain # plain/apop/cram-md5/external
+Auth-User: user
+Auth-Pass: password
+Auth-Protocol: imap # imap/pop3/smtp
+Auth-Login-Attempt: 1
+Client-IP: 192.0.2.42
+Client-Host: client.example.org
+</pre></blockquote><p> 
+Хороший ответ:
+</p> <blockquote class="example"><pre>
+HTTP/1.0 200 OK
+Auth-Status: OK
+Auth-Server: 198.51.100.1
+Auth-Port: 143
+</pre></blockquote><p> 
+Плохой ответ:
+</p> <blockquote class="example"><pre>
+HTTP/1.0 200 OK
+Auth-Status: Invalid login or password
+Auth-Wait: 3
+</pre></blockquote><p> 
+</p><p>
+Если заголовка “Auth-Wait” нет,
+то после выдачи ошибки соединение будет закрыто.
+В текущей реализации на каждую попытку аутентификации выделяется память,
+которая освобождается только при завершении сессии.
+Поэтому число неудачных попыток аутентификации в рамках одной сессии
+должно быть ограничено — после 10-20 попыток (номер попытки передаётся
+в заголовке “Auth-Login-Attempt”) сервер должен выдать ответ
+без заголовка “Auth-Wait”.
+</p><p>
+При использовании APOP или CRAM-MD5 запрос и ответ будут выглядеть так:
+</p> <blockquote class="example"><pre>
+GET /auth HTTP/1.0
+Host: localhost
+Auth-Method: apop
+Auth-User: user
+Auth-Salt: &lt;238188073.1163692009@mail.example.com&gt;
+Auth-Pass: auth_response
+Auth-Protocol: imap
+Auth-Login-Attempt: 1
+Client-IP: 192.0.2.42
+Client-Host: client.example.org
+</pre></blockquote><p> 
+Хороший ответ:
+</p> <blockquote class="example"><pre>
+HTTP/1.0 200 OK
+Auth-Status: OK
+Auth-Server: 198.51.100.1
+Auth-Port: 143
+Auth-Pass: plain-text-pass
+</pre></blockquote><p> 
+</p><p>
+Если в ответе есть заголовок “Auth-User”,
+то он переопределяет имя пользователя,
+используемое для аутентификации с бэкендом.
+</p><p>
+Для SMTP в ответе дополнительно учитывается заголовок
+“Auth-Error-Code” — если он есть,
+то используется как код ответа в случае ошибки.
+Если его нет, то по умолчанию к “Auth-Status”
+будет добавлен код 535 5.7.0.
+</p><p>
+Например, если от сервера аутентификации будет получен ответ:
+</p> <blockquote class="example"><pre>
+HTTP/1.0 200 OK
+Auth-Status: Temporary server problem, try again later
+Auth-Error-Code: 451 4.3.0
+Auth-Wait: 3
+</pre></blockquote><p> 
+то по SMTP клиенту будет выдана ошибка
+</p> <blockquote class="example"><pre>
+451 4.3.0 Temporary server problem, try again later
+</pre></blockquote><p> 
+</p><p>
+Если при проксировании SMTP не требуется аутентификация,
+запрос будет выглядеть так:
+</p> <blockquote class="example"><pre>
+GET /auth HTTP/1.0
+Host: localhost
+Auth-Method: none
+Auth-User:
+Auth-Pass:
+Auth-Protocol: smtp
+Auth-Login-Attempt: 1
+Client-IP: 192.0.2.42
+Client-Host: client.example.org
+Auth-SMTP-Helo: client.example.org
+Auth-SMTP-From: MAIL FROM: &lt;&gt;
+Auth-SMTP-To: RCPT TO: &lt;postmaster@mail.example.com&gt;
+</pre></blockquote><p> 
+</p><p>
+Для клиентского соединения по протоколу SSL/TLS (1.7.11)
+добавляется заголовок “Auth-SSL”, и если директива
+<a href="ngx_mail_ssl_module.html#ssl_verify_client">ssl_verify_client</a> включена,
+заголовок “Auth-SSL-Verify” содержит
+результат проверки клиентского сертификата:
+“<code>SUCCESS</code>”, “<code>FAILED:</code><code><i>reason</i></code>”
+и, если сертификат не был предоставлен, “<code>NONE</code>”.
+</p> <blockquote class="note">
+До версии 1.11.7 результат “<code>FAILED</code>”
+не содержал строку <code><i>reason</i></code>.
+</blockquote><p> 
+Если клиентский сертификат был предоставлен,
+информация о нём передаётся в следующих заголовках запроса:
+“Auth-SSL-Subject”, “Auth-SSL-Issuer”,
+“Auth-SSL-Serial” и “Auth-SSL-Fingerprint”.
+Если директива <a href="#auth_http_pass_client_cert">auth_http_pass_client_cert</a> включена,
+сам сертификат передаётся в заголовке
+“Auth-SSL-Cert”.
+Протокол и шифр установленного соединения
+передаются в заголовках “Auth-SSL-Protocol”
+и “Auth-SSL-Cipher” (1.21.2).
+Запрос будет выглядеть так:
+</p> <blockquote class="example"><pre>
+GET /auth HTTP/1.0
+Host: localhost
+Auth-Method: plain
+Auth-User: user
+Auth-Pass: password
+Auth-Protocol: imap
+Auth-Login-Attempt: 1
+Client-IP: 192.0.2.42
+Auth-SSL: on
+Auth-SSL-Protocol: TLSv1.3
+Auth-SSL-Cipher: TLS_AES_256_GCM_SHA384
+Auth-SSL-Verify: SUCCESS
+Auth-SSL-Subject: /CN=example.com
+Auth-SSL-Issuer: /CN=example.com
+Auth-SSL-Serial: C07AD56B846B5BFF
+Auth-SSL-Fingerprint: 29d6a80a123d13355ed16b4b04605e29cb55a5ad
+</pre></blockquote><p> 
+</p><a name="proxy_protocol"></a><p>
+При использовании
+<a href="ngx_mail_core_module.html#proxy_protocol">протокола PROXY</a>,
+информация о нём передаётся в следующих заголовках запроса:
+“Proxy-Protocol-Addr”,
+“Proxy-Protocol-Port”,
+“Proxy-Protocol-Server-Addr” и
+“Proxy-Protocol-Server-Port” (1.19.8).
+</p>
+
+</div></div></body></html>

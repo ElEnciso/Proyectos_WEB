@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Как nginx обрабатывает TCP/UDP-сессии</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/stream/stream_processing.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Как nginx обрабатывает TCP/UDP-сессии</h2><p>
+Обработка клиентской TCP/UDP-сессии происходит
+последовательными <b>фазами</b>:
+
+</p> <dl class="compact">
+
+<dt id="postaccept_phase">
+<code>Post-accept</code>
+</dt>
+<dd>
+Первая фаза после принятия клиентского соединения.
+В этой фазе выполняется модуль
+<a href="ngx_stream_realip_module.html">ngx_stream_realip_module</a>.
+</dd>
+
+<dt id="preaccess_phase">
+<code>Pre-access</code>
+</dt>
+<dd>
+Предварительная проверка доступа.
+В этой фазе выполняются модули
+<a href="ngx_stream_limit_conn_module.html">ngx_stream_limit_conn_module</a>
+и
+<a href="ngx_stream_set_module.html">ngx_stream_set_module</a>.
+</dd>
+
+<dt id="access_phase">
+<code>Access</code>
+</dt>
+<dd>
+Ограничение доступа для клиента перед обработкой данных.
+В этой фазе
+выполняется модуль
+<a href="ngx_stream_access_module.html">ngx_stream_access_module</a>,
+при использовании <a href="../njs/index.html">njs</a>
+выполняется
+директива <a href="ngx_stream_js_module.html#js_access">js_access</a>.
+
+</dd>
+
+<dt id="ssl_phase">
+<code>SSL</code>
+</dt>
+<dd>
+
+Терминирование TLS/SSL.
+В этой фазе выполняется модуль
+<a href="ngx_stream_ssl_module.html">ngx_stream_ssl_module</a>.
+</dd>
+
+<dt id="preread_phase">
+<code>Preread</code>
+</dt>
+<dd>
+Чтение первых байт данных в
+<a href="ngx_stream_core_module.html#preread_buffer_size">буфер
+предварительного чтения</a> для анализа,
+например модулем
+<a href="ngx_stream_ssl_preread_module.html">ngx_stream_ssl_preread_module</a>,
+перед их обработкой.
+При использовании <a href="../njs/index.html">njs</a>
+в этой фазе выполняется
+директива <a href="ngx_stream_js_module.html#js_preread">js_preread</a>.
+</dd>
+
+<dt id="content_phase">
+<code>Content</code>
+</dt>
+<dd>
+Обязательная фаза, в которой происходит обработка данных, как правило
+<a href="ngx_stream_proxy_module.html">проксирование</a> на
+<a href="ngx_stream_upstream_module.html">группу серверов</a>
+или <a href="ngx_stream_return_module.html">отправка</a> клиенту
+заданного значения.
+При использовании <a href="../njs/index.html">njs</a>
+в этой фазе выполняется
+директива <a href="ngx_stream_js_module.html#js_filter">js_filter</a>.
+</dd>
+
+<dt id="log_phase">
+<code>Log</code>
+</dt>
+<dd>
+Заключительная фаза,
+в которой записывается результат обработки клиентской сессии.
+В этой фазе выполняется модуль
+<a href="ngx_stream_log_module.html">ngx_stream_log_module</a>.
+</dd>
+</dl><p> 
+
+</p></div></div></body></html>

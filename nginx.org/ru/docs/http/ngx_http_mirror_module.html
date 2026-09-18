@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_mirror_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_mirror_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_mirror_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#mirror">mirror</a><br>     <a href="#mirror_request_body">mirror_request_body</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_mirror_module</code> (1.13.4) позволяет
+зеркалировать исходный запрос
+при помощи создания фоновых зеркалирующих подзапросов.
+Ответы на зеркалирующие подзапросы игнорируются.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+location / {
+    mirror /mirror;
+    proxy_pass http://backend;
+}
+
+location = /mirror {
+    internal;
+    proxy_pass http://test_backend$request_uri;
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="mirror"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mirror</strong> <code><i>uri</i></code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>mirror off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт URI, на который будет зеркалироваться исходный запрос.
+На одном уровне конфигурации может быть задано несколько зеркал.
+</p><a name="mirror_request_body"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mirror_request_body</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>mirror_request_body on;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Определяет, зеркалировать ли тело запроса клиента.
+Если включено, то тело запроса клиента будет прочитано
+перед созданием зеркалирующих подзапросов.
+В этом случае небуферизованное проксирование тела запроса клиента,
+задаваемое директивами
+<a href="ngx_http_proxy_module.html#proxy_request_buffering">proxy_request_buffering</a>,
+<a href="ngx_http_fastcgi_module.html#fastcgi_request_buffering">fastcgi_request_buffering</a>,
+<a href="ngx_http_scgi_module.html#scgi_request_buffering">scgi_request_buffering</a>
+и
+<a href="ngx_http_uwsgi_module.html#uwsgi_request_buffering">uwsgi_request_buffering</a>,
+будет отключено.
+</p> <blockquote class="example"><pre>
+location / {
+    mirror /mirror;
+    mirror_request_body off;
+    proxy_pass http://backend;
+}
+
+location = /mirror {
+    internal;
+    proxy_pass http://log_backend;
+    proxy_pass_request_body off;
+    proxy_set_header Content-Length "";
+    proxy_set_header X-Original-URI $request_uri;
+}
+</pre></blockquote><p> 
+</p>
+
+</div></div></body></html>

@@ -1,0 +1,1348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Сборка nginx из исходных файлов</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/configure.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Сборка nginx из исходных файлов</h2><p>
+Сборка настраивается командой <code>configure</code>.
+Она определяет особенности системы и, в частности, методы, которые nginx
+может использовать для обработки соединений.
+В конце концов она создаёт <code>Makefile</code>.
+</p><p>
+Команда <code>configure</code> поддерживает следующие параметры:
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--help</code>
+</dt>
+<dd>
+печатает справочное сообщение.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt id="prefix">
+<code>--prefix=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог, в котором будут находиться файлы сервера.
+Этот же каталог будет использоваться для всех относительных путей,
+задаваемых <code>configure</code> (кроме путей к исходным текстам
+библиотек) и в конфигурационном файле <code>nginx.conf</code>.
+По умолчанию — каталог <code>/usr/local/nginx</code>.
+</dd>
+
+<dt>
+<code>--sbin-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя исполняемого файла nginx.
+Это имя используется только на стадии установки.
+По умолчанию файл называется
+<code><code><i>префикс</i></code>/sbin/nginx</code>.
+</dd>
+
+<dt>
+<code>--modules-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог, в который будут устанавливаться динамические модули.
+По умолчанию используется каталог <code><code><i>префикс</i></code>/modules</code>.
+</dd>
+
+<dt id="conf_path">
+<code>--conf-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя конфигурационного файла <code>nginx.conf</code>.
+При желании nginx можно всегда запустить с другим конфигурационным файлом,
+указав его в параметре командной строки
+<nobr><code>-c <code><i>файл</i></code></code></nobr>.
+По умолчанию файл называется
+<code><code><i>префикс</i></code>/conf/nginx.conf</code>.
+</dd>
+
+<dt>
+<code>--error-log-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя основного файла ошибок, предупреждений и диагностики.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="ngx_core_module.html#error_log">error_log</a>.
+По умолчанию имя
+файла — <code><code><i>префикс</i></code>/logs/error.log</code>.
+</dd>
+
+<dt>
+<code>--pid-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя файла <code>nginx.pid</code>,
+в котором будет храниться номер главного процесса.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="ngx_core_module.html#pid">pid</a>.
+По умолчанию имя
+файла — <code><code><i>префикс</i></code>/logs/nginx.pid</code>.
+</dd>
+
+<dt>
+<code>--lock-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт префикс имён файлов блокировок.
+После установки значение можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="ngx_core_module.html#lock_file">lock_file</a>.
+По умолчанию используется значение
+<code><code><i>префикс</i></code>/logs/nginx.lock</code>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--user=<code><i>имя</i></code></code>
+</dt>
+<dd>
+задаёт имя непривилегированного пользователя, с правами которого будут
+выполняться рабочие процессы.
+После установки это имя можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="ngx_core_module.html#user">user</a>.
+По умолчанию имя пользователя nobody.
+</dd>
+
+<dt>
+<code>--group=<code><i>имя</i></code></code>
+</dt>
+<dd>
+задаёт имя группы, с правами которой будут выполняться рабочие процессы.
+После установки это имя можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="ngx_core_module.html#user">user</a>.
+По умолчанию группа совпадает с именем непривилегированного пользователя.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt id="build">
+<code>--build=<code><i>имя</i></code></code>
+</dt>
+<dd>
+задаёт необязательное имя сборки nginx.
+</dd>
+
+<dt>
+<code>--builddir=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для сборки.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-select_module</code><br>
+<code>--without-select_module</code>
+</dt>
+<dd>
+разрешает или запрещает сборку модуля для работы сервера
+с помощью метода <code>select()</code>.
+Этот модуль собирается автоматически, если на платформе не обнаружено
+более подходящего метода — kqueue, epoll или /dev/poll.
+</dd>
+
+<dt>
+<code>--with-poll_module</code><br>
+<code>--without-poll_module</code>
+</dt>
+<dd>
+разрешает или запрещает сборку модуля для работы сервера
+с помощью метода <code>poll()</code>.
+Этот модуль собирается автоматически, если на платформе не обнаружено
+более подходящего метода — kqueue, epoll или /dev/poll.
+</dd>
+
+<dt>
+<code>--with-control-api</code>
+</dt>
+<dd>
+разрешает использование
+<a href="https://docs.nginx.com/nginx/admin-guide/basic-functionality/runtime-control#control-api">REST API управления nginx</a>
+(1.31.5), см. также
+параметр командной строки
+<a href="switches.html#l"><code>-l</code></a>.
+</dd>
+
+<dt>
+<code>--with-threads</code>
+</dt>
+<dd>
+разрешает использование
+<a href="ngx_core_module.html#thread_pool">пулов потоков</a>.
+</dd>
+
+<dt>
+<code>--with-file-aio</code>
+</dt>
+<dd>
+разрешает использование
+<a href="http/ngx_http_core_module.html#aio">файлового асинхронного
+ввода-вывода</a> (AIO) во FreeBSD и Linux.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-http_ssl_module</code>
+</dt>
+<dd>
+разрешает сборку модуля для работы HTTP-сервера по
+<a href="http/ngx_http_ssl_module.html">протоколу HTTPS</a>.
+По умолчанию модуль не собирается.
+Для сборки и работы этого модуля нужна библиотека OpenSSL.
+</dd>
+
+<dt>
+<code>--with-http_v2_module</code>
+</dt>
+<dd>
+разрешает сборку модуля для работы HTTP-сервера по протоколу
+<a href="http/ngx_http_v2_module.html">HTTP/2</a>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_v3_module</code>
+</dt>
+<dd>
+разрешает сборку модуля для работы HTTP-сервера по протоколу
+<a href="http/ngx_http_v3_module.html">HTTP/3</a>.
+По умолчанию модуль не собирается.
+Для сборки и работы этого модуля
+нужна библиотека OpenSSL с поддержкой HTTP/3.
+</dd>
+
+<dt>
+<code>--with-http_realip_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_realip_module.html">ngx_http_realip_module</a>,
+позволяющего менять адрес клиента на переданный в указанном поле заголовка.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_addition_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_addition_module.html">ngx_http_addition_module</a>,
+позволяющего добавлять текст до и после ответа.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_xslt_module</code><br>
+<code>--with-http_xslt_module=dynamic</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_xslt_module.html">ngx_http_xslt_module</a>,
+позволяющего преобразовывать XML-ответ с помощью XSLT-шаблонов.
+По умолчанию модуль не собирается.
+Для сборки и работы этого модуля нужны библиотеки
+<a href="http://xmlsoft.org">libxml2</a> и
+<a href="http://xmlsoft.org/XSLT/">libxslt</a>.
+</dd>
+
+<dt>
+<code>--with-http_image_filter_module</code><br>
+<code>--with-http_image_filter_module=dynamic</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_image_filter_module.html">ngx_http_image_filter_module</a>,
+позволяющего преобразовывать изображения в форматах JPEG, GIF, PNG и WebP.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_geoip_module</code><br>
+<code>--with-http_geoip_module=dynamic</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_geoip_module.html">ngx_http_geoip_module</a>,
+создающего переменные, значения которых зависят от IP-адреса клиента,
+используя готовые базы данных
+<a href="http://www.maxmind.com">MaxMind</a>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_sub_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_sub_module.html">ngx_http_sub_module</a>,
+позволяющего изменять в ответе одну заданную строку на другую.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_dav_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_dav_module.html">ngx_http_dav_module</a>,
+предназначенного для автоматизации задач управления файлами на сервере
+по протоколу WebDAV.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_flv_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_flv_module.html">ngx_http_flv_module</a>,
+обеспечивающего серверную поддержку псевдо-стриминга
+для файлов Flash Video (FLV).
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_mp4_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_mp4_module.html">ngx_http_mp4_module</a>,
+обеспечивающего серверную поддержку псевдо-стриминга
+для файлов в формате MP4.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_gunzip_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_gunzip_module.html">ngx_http_gunzip_module</a>,
+позволяющего распаковывать ответы с “<code>Content-Encoding: gzip</code>”
+для тех клиентов, которые не поддерживают метод сжатия “gzip”.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_gzip_static_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_gzip_static_module.html">ngx_http_gzip_static_module</a>,
+позволяющего отдавать вместо обычного файла предварительно сжатый файл
+с таким же именем и с расширением “<code>.gz</code>”.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_auth_request_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_auth_request_module.html">ngx_http_auth_request_module</a>,
+предоставляющего возможность авторизации клиента,
+основанной на результате подзапроса.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_random_index_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_random_index_module.html">ngx_http_random_index_module</a>,
+обслуживающего запросы, оканчивающиеся слэшом (‘<code>/</code>’),
+и выдающего случайный файл в качестве индексного файла каталога.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_secure_link_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_secure_link_module.html">ngx_http_secure_link_module</a>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_degradation_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<code>ngx_http_degradation_module</code>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_slice_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_slice_module.html">ngx_http_slice_module</a>,
+позволяющего разбить запрос на подзапросы,
+каждый из которых возвращает определённый диапазон ответа.
+Модуль обеспечивает более эффективное кэширование больших ответов.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_stub_status_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_stub_status_module.html">ngx_http_stub_status_module</a>,
+предоставляющего доступ к базовой информации о состоянии сервера.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-http_json_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="http/ngx_http_json_module.html">ngx_http_json_module</a>,
+создающего переменные со значениями из документа JSON.
+По умолчанию модуль не собирается.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--without-http_charset_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_charset_module.html">ngx_http_charset_module</a>,
+позволяющего добавлять указанную кодировку в
+поле “Content-Type” заголовка ответа
+и перекодировать данные из одной кодировки в другую.
+</dd>
+
+<dt>
+<code>--without-http_gzip_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_gzip_module.html">сжатия ответов</a> HTTP-сервера.
+Для сборки и работы этого модуля нужна библиотека zlib.
+</dd>
+
+<dt>
+<code>--without-http_ssi_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_ssi_module.html">ngx_http_ssi_module</a>,
+обрабатывающего команды SSI (Server Side Includes)
+в проходящих через него ответах.
+</dd>
+
+<dt>
+<code>--without-http_userid_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_userid_module.html">ngx_http_userid_module</a>,
+выдающего куки для идентификации клиентов.
+</dd>
+
+<dt>
+<code>--without-http_access_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_access_module.html">ngx_http_access_module</a>,
+позволяющего ограничить доступ для определённых адресов клиентов.
+</dd>
+
+<dt>
+<code>--without-http_auth_basic_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_auth_basic_module.html">ngx_http_auth_basic_module</a>,
+позволяющего ограничить доступ к ресурсам с проверкой имени
+и пароля пользователя по протоколу “HTTP Basic Authentication”.
+</dd>
+
+<dt>
+<code>--without-http_mirror_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_mirror_module.html">ngx_http_mirror_module</a>,
+позволяющего зеркалировать исходный запрос при помощи создания фоновых
+зеркалирующих подзапросов.
+</dd>
+
+<dt>
+<code>--without-http_autoindex_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_autoindex_module.html">ngx_http_autoindex_module</a>,
+обслуживающего запросы, оканчивающиеся слэшом (‘<code>/</code>’),
+и выдающего листинг каталога, когда модуль
+<a href="http/ngx_http_index_module.html">ngx_http_index_module</a>
+не нашёл индексный файл.
+</dd>
+
+<dt>
+<code>--without-http_geo_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_geo_module.html">ngx_http_geo_module</a>,
+позволяющего создавать переменные,
+значения которых зависят от IP-адреса клиента.
+</dd>
+
+<dt>
+<code>--without-http_map_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_map_module.html">ngx_http_map_module</a>,
+позволяющего создавать переменные,
+значения которых зависят от значений других переменных.
+</dd>
+
+<dt>
+<code>--without-http_split_clients_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_split_clients_module.html">ngx_http_split_clients_module</a>,
+позволяющего создавать переменные для A/B тестирования.
+</dd>
+
+<dt>
+<code>--without-http_referer_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_referer_module.html">ngx_http_referer_module</a>,
+позволяющего блокировать доступ к сайту для запросов с неверными значениями
+поля “Referer” в заголовке.
+</dd>
+
+<dt>
+<code>--without-http_rewrite_module</code>
+</dt>
+<dd>
+запрещает сборку модуля HTTP-сервера, позволяющего
+<a href="http/ngx_http_rewrite_module.html">делать
+перенаправления и менять URI запросов</a>.
+Для сборки и работы этого модуля нужна библиотека PCRE.
+</dd>
+
+<dt>
+<code>--without-http_proxy_module</code>
+</dt>
+<dd>
+запрещает сборку
+<a href="http/ngx_http_proxy_module.html">проксирующего модуля</a>
+HTTP-сервера.
+
+</dd>
+
+<dt>
+<code>--without-http_fastcgi_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_fastcgi_module.html">ngx_http_fastcgi_module</a>,
+позволяющего передавать запросы FastCGI-серверу.
+</dd>
+
+<dt>
+<code>--without-http_uwsgi_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_uwsgi_module.html">ngx_http_uwsgi_module</a>,
+позволяющего передавать запросы uwsgi-серверу.
+</dd>
+
+<dt>
+<code>--without-http_scgi_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_scgi_module.html">ngx_http_scgi_module</a>,
+позволяющего передавать запросы SCGI-серверу.
+</dd>
+
+<dt>
+<code>--without-http_grpc_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_grpc_module.html">ngx_http_grpc_module</a>,
+позволяющего передавать запросы gRPC-серверу.
+</dd>
+
+<dt>
+<code>--without-http_tunnel_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_tunnel_module.html">ngx_http_tunnel_module</a>,
+позволяющего обрабатывать запросы HTTP/1.1 CONNECT
+для установки сквозного виртуального соединения с другим сервером.
+</dd>
+
+<dt>
+<code>--without-http_memcached_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_memcached_module.html">ngx_http_memcached_module</a>,
+позволяющего получать ответы из сервера memcached.
+</dd>
+
+<dt>
+<code>--without-http_limit_conn_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_limit_conn_module.html">ngx_http_limit_conn_module</a>,
+позволяющего ограничить число соединений по заданному ключу,
+в частности, число соединений с одного IP-адреса.
+</dd>
+
+<dt>
+<code>--without-http_limit_req_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_limit_req_module.html">ngx_http_limit_req_module</a>,
+позволяющего ограничить скорость обработки запросов по заданному ключу или,
+как частный случай, скорость обработки запросов, поступающих с одного IP-адреса.
+</dd>
+
+<dt>
+<code>--without-http_empty_gif_module</code>
+</dt>
+<dd>
+запрещает сборку модуля,
+<a href="http/ngx_http_empty_gif_module.html">выдающего однопиксельный
+прозрачный GIF</a>.
+</dd>
+
+<dt>
+<code>--without-http_browser_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="http/ngx_http_browser_module.html">ngx_http_browser_module</a>,
+создающего переменные, значения которых зависят от значения
+поля “User-Agent” в заголовке запроса.
+</dd>
+
+<dt>
+<code>--without-http_upstream_hash_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="http/ngx_http_upstream_module.html#hash">hash</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_ip_hash_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="http/ngx_http_upstream_module.html#ip_hash">ip_hash</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_least_conn_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="http/ngx_http_upstream_module.html#least_conn">least_conn</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_least_time_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="http/ngx_http_upstream_module.html#least_time">least_time</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_random_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="http/ngx_http_upstream_module.html#random">random</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_keepalive_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего
+<a href="http/ngx_http_upstream_module.html#keepalive">кэширование
+соединений</a> к вышестоящим серверам.
+</dd>
+
+<dt>
+<code>--without-http_upstream_zone_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, позволяющего сохранять рабочее состояние группы
+вышестоящих серверов в
+<a href="http/ngx_http_upstream_module.html#zone">разделяемой
+памяти</a>.
+</dd>
+
+<dt>
+<code>--without-http_upstream_sticky_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего
+<a href="http/ngx_http_upstream_module.html#sticky">режим
+привязки сеансов</a> к вышестоящим серверам.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-http_perl_module</code><br>
+<code>--with-http_perl_module=dynamic</code>
+</dt>
+<dd>
+разрешает сборку модуля, добавляющего
+<a href="http/ngx_http_perl_module.html">встроенный Perl</a>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-perl_modules_path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог, в котором будут находиться файлы модулей Perl.
+</dd>
+
+<dt>
+<code>--with-perl=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя исполняемого файла Perl.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--http-log-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт имя основного файла регистрации запросов HTTP-сервера.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_log_module.html#access_log">access_log</a>.
+По умолчанию имя
+файла — <code><code><i>префикс</i></code>/logs/access.log</code>.
+</dd>
+
+<dt>
+<code>--http-client-body-temp-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для хранения временных файлов
+с телами запросов клиентов.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_core_module.html#client_body_temp_path">client_body_temp_path</a>.
+По умолчанию используется каталог
+<code><code><i>префикс</i></code>/client_body_temp</code>.
+</dd>
+
+<dt>
+<code>--http-proxy-temp-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для хранения временных файлов
+с данными, полученными от проксируемых серверов.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_proxy_module.html#proxy_temp_path">proxy_temp_path</a>.
+По умолчанию используется каталог
+<code><code><i>префикс</i></code>/proxy_temp</code>.
+</dd>
+
+<dt>
+<code>--http-fastcgi-temp-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для хранения временных файлов
+с данными, полученными от FastCGI-серверов.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_fastcgi_module.html#fastcgi_temp_path">fastcgi_temp_path</a>.
+По умолчанию используется каталог
+<code><code><i>префикс</i></code>/fastcgi_temp</code>.
+</dd>
+
+<dt>
+<code>--http-uwsgi-temp-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для хранения временных файлов
+с данными, полученными от uwsgi-серверов.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_uwsgi_module.html#uwsgi_temp_path">uwsgi_temp_path</a>.
+По умолчанию используется каталог
+<code><code><i>префикс</i></code>/uwsgi_temp</code>.
+</dd>
+
+<dt>
+<code>--http-scgi-temp-path=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт каталог для хранения временных файлов
+с данными, полученными от SCGI-серверов.
+После установки имя файла можно всегда поменять в конфигурационном
+файле <code>nginx.conf</code> с помощью директивы
+<a href="http/ngx_http_scgi_module.html#scgi_temp_path">scgi_temp_path</a>.
+По умолчанию используется каталог
+<code><code><i>префикс</i></code>/scgi_temp</code>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--without-http</code>
+</dt>
+<dd>
+запрещает <a href="http/ngx_http_core_module.html">HTTP-сервер</a>.
+</dd>
+
+<dt>
+<code>--without-http-cache</code>
+</dt>
+<dd>
+запрещает HTTP-кэш.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-mail</code><br>
+<code>--with-mail=dynamic</code>
+</dt>
+<dd>
+разрешает POP3/IMAP4/SMTP
+<a href="mail/ngx_mail_core_module.html">почтовый прокси-сервер</a>.
+</dd>
+
+<dt>
+<code>--with-mail_ssl_module</code>
+</dt>
+<dd>
+разрешает сборку модуля для работы почтового прокси-сервера по
+<a href="mail/ngx_mail_ssl_module.html">протоколу SSL/TLS</a>.
+По умолчанию модуль не собирается.
+Для сборки и работы этого модуля нужна библиотека OpenSSL.
+</dd>
+
+<dt>
+<code>--without-mail_pop3_module</code>
+</dt>
+<dd>
+запрещает протокол <a href="mail/ngx_mail_pop3_module.html">POP3</a>
+в почтовом прокси-сервере.
+</dd>
+
+<dt>
+<code>--without-mail_imap_module</code>
+</dt>
+<dd>
+запрещает протокол <a href="mail/ngx_mail_imap_module.html">IMAP</a>
+в почтовом прокси-сервере.
+</dd>
+
+<dt>
+<code>--without-mail_smtp_module</code>
+</dt>
+<dd>
+запрещает протокол <a href="mail/ngx_mail_smtp_module.html">SMTP</a>
+в почтовом прокси-сервере.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-stream</code><br>
+<code>--with-stream=dynamic</code>
+</dt>
+<dd>
+разрешает сборку
+<a href="stream/ngx_stream_core_module.html">модуля stream</a>
+для TCP/UDP-проксирования и балансировки.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-stream_ssl_module</code>
+</dt>
+<dd>
+разрешает сборку модуля для работы модуля stream по
+<a href="stream/ngx_stream_ssl_module.html">протоколу SSL/TLS</a>.
+По умолчанию модуль не собирается.
+Для сборки и работы этого модуля нужна библиотека OpenSSL.
+</dd>
+
+<dt>
+<code>--with-stream_realip_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="stream/ngx_stream_realip_module.html">ngx_stream_realip_module</a>,
+позволяющего менять адрес клиента на переданный в заголовке протокола PROXY.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-stream_geoip_module</code><br>
+<code>--with-stream_geoip_module=dynamic</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="stream/ngx_stream_geoip_module.html">ngx_stream_geoip_module</a>,
+создающего переменные, значения которых зависят от IP-адреса клиента,
+используя готовые базы данных
+<a href="http://www.maxmind.com">MaxMind</a>.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--with-stream_ssl_preread_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="stream/ngx_stream_ssl_preread_module.html">ngx_stream_ssl_preread_module</a>,
+позволяющего извлекать информацию из сообщения
+<a href="https://datatracker.ietf.org/doc/html/rfc5246#section-7.4.1.2">ClientHello</a>
+без терминирования SSL/TLS.
+По умолчанию модуль не собирается.
+</dd>
+
+<dt>
+<code>--without-stream_limit_conn_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_limit_conn_module.html">ngx_stream_limit_conn_module</a>,
+позволяющего ограничить число соединений по заданному ключу,
+в частности, число соединений с одного IP-адреса.
+</dd>
+
+<dt>
+<code>--without-stream_access_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_access_module.html">ngx_stream_access_module</a>,
+позволяющего ограничить доступ для определённых адресов клиентов.
+</dd>
+
+<dt>
+<code>--without-stream_geo_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_geo_module.html">ngx_stream_geo_module</a>,
+позволяющего создавать переменные,
+значения которых зависят от IP-адреса клиента.
+</dd>
+
+<dt>
+<code>--without-stream_map_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_map_module.html">ngx_stream_map_module</a>,
+позволяющего создавать переменные,
+значения которых зависят от значений других переменных.
+</dd>
+
+<dt>
+<code>--without-stream_split_clients_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_split_clients_module.html">ngx_stream_split_clients_module</a>,
+позволяющего создавать переменные для A/B тестирования.
+</dd>
+
+<dt>
+<code>--without-stream_return_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_return_module.html">ngx_stream_return_module</a>,
+позволяющего отправить заданное значение клиенту
+и после этого закрыть соединение.
+</dd>
+
+<dt>
+<code>--without-stream_pass_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_pass_module.html">ngx_stream_pass_module</a>,
+позволяющего передавать принятые соединения на другие слушающие сокеты.
+</dd>
+
+<dt>
+<code>--without-stream_set_module</code>
+</dt>
+<dd>
+запрещает сборку модуля
+<a href="stream/ngx_stream_set_module.html">ngx_stream_set_module</a>,
+позволяющего устанавливать значение переменной.
+</dd>
+
+<dt>
+<code>--without-stream_upstream_hash_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="stream/ngx_stream_upstream_module.html#hash">hash</a>.
+</dd>
+
+<dt>
+<code>--without-stream_upstream_least_conn_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="stream/ngx_stream_upstream_module.html#least_conn">least_conn</a>.
+</dd>
+
+<dt>
+<code>--without-stream_upstream_least_time_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="stream/ngx_stream_upstream_module.html#least_time">least_time</a>.
+</dd>
+
+<dt>
+<code>--without-stream_upstream_random_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, реализующего метод балансировки нагрузки
+<a href="stream/ngx_stream_upstream_module.html#random">random</a>.
+</dd>
+
+<dt>
+<code>--without-stream_upstream_zone_module</code>
+</dt>
+<dd>
+запрещает сборку модуля, позволяющего сохранять рабочее состояние группы
+вышестоящих серверов в
+<a href="stream/ngx_stream_upstream_module.html#zone">разделяемой
+памяти</a>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-google_perftools_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<a href="ngx_google_perftools_module.html">ngx_google_perftools_module</a>,
+обеспечивающего поддержку профилирования рабочих процессов nginx при помощи
+<a href="https://github.com/gperftools/gperftools">Google Performance Tools</a>.
+Модуль предназначен для разработчиков nginx и не собирается по умолчанию.
+</dd>
+
+<dt>
+<code>--with-cpp_test_module</code>
+</dt>
+<dd>
+разрешает сборку модуля
+<code>ngx_cpp_test_module</code>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--add-module=<code><i>путь</i></code></code>
+</dt>
+<dd>
+разрешает сборку внешнего модуля.
+</dd>
+
+<dt>
+<code>--add-dynamic-module=<code><i>путь</i></code></code>
+</dt>
+<dd>
+разрешает сборку внешнего динамического модуля.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-compat</code>
+</dt>
+<dd>
+включает режим совместимости с динамическими модулями.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-cc=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт компилятор, который будет использоваться при сборке.
+</dd>
+
+<dt>
+<code>--with-cpp=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт препроцессор, который будет использоваться при сборке.
+</dd>
+
+<dt>
+<code>--with-cc-opt=<code><i>параметры</i></code></code>
+</dt>
+<dd>
+задаёт дополнительные параметры, которые будут добавлены к переменной CFLAGS.
+При использовании системной библиотеки PCRE во FreeBSD, нужно указать
+<code>--with-cc-opt="-I /usr/local/include"</code>.
+Если нужно увеличить число файлов, с которыми может работать
+<code>select()</code>, то это тоже можно задать здесь же:
+<code>--with-cc-opt="-D FD_SETSIZE=2048"</code>.
+</dd>
+
+<dt>
+<code>--with-ld-opt=<code><i>параметры</i></code></code>
+</dt>
+<dd>
+задаёт дополнительные параметры, которые будут использованы при линковке.
+При использовании системной библиотеки PCRE во FreeBSD, нужно указать
+<code>--with-ld-opt="-L /usr/local/lib"</code>.
+</dd>
+
+<dt>
+<code>--with-cpu-opt=<code><i>cpu</i></code></code>
+</dt>
+<dd>
+разрешает сборку для одного из следующих процессоров:
+<code>pentium</code>, <code>pentiumpro</code>,
+<code>pentium3</code>, <code>pentium4</code>,
+<code>athlon</code>, <code>opteron</code>,
+<code>sparc32</code>, <code>sparc64</code>,
+<code>ppc64</code>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--without-pcre</code>
+</dt>
+<dd>
+запрещает использование библиотеки PCRE.
+</dd>
+
+<dt>
+<code>--with-pcre</code>
+</dt>
+<dd>
+разрешает использование библиотеки PCRE.
+</dd>
+
+<dt>
+<code>--with-pcre=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт путь к исходным текстам библиотеки PCRE.
+Дистрибутив библиотеки
+нужно взять на сайте <a href="http://www.pcre.org">PCRE</a>
+и распаковать.
+Всё остальное сделают <code>./configure</code> nginx’а и
+<code>make</code>.
+Библиотека нужна для использования регулярных выражений в директиве
+<a href="http/ngx_http_core_module.html#location">location</a>
+и для модуля
+<a href="http/ngx_http_rewrite_module.html">ngx_http_rewrite_module</a>.
+</dd>
+
+<dt>
+<code>--with-pcre-opt=<code><i>параметры</i></code></code>
+</dt>
+<dd>
+задаёт дополнительные параметры сборки PCRE.
+</dd>
+
+<dt>
+<code>--with-pcre-jit</code>
+</dt>
+<dd>
+собирает библиотеку PCRE с
+поддержкой JIT-компиляции (1.1.12, директива
+<a href="ngx_core_module.html#pcre_jit">pcre_jit</a>).
+</dd>
+
+<dt>
+<code>--without-pcre2</code>
+</dt>
+<dd>
+запрещает использование библиотеки PCRE2
+вместо исходной библиотеки PCRE (1.21.5).
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-zlib=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт путь к исходным текстам библиотеки zlib.
+Дистрибутив библиотеки нужно взять на сайте
+<a href="http://zlib.net">zlib</a> и распаковать.
+Всё остальное сделают <code>./configure</code> nginx’а и
+<code>make</code>.
+Библиотека нужна для модуля
+<a href="http/ngx_http_gzip_module.html">ngx_http_gzip_module</a>.
+</dd>
+
+<dt>
+<code>--with-zlib-opt=<code><i>параметры</i></code></code>
+</dt>
+<dd>
+задаёт дополнительные параметры сборки zlib.
+</dd>
+
+<dt>
+<code>--with-zlib-asm=<code><i>cpu</i></code></code>
+</dt>
+<dd>
+разрешает использование при сборке библиотеки zlib ассемблерных вставок,
+оптимизированных для одного из следующих процессоров:
+<code>pentium</code>, <code>pentiumpro</code>.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-libatomic</code>
+</dt>
+<dd>
+разрешает сборку с библиотекой libatomic_ops.
+</dd>
+
+<dt>
+<code>--with-libatomic=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт путь к исходным текстам библиотеки libatomic_ops.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-openssl=<code><i>путь</i></code></code>
+</dt>
+<dd>
+задаёт путь к исходным текстам библиотеки OpenSSL.
+</dd>
+
+<dt>
+<code>--with-openssl-opt=<code><i>параметры</i></code></code>
+</dt>
+<dd>
+задаёт дополнительные параметры сборки OpenSSL.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <dl class="compact">
+
+<dt>
+<code>--with-debug</code>
+</dt>
+<dd>
+разрешает <a href="debugging_log.html">отладочный лог</a>.
+</dd>
+
+</dl><p> 
+</p><p>
+Пример использования параметров (всё это нужно набрать в одной строке):
+</p> <blockquote class="example"><pre>
+./configure
+    --sbin-path=/usr/local/nginx/nginx
+    --conf-path=/usr/local/nginx/nginx.conf
+    --pid-path=/usr/local/nginx/nginx.pid
+    --with-http_ssl_module
+    --with-pcre=../pcre2-10.39
+    --with-zlib=../zlib-1.3
+</pre></blockquote><p> 
+</p><p>
+После конфигурации
+nginx компилируется и устанавливается с помощью <code>make</code>.
+</p></div></div></body></html>

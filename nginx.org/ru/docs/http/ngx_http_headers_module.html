@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_headers_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_headers_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_headers_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#add_header">add_header</a><br>     <a href="#add_header_inherit">add_header_inherit</a><br>     <a href="#add_trailer">add_trailer</a><br>     <a href="#add_trailer_inherit">add_trailer_inherit</a><br>     <a href="#expires">expires</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_headers_module</code> позволяет выдавать
+поля заголовка “Expires” и “Cache-Control”,
+а также добавлять произвольные поля в заголовок ответа.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+expires    24h;
+expires    modified +24h;
+expires    @24h;
+expires    0;
+expires    -1;
+expires    epoch;
+expires    $expires;
+add_header Cache-Control private;
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="add_header"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>add_header</strong> 
+<code><i>имя</i></code> <code><i>значение</i></code>
+[<code>always</code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Добавляет указанное поле в заголовок ответа при условии, что код ответа
+равен 200, 201 (1.3.10), 204, 206, 301, 302, 303, 304,
+307 (1.1.16, 1.0.13) или 308 (1.13.0).
+В значении параметра можно использовать переменные.
+</p><a name="add_header_default_inherit"></a><p>
+Директив <code>add_header</code> может быть несколько.
+Директивы наследуются с предыдущего уровня конфигурации при условии, что
+на данном уровне не описаны свои директивы <code>add_header</code>.
+Правила наследования могут быть переопределены при помощи
+директивы <a href="#add_header_inherit">add_header_inherit</a> (1.29.3).
+</p><p>
+Если указан параметр <code>always</code> (1.7.5),
+то поле заголовка будет добавлено независимо от кода ответа.
+</p><a name="add_header_inherit"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>add_header_inherit</strong> 
+    <code>on</code> |
+    <code>off</code> |
+    <code>merge</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>add_header_inherit on;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if in location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.29.3.
+            </p></div><p>
+Позволяет изменять правила наследования значений, указанных в
+директивах <a href="#add_header">add_header</a>.
+По умолчанию используется
+<a href="#add_header_default_inherit">стандартная</a> модель наследования.
+</p><p>
+Параметр <code>merge</code> включает добавление значений
+с предыдущего уровня к значениям, указанным на текущем уровне.
+</p><p>
+Параметр <code>off</code> отменяет наследование значений
+с предыдущего уровня конфигурации.
+</p><p>
+Сами правила наследования также наследуются стандартным образом.
+Например <code>add_header_inherit merge;</code>,
+определённый на верхнем уровне,
+будет рекурсивно наследоваться во всех вложенных уровнях
+до тех пор, пока не будет переопределён.
+</p><a name="add_trailer"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>add_trailer</strong> 
+<code><i>имя</i></code> <code><i>значение</i></code>
+[<code>always</code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.13.2.
+            </p></div><p>
+Добавляет указанное поле в конец ответа при условии, что код ответа
+равен 200, 201, 206, 301, 302, 303, 307 или 308.
+В значении можно использовать переменные.
+</p><a name="add_trailer_default_inherit"></a><p>
+Директив <code>add_trailer</code> может быть несколько.
+Директивы наследуются с предыдущего уровня конфигурации при условии, что
+на данном уровне не описаны свои директивы <code>add_trailer</code>.
+Правила наследования могут быть переопределены при помощи
+директивы <a href="#add_trailer_inherit">add_trailer_inherit</a> (1.29.3).
+</p><p>
+Если указан параметр <code>always</code>,
+то указанное поле будет добавлено независимо от кода ответа.
+</p><a name="add_trailer_inherit"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>add_trailer_inherit</strong> 
+    <code>on</code> |
+    <code>off</code> |
+    <code>merge</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>add_trailer_inherit on;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if in location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.29.3.
+            </p></div><p>
+Позволяет изменять правила наследования значений, указанных в
+директивах <a href="#add_trailer">add_trailer</a>.
+По умолчанию используется
+<a href="#add_trailer_default_inherit">стандартная</a> модель наследования.
+</p><p>
+Параметр <code>merge</code> включает добавление значений
+с предыдущего уровня к значениям, указанным на текущем уровне.
+</p><p>
+Параметр <code>off</code> отменяет наследование значений
+с предыдущего уровня конфигурации.
+</p><p>
+Сами правила наследования также наследуются стандартным образом.
+Например <code>add_trailer_inherit merge;</code>,
+определённый на верхнем уровне,
+будет рекурсивно наследоваться во всех вложенных уровнях
+до тех пор, пока не будет переопределён.
+</p><a name="expires"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>expires</strong> [<code>modified</code>] <code><i>время</i></code>;</code><br><code><strong>expires</strong> 
+    <code>epoch</code> |
+    <code>max</code> |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>expires off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code>, <code>if в location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает или запрещает добавлять или менять поля “Expires”
+и “Cache-Control” в заголовке ответа при условии, что код ответа
+равен 200, 201 (1.3.10), 204, 206, 301, 302, 303, 304,
+307 (1.1.16, 1.0.13) или 308 (1.13.0).
+В качестве параметра можно задать положительное или отрицательное
+<a href="../syntax.html">время</a>.
+</p><p>
+Время в поле “Expires” получается как сумма текущего времени
+и времени, заданного в директиве.
+Если используется параметр <code>modified</code> (0.7.0, 0.6.32),
+то время получается как сумма
+времени модификации файла и времени, заданного в директиве.
+</p><p>
+Кроме того, с помощью префикса “<code>@</code>” можно задать
+время суток (0.7.9, 0.6.34):
+</p> <blockquote class="example"><pre>
+expires @15h30m;
+</pre></blockquote><p> 
+</p><p>
+Содержимое поля “Cache-Control” зависит от знака
+заданного времени:
+</p> <ul class="compact">
+
+<li>
+отрицательное время — “Cache-Control: no-cache”.
+</li>
+
+<li>
+положительное или равное нулю время —
+“Cache-Control: max-age=<code><i>t</i></code>”,
+где <code><i>t</i></code> это время в секундах, заданное в директиве.
+</li>
+
+</ul><p> 
+</p><p>
+Параметр <code>epoch</code> задаёт время
+“<code>Thu, 01 Jan 1970 00:00:01 GMT</code>”
+(1 января 1970 00:00:01 GMT) для поля “Expires”
+и “<code>no-cache</code>” для поля “Cache-Control”.
+</p><p>
+Параметр <code>max</code> задаёт время
+“<code>Thu, 31 Dec 2037 23:55:55 GMT</code>”
+(31 декабря 2037 23:55:55 GMT) для поля “Expires”
+и 10 лет для поля “Cache-Control”.
+</p><p>
+Параметр <code>off</code> запрещает добавлять или менять поля
+“Expires” и “Cache-Control” в заголовке ответа.
+</p><p>
+В значении последнего параметра можно использовать переменные (1.7.9):
+</p> <blockquote class="example"><pre>
+map $sent_http_content_type $expires {
+    default         off;
+    application/pdf 42d;
+    ~image/         max;
+}
+
+expires $expires;
+</pre></blockquote><p> 
+</p>
+
+</div></div></body></html>

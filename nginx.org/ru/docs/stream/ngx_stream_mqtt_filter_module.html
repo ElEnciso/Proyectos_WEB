@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_stream_mqtt_filter_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/stream/ngx_stream_mqtt_filter_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_stream_mqtt_filter_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#mqtt">mqtt</a><br>     <a href="#mqtt_buffers">mqtt_buffers</a><br>     <a href="#mqtt_rewrite_buffer_size">mqtt_rewrite_buffer_size</a><br>     <a href="#mqtt_set_connect">mqtt_set_connect</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_stream_mqtt_filter_module</code> (1.23.4) обеспечивает
+поддержку протокола Message Queuing Telemetry Transport (MQTT)
+версий
+<a href="https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html">3.1.1</a>
+и
+<a href="https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html">5.0</a>.
+</p><p>
+</p> <blockquote class="note">
+Модуль доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+listen            127.0.0.1:18883;
+proxy_pass        backend;
+proxy_buffer_size 16k;
+
+mqtt             on;
+mqtt_set_connect clientid "$client";
+mqtt_set_connect username "$name";
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="mqtt"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mqtt</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>mqtt off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Включает протокол MQTT для данного виртуального сервера.
+</p><a name="mqtt_buffers"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mqtt_buffers</strong> <code><i>число</i></code> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>mqtt_buffers 100 1k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.25.1.
+            </p></div><p>
+Задаёт <code><i>число</i></code> и <code><i>размер</i></code> буферов,
+необходимых для обработки MQTT-сообщений,
+для одного соединения.
+</p><a name="mqtt_rewrite_buffer_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mqtt_rewrite_buffer_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>mqtt_rewrite_buffer_size 4k|8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.25.1.
+Вместо неё следует использовать директиву
+<a href="#mqtt_buffers">mqtt_buffers</a>.
+</blockquote><p> 
+</p><p>
+Задаёт <code><i>размер</i></code> буфера,
+в который будет записываться модифицированное сообщение.
+По умолчанию размер одного буфера равен размеру страницы памяти.
+В зависимости от платформы это или 4K, или 8K,
+однако его можно сделать меньше.
+</p><a name="mqtt_set_connect"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>mqtt_set_connect</strong> <code>поле</code> <code><i>значение</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Устанавливает <code>поле</code>
+в заданное <code>значение</code> для сообщения CONNECT.
+Поддерживаются следующие поля:
+<code>clientid</code>,
+<code>username</code> и
+<code>password</code>.
+В качестве значения можно использовать текст, переменные и их комбинации.
+</p><p>
+На одном уровне может быть указано
+несколько директив <code>mqtt_set_connect</code>:
+</p> <blockquote class="example"><pre>
+mqtt_set_connect clientid "$client";
+mqtt_set_connect username "$name";
+</pre></blockquote><p> 
+</p>
+
+</div></div></body></html>

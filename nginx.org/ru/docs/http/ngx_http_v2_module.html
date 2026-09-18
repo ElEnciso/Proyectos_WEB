@@ -1,0 +1,559 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_v2_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_v2_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_v2_module</h2><table width="100%"><tr><td align="left"><a href="#issues">Известные проблемы</a><br><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#http2">http2</a><br>     <a href="#http2_body_preread_size">http2_body_preread_size</a><br>     <a href="#http2_chunk_size">http2_chunk_size</a><br>     <a href="#http2_idle_timeout">http2_idle_timeout</a><br>     <a href="#http2_max_concurrent_pushes">http2_max_concurrent_pushes</a><br>     <a href="#http2_max_concurrent_streams">http2_max_concurrent_streams</a><br>     <a href="#http2_max_field_size">http2_max_field_size</a><br>     <a href="#http2_max_header_size">http2_max_header_size</a><br>     <a href="#http2_max_requests">http2_max_requests</a><br>     <a href="#http2_push">http2_push</a><br>     <a href="#http2_push_preload">http2_push_preload</a><br>     <a href="#http2_recv_buffer_size">http2_recv_buffer_size</a><br>     <a href="#http2_recv_timeout">http2_recv_timeout</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_v2_module</code> (1.9.5) обеспечивает
+поддержку
+<a href="https://datatracker.ietf.org/doc/html/rfc7540">HTTP/2</a>.
+</p><p>
+По умолчанию этот модуль не собирается, его сборку необходимо разрешить
+с помощью конфигурационного параметра
+<code>--with-http_v2_module</code>.
+</p>
+
+
+<a name="issues"></a><center><h4>Известные проблемы</h4></center><p>
+До версии 1.9.14
+буферизация тела запроса клиента не могла быть запрещена
+независимо от
+значения директив
+<a href="ngx_http_proxy_module.html#proxy_request_buffering">proxy_request_buffering</a>,
+<a href="ngx_http_fastcgi_module.html#fastcgi_request_buffering">fastcgi_request_buffering</a>,
+<a href="ngx_http_uwsgi_module.html#uwsgi_request_buffering">uwsgi_request_buffering</a> и
+<a href="ngx_http_scgi_module.html#scgi_request_buffering">scgi_request_buffering</a>.
+</p><p>
+До версии 1.19.1
+механизм <a href="ngx_http_core_module.html#lingering_close">lingering_close</a>
+не использовался в управлении закрытием HTTP/2-соединений.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+server {
+    listen 443 ssl;
+
+    http2 on;
+
+    ssl_certificate server.crt;
+    ssl_certificate_key server.key;
+}
+</pre></blockquote><p> 
+Чтобы принимать HTTP/2-соединения по TLS, необходимо
+наличие поддержки расширения “Application-Layer Protocol Negotiation” (ALPN)
+протокола TLS, появившейся в
+<a href="http://www.openssl.org">OpenSSL</a> версии 1.0.2.
+</p><p>
+Если
+директива <a href="ngx_http_ssl_module.html#ssl_prefer_server_ciphers">ssl_prefer_server_ciphers</a>
+установлена в значение “<code>on</code>”,
+<a href="ngx_http_ssl_module.html#ssl_ciphers">шифры</a>
+должны быть настроены таким образом, чтобы соответствовать чёрному списку
+<a href="https://datatracker.ietf.org/doc/html/rfc9113#appendix-A">RFC 9113, Appendix A</a>,
+а также поддерживаться клиентами.
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="http2"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2 off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.25.1.
+            </p></div><p>
+Разрешает
+протокол
+<a href="https://datatracker.ietf.org/doc/html/rfc9113">HTTP/2</a>.
+</p><a name="http2_body_preread_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_body_preread_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_body_preread_size 64k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.0.
+            </p></div><p>
+Задаёт <code><i>размер</i></code> буфера для каждого запроса,
+в который может сохраняться тело запроса
+до того, как оно начнёт обрабатываться.
+</p><a name="http2_chunk_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_chunk_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_chunk_size 8k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт максимальный размер частей,
+на которое будет разделяться тело ответа.
+Слишком маленькое значение может привести к росту накладных расходов.
+Слишком большое значение может негативно сказаться на приоритизации из-за
+<a href="http://en.wikipedia.org/wiki/Head-of-line_blocking">
+блокировки очереди</a>.
+</p><a name="http2_idle_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_idle_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_idle_timeout 3m;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.19.7.
+Вместо неё следует использовать директиву
+<a href="ngx_http_core_module.html#keepalive_timeout">keepalive_timeout</a>.
+</blockquote><p> 
+</p><p>
+Задаёт таймаут неактивности, после которого соединение закрывается.
+</p><a name="http2_max_concurrent_pushes"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_max_concurrent_pushes</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_max_concurrent_pushes 10;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.13.9.
+            </p></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.25.1.
+</blockquote><p> 
+</p><p>
+Ограничивает максимальное число параллельных
+<a href="#http2_push">push</a>-запросов в соединении.
+</p><a name="http2_max_concurrent_streams"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_max_concurrent_streams</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_max_concurrent_streams 128;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт максимальное число параллельных HTTP/2-потоков
+в соединении.
+</p><a name="http2_max_field_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_max_field_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_max_field_size 4k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.19.7.
+Вместо неё следует использовать директиву
+<a href="ngx_http_core_module.html#large_client_header_buffers">large_client_header_buffers</a>.
+</blockquote><p> 
+</p><p>
+Ограничивает максимальный размер
+заголовка запроса, сжатого при помощи
+<a href="https://datatracker.ietf.org/doc/html/rfc7541">HPACK</a>.
+Ограничение применяется в равной степени как к имени, так и к значению.
+Если применяется кодирование Хаффмана,
+то фактический размер распакованных строк имени и значения может быть больше.
+Ограничение по умолчанию подходит для большинства запросов.
+</p><a name="http2_max_header_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_max_header_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_max_header_size 16k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.19.7.
+Вместо неё следует использовать директиву
+<a href="ngx_http_core_module.html#large_client_header_buffers">large_client_header_buffers</a>.
+</blockquote><p> 
+</p><p>
+Ограничивает максимальный размер всего списка заголовков запроса после
+распаковки <a href="https://datatracker.ietf.org/doc/html/rfc7541">HPACK</a>.
+Ограничение по умолчанию подходит для большинства запросов.
+</p><a name="http2_max_requests"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_max_requests</strong> <code><i>число</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_max_requests 1000;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.6.
+            </p></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.19.7.
+Вместо неё следует использовать директиву
+<a href="ngx_http_core_module.html#keepalive_requests">keepalive_requests</a>.
+</blockquote><p> 
+</p><p>
+Задаёт максимальное число запросов (включая
+<a href="#http2_push">push</a>-запросы), которые можно
+сделать по одному соединению HTTP/2,
+после чего очередной клиентский запрос приведёт к закрытию соединения
+и необходимости установить новое соединение.
+</p><p>
+Периодическое закрытие соединений необходимо для освобождения
+памяти, выделенной под конкретные соединения.
+Поэтому использование слишком большого максимального числа запросов
+может приводить к чрезмерному потреблению памяти и не рекомендуется.
+</p><a name="http2_push"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_push</strong> <code><i>uri</i></code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_push off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.13.9.
+            </p></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.25.1.
+Вместо неё можно использовать директиву
+<a href="ngx_http_core_module.html#early_hints">early_hints</a>.
+</blockquote><p> 
+</p><p>
+Заблаговременно отправляет
+(<a href="https://datatracker.ietf.org/doc/html/rfc9113#section-8.4">push</a>) запрос
+к заданному <code><i>uri</i></code>
+вместе с ответом на оригинальный запрос.
+Будут обработаны только относительные URI с абсолютными путями,
+например:
+</p> <blockquote class="example"><pre>
+http2_push /static/css/main.css;
+</pre></blockquote><p> 
+В значении <code><i>uri</i></code> допустимо использование переменных.
+</p><p>
+На одном уровне конфигурации можно указать несколько
+<code>http2_push</code> директив.
+Параметр <code>off</code> отменяет действие
+унаследованных с предыдущего уровня конфигурации
+директив <code>http2_push</code>.
+</p><a name="http2_push_preload"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_push_preload</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_push_preload off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.13.9.
+            </p></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.25.1.
+</blockquote><p> 
+</p><p>
+Разрешает автоматическое преобразование
+<a href="https://www.w3.org/TR/preload/#server-push-http-2">preload
+links</a>,
+указанных в полях “Link” заголовка ответа, в
+<a href="https://datatracker.ietf.org/doc/html/rfc9113#section-8.4">push</a>-запросы.
+</p><a name="http2_recv_buffer_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_recv_buffer_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_recv_buffer_size 256k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт размер входного буфера для
+<a href="../ngx_core_module.html#worker_processes">рабочего
+процесса</a>.
+</p><a name="http2_recv_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>http2_recv_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>http2_recv_timeout 30s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+</p> <blockquote class="note">
+Эта директива устарела начиная с версии 1.19.7.
+Вместо неё следует использовать директиву
+<a href="ngx_http_core_module.html#client_header_timeout">client_header_timeout</a>.
+</blockquote><p> 
+</p><p>
+Задаёт таймаут в случае, когда от клиента ожидаются ещё данные,
+после которого соединение закрывается.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+Модуль <code>ngx_http_v2_module</code>
+поддерживает следующие встроенные переменные:
+</p> <dl>
+
+<dt id="var_http2"><code>$http2</code></dt>
+<dd>
+согласованный идентификатор протокола:
+“<code>h2</code>” для HTTP/2 через TLS,
+“<code>h2c</code>” для HTTP/2 через незашифрованный TCP,
+либо пустая строка.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

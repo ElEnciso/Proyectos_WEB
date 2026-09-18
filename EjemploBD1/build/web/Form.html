@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Dinámico - Singularity</title>
+    <link rel="stylesheet" href="CSS/estilos.css">
+</head>
+<body>
+
+    <div class="contenedor-formulario-fijo">
+        <h3>Registro General Dinámico</h3>
+        
+        <form id="formGeneral" action="insertarEvento.jsp" method="post">
+            
+            <div class="grupo-formulario">
+                <label for="destinoTabla">¿A qué catálogo deseas registrar información?</label>
+                <select id="destinoTabla" class="btn" style="width: 100%; background: #34495e; color: white; padding: 10px;" onchange="ajustarFormulario()">
+                    <optgroup label="--- GESTIÓN PRINCIPAL ---">
+                        <option value="eventos" selected>Eventos</option>
+                        <option value="articulos">Artículos</option>
+                    </optgroup>
+                    <optgroup label="--- DIRECTORIOS Y CATÁLOGOS ---">
+                        <option value="empresas">Empresas</option>
+                        <option value="clientes">Clientes</option>
+                        <option value="ponentes">Ponentes</option>
+                        <option value="autores">Autores</option>
+                        <option value="areas">Áreas</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <hr style="border:0; height:1px; background:#eee; margin: 20px 0;">
+
+            <div id="campos-eventos" class="bloque-campos">
+                <div class="grupo-formulario">
+                    <label>Nombre del Evento:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Fecha:</label>
+                    <input type="date" name="fecha" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Tipo de Evento (Ej. Congreso, Simposio):</label>
+                    <input type="text" name="tipo_evento" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Horario (Ej. 09:00 - 18:00):</label>
+                    <input type="text" name="horario" required>
+                </div>
+            </div>
+
+            <div id="campos-articulos" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Título (Inglés):</label>
+                    <input type="text" name="titulo_ingles" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Título (Español):</label>
+                    <input type="text" name="titulo_espanol" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Fecha de Publicación:</label>
+                    <input type="date" name="fecha_publicacion" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Abstract (Inglés):</label>
+                    <textarea name="abstract_ingles" rows="3" required style="width: 100%;"></textarea>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Abstract (Español):</label>
+                    <textarea name="abstract_espanol" rows="3" required style="width: 100%;"></textarea>
+                </div>
+                <div class="grupo-formulario">
+                    <label>ID de Edición a la que pertenece:</label>
+                    <input type="number" name="idEdicion" required>
+                </div>
+            </div>
+
+            <div id="campos-empresas" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Nombre de la Empresa:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" name="correo" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Teléfono:</label>
+                    <input type="text" name="telefono" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>ID de Aliado asociado:</label>
+                    <input type="number" name="idAliado" required>
+                </div>
+            </div>
+
+            <div id="campos-clientes" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Paterno:</label>
+                    <input type="text" name="apellido_paterno" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Materno:</label>
+                    <input type="text" name="apellido_materno">
+                </div>
+                <div class="grupo-formulario">
+                    <label>ID de Empresa asociada:</label>
+                    <input type="number" name="idEmpresa" required>
+                </div>
+            </div>
+
+            <div id="campos-ponentes" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Paterno:</label>
+                    <input type="text" name="apellido_paterno" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Materno:</label>
+                    <input type="text" name="apellido_materno">
+                </div>
+                <div class="grupo-formulario">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" name="correo" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Teléfono:</label>
+                    <input type="text" name="telefono" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>ID de Historial Académico:</label>
+                    <input type="number" name="idHistorial" required>
+                </div>
+            </div>
+
+            <div id="campos-autores" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Paterno:</label>
+                    <input type="text" name="apellido_paterno" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Apellido Materno:</label>
+                    <input type="text" name="apellido_materno">
+                </div>
+                <div class="grupo-formulario">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" name="correo" required>
+                </div>
+            </div>
+
+            <div id="campos-areas" class="bloque-campos" style="display: none;">
+                <div class="grupo-formulario">
+                    <label>Nombre del Área:</label>
+                    <input type="text" name="nombre" required>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button type="submit" class="btn btn-guardar">Guardar Registro</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function ajustarFormulario() {
+            var tablaSeleccionada = document.getElementById("destinoTabla").value;
+            var formulario = document.getElementById("formGeneral");
+            
+            // 1. Ocultar todos los bloques y DESACTIVAR sus inputs
+            var bloques = document.getElementsByClassName("bloque-campos");
+            for (var i = 0; i < bloques.length; i++) {
+                bloques[i].style.display = "none";
+                var inputs = bloques[i].querySelectorAll("input, textarea");
+                for (var j = 0; j < inputs.length; j++) {
+                    inputs[j].disabled = true; // El navegador ignora los campos disabled
+                }
+            }
+            
+            // 2. Mostrar solo el bloque seleccionado y ACTIVAR sus inputs
+            var bloqueActivo = document.getElementById("campos-" + tablaSeleccionada);
+            if (bloqueActivo) {
+                bloqueActivo.style.display = "block";
+                var inputsActivos = bloqueActivo.querySelectorAll("input, textarea");
+                for (var j = 0; j < inputsActivos.length; j++) {
+                    inputsActivos[j].disabled = false;
+                }
+            }
+            
+            // 3. Cambiar el destino del Action
+            if (tablaSeleccionada === "eventos") {
+                formulario.action = "insertarEvento.jsp"; 
+            } 
+            else if (tablaSeleccionada === "articulos") {
+                formulario.action = "insertarArticulo.jsp";
+            }
+            else if (tablaSeleccionada === "empresas") {
+                formulario.action = "insertarEmpresa.jsp";
+            } 
+            else if (tablaSeleccionada === "clientes") {
+                formulario.action = "insertarCliente.jsp";
+            } 
+            else if (tablaSeleccionada === "ponentes") {
+                formulario.action = "insertarPonente.jsp";
+            }
+            else if (tablaSeleccionada === "autores") {
+                formulario.action = "insertarAutor.jsp";
+            }
+            else if (tablaSeleccionada === "areas") {
+                formulario.action = "insertarArea.jsp";
+            }
+        }
+
+        // Ejecutamos la función apenas cargue la página para desactivar los campos ocultos iniciales
+        window.onload = ajustarFormulario;
+    </script>
+    <div style="text-align: right; margin-top: 15px; margin-right: 35%">
+            <a href="tablaPersonas.jsp" class="btn btn-cargar" style="text-decoration: none; display: inline-block;">Volver al Menú Principal</a>
+    </div>
+</body>
+</html>

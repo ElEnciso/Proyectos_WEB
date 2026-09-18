@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Единицы измерения в конфигурационном файле</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/syntax.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Единицы измерения в конфигурационном файле</h2><table width="100%"><tr><td align="left"><a href="#size">Размеры и смещения</a><br><a href="#time">Интервалы времени</a><br></td></tr></table><a name="summary"></a><p>
+nginx поддерживает несколько единиц измерения для указания
+размеров, смещений и временных интервалов в конфигурационных файлах.
+</p><a name="size"></a><center><h4>Размеры и смещения</h4></center><p>
+Размеры можно указывать в байтах, килобайтах или мегабайтах
+используя следующие суффиксы:
+
+</p> <ul class="compact">
+
+<li>
+<code>k</code> и <code>K</code> для килобайт
+</li>
+
+<li>
+<code>m</code> и <code>M</code> для мегабайт
+</li>
+
+</ul><p> 
+</p><p>
+Например,
+“<code>1024</code>”, “<code>8k</code>”, “<code>1m</code>”.
+</p><p>
+Смещения также можно указать в гигабайтах используя
+суффиксы <code>g</code> или <code>G</code>.
+</p><a name="time"></a><center><h4>Интервалы времени</h4></center><p>
+Интервалы времени можно задавать в миллисекундах, секундах,
+минутах, часах, днях и т.д., используя следующие суффиксы:
+<table width="30%">
+<tr><td width="20%">ms</td><td>миллисекунды</td></tr>
+<tr><td width="20%">s</td><td>секунды (по умолчанию)</td></tr>
+<tr><td width="20%">m</td><td>минуты</td></tr>
+<tr><td width="20%">h</td><td>часы</td></tr>
+<tr><td width="20%">d</td><td>дни</td></tr>
+<tr><td width="20%">w</td><td>недели</td></tr>
+<tr><td width="20%">M</td><td>месяцы, 30 дней</td></tr>
+<tr><td width="20%">y</td><td>годы, 365 дней</td></tr>
+</table>
+</p><p>
+В одном значении можно комбинировать различные единицы,
+указывая их в порядке от более к менее значащим,
+и по желанию отделяя их пробелами.
+Например, “<code>1h 30m</code>” задаёт то же время,
+что и “<code>90m</code>” или “<code>5400s</code>”.
+</p><p>
+</p> <ul class="compact">
+
+<li>
+<p>
+Значение без суффикса задаёт секунды.
+</p>
+</li>
+
+<li>
+<p>
+Рекомендуется всегда указывать суффикс.
+</p>
+</li>
+
+<li>
+<p>
+Некоторые интервалы времени можно задать лишь с точностью до секунд.
+</p>
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

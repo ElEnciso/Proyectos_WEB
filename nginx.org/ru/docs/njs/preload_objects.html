@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Предзагруженные объекты</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/njs/preload_objects.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Предзагруженные объекты</h2><a name="summary"></a><p>
+</p> <blockquote class="note">
+Предзагруженные объекты поддерживаются только в JavaScript-движке
+<a href="engine.html#njs_engine">njs</a>
+и недоступны в движке
+<a href="engine.html#quickjs_engine">QuickJS</a>.
+</blockquote><p> 
+</p><p>
+Для каждого входящего запроса в njs создаётся отдельная виртуальная машина.
+Это позволяет прогнозировать предсказуемое поглощение памяти
+или осуществить изоляцию запросов.
+Однако поскольку все запросы являются изолированными, то
+если обработчику запроса необходимо получить доступ к данным,
+ему нужно сначала их прочитать самому.
+Это неэффективно, особенно если объём данных большой.
+</p><p>
+Это ограничение можно обойти
+при помощи разделяемого предзагруженного объекта.
+Такие объекты создаются неизменяемыми и не имеют цепочки прототипов:
+у них нет возможности
+изменить значения или добавить/удалить свойства в объектах/массивах.
+</p><a name="working_with_preload_objects"></a><center><h4>Работа с предзагруженными объектами</h4></center><p>
+Примеры работы с предзагруженными объектами в njs:
+
+</p> <ul class="compact">
+
+<li>
+доступ к свойствам по имени:
+<blockquote class="example"><pre>
+preloaded_object.prop_name
+preloaded_object[prop_name]
+</pre></blockquote>
+</li>
+
+<li>
+перечисление свойств:
+<blockquote class="example"><pre>
+for (i in preloaded_object_name) {
+    ...
+}
+</pre></blockquote>
+</li>
+
+<li>
+применение встроенных методов, не изменяющих состояние,
+при помощи <code>call()</code>:
+<blockquote class="example"><pre>
+Array.prototype.filter.call(preloaded_object_name, ...)
+</pre></blockquote>
+</li>
+
+</ul><p> 
+</p></div></div></body></html>

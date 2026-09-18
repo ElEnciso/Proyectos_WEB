@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Движок JavaScript</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/njs/engine.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Движок JavaScript</h2><p>
+Начиная с версии <a href="../njs/changes.html#njs0.8.6">0.8.6</a>
+поддерживается несколько JS-движков.
+Для выбора движка используется директива <code>js_engine</code>
+в
+<a href="../http/ngx_http_js_module.html#js_engine">http</a>
+и
+<a href="../stream/ngx_stream_js_module.html#js_engine">stream</a>.
+По умолчанию используется движок njs.
+</p><a name="njs_engine"></a><center><h4>Движок njs</h4></center><p>
+</p> <blockquote class="note">
+Движок njs объявлен устаревшим
+начиная с <a href="changes.html#njs1.0.0">1.0.0</a>;
+для нового кода следует использовать движок
+<a href="#quickjs_engine">QuickJS</a>.
+</blockquote><p> 
+</p><p>
+njs  —  встроенный движок JavaScript,
+разработанный как часть модуля njs.
+Подробнее см. в разделе <a href="compatibility.html">Совместимость</a>.
+</p><a name="quickjs_engine"></a><center><h4>Движок QuickJS</h4></center><p>
+<a href="https://bellard.org/quickjs/">QuickJS</a>  —  компактный
+встроенный движок JavaScript, который поддерживает
+спецификацию <a href="https://tc39.es/ecma262/2023/">ES2023</a>,
+включая модули, асинхронные генераторы, прокси и BigInt.
+</p><p>
+Начиная с <a href="changes.html#njs0.8.6">0.8.6</a>
+доступна
+оперативная замена
+<a href="reference.html">njs/nginx objects</a>
+для обеспечения совместимости с движком njs, но с некоторыми исключениями:
+
+</p> <ul class="compact">
+
+<li>
+API njs:
+<a href="reference.html#njs_dump"><code>njs.dump()</code></a>,
+<code>console.dump()</code>.
+</li>
+
+<li>
+устаревшее API:
+<code>require()</code>,
+вместо необходимо использовать утверждение <code>import</code>.
+</li>
+
+<li>
+директива <code>js_preload_object</code> для
+<a href="../http/ngx_http_js_module.html#js_preload_object">http</a>
+и
+<a href="../stream/ngx_stream_js_module.html#js_preload_object">stream</a>.
+</li>
+
+</ul><p> 
+
+</p><p>
+статус встроенных модулей njs:
+
+</p> <ul class="compact">
+
+<li>
+<a href="reference.html#buffer"><code>buffer</code></a>:
+начиная с <a href="changes.html#njs0.8.6">0.8.6</a>.
+</li>
+
+<li>
+<a href="reference.html#crypto"><code>crypto</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+<li>
+<a href="reference.html#njs_api_fs"><code>fs</code></a>:
+начиная с <a href="changes.html#njs0.8.9">0.8.9</a>.
+</li>
+
+<li>
+<a href="reference.html#querystring"><code>querystring</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+<li>
+<a href="reference.html#builtin_crypto"><code>WebCrypto</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+<li>
+<a href="reference.html#xml"><code>xml</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+<li>
+<a href="reference.html#zlib"><code>zlib</code></a>:
+начиная с <a href="changes.html#njs0.8.5">0.8.5</a>.
+</li>
+
+</ul><p> 
+
+</p><p>
+статус встроенных объектов njs:
+
+</p> <ul class="compact">
+
+<li>
+<a href="reference.html#process"><code>process</code></a>:
+начиная с <a href="changes.html#njs0.8.8">0.8.8</a>.
+</li>
+
+<li>
+<a href="reference.html#textdecoder"><code>TextDecoder</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+<li>
+<a href="reference.html#textencoder"><code>TextEncoder</code></a>:
+начиная с <a href="changes.html#njs0.8.10">0.8.10</a>.
+</li>
+
+</ul><p> 
+
+</p><p>
+статус встроенных объектов nginx:
+
+</p> <ul class="compact">
+
+<li>
+<a href="reference.html#ngx_fetch"><code>ngx.fetch</code></a>:
+начиная с <a href="changes.html#njs0.9.1">0.9.1</a>.
+</li>
+
+<li>
+<a href="reference.html#ngx_shared"><code>shared dictionary</code></a>:
+начиная с <a href="changes.html#njs0.8.8">0.8.8</a>.
+</li>
+
+</ul><p> 
+
+</p></div></div></body></html>

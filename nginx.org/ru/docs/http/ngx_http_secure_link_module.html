@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_secure_link_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_secure_link_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_secure_link_module</h2><table width="100%"><tr><td align="left"><a href="#directives">Директивы</a><br>     <a href="#secure_link">secure_link</a><br>     <a href="#secure_link_md5">secure_link_md5</a><br>     <a href="#secure_link_secret">secure_link_secret</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_secure_link_module</code> (0.7.18)
+позволяет проверять аутентичность запрашиваемых ссылок,
+защищать ресурсы от несанкционированного доступа,
+а также ограничивать срок действия ссылок.
+</p><p>
+Правильность запрашиваемой ссылки проверяется сравнением переданного
+в запросе значения контрольной суммы со значением,
+вычисляемым для запроса.
+Если ссылка имеет ограниченный срок действия и он истёк,
+ссылка считается устаревшей.
+Результат этих проверок делается доступным в переменной
+<code>$secure_link</code>.
+</p><p>
+Модуль реализует два альтернативных режима работы.
+В первом режиме, который включается директивой
+<a href="#secure_link_secret">secure_link_secret</a>, можно проверить аутентичность
+запрашиваемых ссылок и защитить их от несанкционированного доступа.
+Второй режим (0.8.50) включается директивами
+<a href="#secure_link">secure_link</a> и <a href="#secure_link_md5">secure_link_md5</a>,
+и позволяет также ограничить срок действия ссылок.
+</p><p>
+По умолчанию этот модуль не собирается, его сборку необходимо
+разрешить с помощью конфигурационного параметра
+<code>--with-http_secure_link_module</code>.
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="secure_link"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>secure_link</strong> <code><i>выражение</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт строку с переменными, из которой будет выделено значение
+контрольной суммы и время действия ссылки.
+</p><p>
+Используемые в выражении переменные обычно связаны с запросом;
+см. <a href="#secure_link_md5">пример</a> ниже.
+</p><p>
+Выделенное из строки значение контрольной суммы сравнивается со
+значением MD5-хэша, вычисляемым для выражения, заданного
+директивой <a href="#secure_link_md5">secure_link_md5</a>.
+Если контрольные суммы не совпадают, значением переменной
+<code>$secure_link</code> становится пустая строка.
+Если контрольные суммы совпадают, проверяется время действия ссылки.
+Если срок действия ссылки задан и истёк, переменная
+<code>$secure_link</code> получает значение “<code>0</code>”.
+В противном случае она получает значение “<code>1</code>”.
+Значение MD5-хэш передаётся в запросе закодированным в
+<a href="https://datatracker.ietf.org/doc/html/rfc4648#section-5">base64url</a>.
+</p><p>
+Если ссылка имеет ограниченный срок действия, время её действия
+задаётся в секундах с начала эпохи (1 января 1970 года 00:00:00 GMT).
+Значение указывается в выражении после MD5-хэша
+и отделяется от него запятой.
+Время действия ссылки, переданное в запросе, делается доступным
+в переменной <code>$secure_link_expires</code> для использования
+в директиве <a href="#secure_link_md5">secure_link_md5</a>.
+Если время действия ссылки не задано, ссылка имеет неограниченный
+срок действия.
+</p><a name="secure_link_md5"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>secure_link_md5</strong> <code><i>выражение</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт выражение, для которого считается значение MD5-хэш,
+сравниваемое с переданным в запросе.
+</p><p>
+Выражение должно содержать защищаемую часть ссылки (ресурс)
+и секретную составляющую.
+Если ссылка имеет ограниченный срок действия,
+выражение также должно содержать <code>$secure_link_expires</code>.
+</p><p>
+Для предотвращения несанкционированного доступа выражение
+может содержать информацию о клиенте, например, его адрес и
+версию браузера.
+</p><p>
+Пример:
+</p> <blockquote class="example"><pre>
+location /s/ {
+    secure_link $arg_md5,$arg_expires;
+    secure_link_md5 "$secure_link_expires$uri$remote_addr secret";
+
+    if ($secure_link = "") {
+        return 403;
+    }
+
+    if ($secure_link = "0") {
+        return 410;
+    }
+
+    ...
+}
+</pre></blockquote><p> 
+Ссылка
+“<code>/s/link?md5=_e4Nc3iduzkWRm01TBBNYw&amp;expires=2147483647</code>”
+ограничивает доступ к “<code>/s/link</code>” для клиента с IP-адресом
+127.0.0.1.
+Ссылка также имеет ограниченный срок действия до 19 января 2038 года (GMT).
+</p><p>
+Значение аргумента запроса <code><i>md5</i></code> на UNIX можно получить так:
+</p> <blockquote class="example"><pre>
+echo -n '2147483647/s/link127.0.0.1 secret' | \
+    openssl md5 -binary | openssl base64 | tr +/ -_ | tr -d =
+</pre></blockquote><p> 
+</p><a name="secure_link_secret"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>secure_link_secret</strong> <code><i>слово</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт секретное <code><i>слово</i></code> для проверки аутентичности
+запрашиваемых ссылок.
+</p><p>
+Полный URI запрашиваемой ссылки выглядит так:
+</p> <blockquote class="example"><pre>
+/<code><i>префикс</i></code>/<code><i>хэш</i></code>/<code><i>ссылка</i></code>
+</pre></blockquote><p> 
+где <code><i>хэш</i></code> — MD5-хэш в шестнадцатеричном виде,
+вычисленный для конкатенации ссылки и секретного слова,
+а <code><i>префикс</i></code> — произвольная строка без слэшей.
+</p><p>
+Если запрашиваемая ссылка проходит проверку на аутентичность,
+значением переменной <code>$secure_link</code> становится ссылка,
+выделенная из URI запроса.
+В противном случае значением переменной <code>$secure_link</code>
+становится пустая строка.
+</p><p>
+Пример:
+</p> <blockquote class="example"><pre>
+location /p/ {
+    secure_link_secret secret;
+
+    if ($secure_link = "") {
+        return 403;
+    }
+
+    rewrite ^ /secure/$secure_link;
+}
+
+location /secure/ {
+    internal;
+}
+</pre></blockquote><p> 
+По запросу “<code>/p/5e814704a28d9bc1914ff19fa0c4a00a/link</code>”
+будет выполнено внутреннее перенаправление на
+“<code>/secure/link</code>”.
+</p><p>
+Значение хэша для данного примера на UNIX можно получить так:
+</p> <blockquote class="example"><pre>
+echo -n 'linksecret' | openssl md5 -hex
+</pre></blockquote><p> 
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+</p> <dl>
+
+<dt id="var_secure_link"><code>$secure_link</code></dt>
+<dd>
+Результат проверки ссылки.
+Конкретное значение зависит от выбранного режима работы.
+</dd>
+
+<dt id="var_secure_link_expires"><code>$secure_link_expires</code>
+</dt>
+<dd>
+Время действия ссылки, переданное в запросе.
+Предназначено исключительно для использования в директиве
+<a href="#secure_link_md5">secure_link_md5</a>.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

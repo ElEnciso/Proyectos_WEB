@@ -1,0 +1,1199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_stream_core_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/stream/ngx_stream_core_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_stream_core_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#listen">listen</a><br>     <a href="#preread_buffer_size">preread_buffer_size</a><br>     <a href="#preread_timeout">preread_timeout</a><br>     <a href="#proxy_protocol_timeout">proxy_protocol_timeout</a><br>     <a href="#resolver">resolver</a><br>     <a href="#resolver_timeout">resolver_timeout</a><br>     <a href="#server">server</a><br>     <a href="#server_name">server_name</a><br>     <a href="#server_names_hash_bucket_size">server_names_hash_bucket_size</a><br>     <a href="#server_names_hash_max_size">server_names_hash_max_size</a><br>     <a href="#stream">stream</a><br>     <a href="#tcp_nodelay">tcp_nodelay</a><br>     <a href="#variables_hash_bucket_size">variables_hash_bucket_size</a><br>     <a href="#variables_hash_max_size">variables_hash_max_size</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_stream_core_module</code>
+доступен начиная с версии 1.9.0.
+По умолчанию этот модуль не собирается, его сборку необходимо
+разрешить с помощью конфигурационного параметра
+<code>--with-stream</code>.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+worker_processes auto;
+
+error_log /var/log/nginx/error.log info;
+
+events {
+    worker_connections  1024;
+}
+
+stream {
+    upstream backend {
+        hash $remote_addr consistent;
+
+        server backend1.example.com:12345 weight=5;
+        server 127.0.0.1:12345            max_fails=3 fail_timeout=30s;
+        server unix:/tmp/backend3;
+    }
+
+    upstream dns {
+       server 192.168.0.1:53535;
+       server dns.example.com:53;
+    }
+
+    server {
+        listen 12345;
+        proxy_connect_timeout 1s;
+        proxy_timeout 3s;
+        proxy_pass backend;
+    }
+
+    server {
+        listen 127.0.0.1:53 udp reuseport;
+        proxy_timeout 20s;
+        proxy_pass dns;
+    }
+
+    server {
+        listen [::1]:12345;
+        proxy_pass unix:/tmp/stream.socket;
+    }
+}
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="listen"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>listen</strong> 
+    <code><i>адрес</i></code>:<code><i>порт</i></code>
+    [<code>default_server</code>]
+    [<code>ssl</code>]
+    [<code>udp</code>]
+    [<code>proxy_protocol</code>]
+    [<code>setfib</code>=<code><i>число</i></code>]
+    [<code>fastopen</code>=<code><i>число</i></code>]
+    [<code>backlog</code>=<code><i>число</i></code>]
+    [<code>rcvbuf</code>=<code><i>размер</i></code>]
+    [<code>sndbuf</code>=<code><i>размер</i></code>]
+    [<code>accept_filter</code>=<code><i>фильтр</i></code>]
+    [<code>deferred</code>]
+    [<code>bind</code>]
+    [<code>ipv6only</code>=<code>on</code>|<code>off</code>]
+    [<code>reuseport</code>]
+    [<code>multipath</code>]
+    [<code>so_keepalive</code>=<code>on</code>|<code>off</code>|[<code><i>keepidle</i></code>]:[<code><i>keepintvl</i></code>]:[<code><i>keepcnt</i></code>]];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт <code><i>адрес</i></code> и <code><i>порт</i></code> для сокета,
+на котором сервер будет принимать соединения.
+Можно указать только порт.
+Кроме того, адрес может быть именем хоста, например:
+</p> <blockquote class="example"><pre>
+listen 127.0.0.1:12345;
+listen *:12345;
+listen 12345;     # то же, что и *:12345
+listen localhost:12345;
+</pre></blockquote><p> 
+IPv6-адреса задаются в квадратных скобках:
+</p> <blockquote class="example"><pre>
+listen [::1]:12345;
+listen [::]:12345;
+</pre></blockquote><p> 
+UNIX-сокеты задаются префиксом “<code>unix:</code>”
+</p> <blockquote class="example"><pre>
+listen unix:/var/run/nginx.sock;
+</pre></blockquote><p> 
+</p><a name="listen_port_range"></a><p>
+Диапазоны портов (1.15.10) задаются при помощи
+указания первого и последнего порта через дефис:
+</p> <blockquote class="example"><pre>
+listen 127.0.0.1:12345-12399;
+listen 12345-12399;
+</pre></blockquote><p> 
+</p><p>
+Если у директивы есть параметр <code>default_server</code>, то сервер,
+в котором описана эта директива, будет сервером по умолчанию для указанной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code> (1.25.5).
+Если же директив с параметром <code>default_server</code> нет, то
+сервером по умолчанию будет первый сервер, в котором описана пара
+<code><i>адрес</i></code>:<code><i>порт</i></code>.
+</p><p>
+Параметр <code>ssl</code> указывает на то, что все соединения,
+принимаемые на данном порту, должны работать в режиме SSL.
+</p><a name="udp"></a><p>
+Параметр <code>udp</code> конфигурирует слушающий сокет
+для работы с датаграммами (1.9.13).
+Для обработки пакетов с одного адреса и порта в рамках одной сессии
+необходимо также указывать
+параметр <a href="#reuseport"><code>reuseport</code></a>.
+</p><a name="proxy_protocol"></a><p>
+Параметр <code>proxy_protocol</code> (1.11.4)
+указывает на то, что все соединения, принимаемые на данном порту,
+должны использовать
+<a href="http://www.haproxy.org/download/1.8/doc/proxy-protocol.txt">протокол
+PROXY</a>.
+</p> <blockquote class="note">
+Протокол PROXY версии 2 поддерживается начиная с версии 1.13.11.
+</blockquote><p> 
+</p><p>
+В директиве <code>listen</code> можно также указать несколько
+дополнительных параметров, специфичных для связанных с сокетами
+системных вызовов.
+Эти параметры можно задать в любой директиве <code>listen</code>,
+но только один раз для указанной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code>.
+</p> <dl class="compact">
+
+<dt>
+<code>setfib</code>=<code><i>число</i></code>
+</dt>
+<dd>
+этот параметр (1.25.5) задаёт таблицу маршрутизации, FIB
+(параметр <code>SO_SETFIB</code>) для слушающего сокета.
+В настоящий момент это работает только на FreeBSD.
+</dd>
+
+<dt>
+<code>fastopen</code>=<code><i>число</i></code>
+</dt>
+<dd>
+включает
+“<a href="http://en.wikipedia.org/wiki/TCP_Fast_Open">TCP Fast Open</a>”
+для слушающего сокета (1.21.0) и
+<a href="https://datatracker.ietf.org/doc/html/rfc7413#section-5.1">ограничивает</a>
+максимальную длину очереди соединений, которые ещё не завершили процесс
+three-way handshake.
+<blockquote class="note">
+Не включайте “TCP Fast Open”, не убедившись, что сервер может адекватно
+обрабатывать многократное получение
+<a href="https://datatracker.ietf.org/doc/html/rfc7413#section-6.1">
+одного и того же SYN-пакета с данными</a>.
+</blockquote>
+</dd>
+
+<dt>
+<code>backlog</code>=<code><i>число</i></code>
+</dt>
+<dd>
+задаёт параметр <code>backlog</code> в вызове
+<code>listen()</code>, который ограничивает
+максимальный размер очереди ожидающих приёма соединений (1.9.2).
+По умолчанию <code>backlog</code> устанавливается равным -1 для
+FreeBSD, DragonFly BSD и macOS,
+и 511 для других платформ.
+</dd>
+
+<dt>
+<code>rcvbuf</code>=<code><i>размер</i></code>
+</dt>
+<dd>
+задаёт размер буфера приёма
+(параметр <code>SO_RCVBUF</code>) для слушающего сокета (1.11.13).
+</dd>
+
+<dt>
+<code>sndbuf</code>=<code><i>размер</i></code>
+</dt>
+<dd>
+задаёт размер буфера передачи
+(параметр <code>SO_SNDBUF</code>) для слушающего сокета (1.11.13).
+</dd>
+
+<dt>
+<code>accept_filter</code>=<code><i>фильтр</i></code>
+</dt>
+<dd>
+задаёт название accept-фильтра
+(параметр <code>SO_ACCEPTFILTER</code>) для слушающего сокета,
+который включается для фильтрации входящих соединений
+перед передачей их в <code>accept()</code> (1.25.5).
+Работает только на FreeBSD и NetBSD 5.0+.
+Можно использовать два фильтра:
+<a href="http://man.freebsd.org/accf_data">dataready</a>
+и
+<a href="http://man.freebsd.org/accf_http">httpready</a>.
+</dd>
+
+<dt>
+<code>deferred</code>
+</dt>
+<dd>
+указывает использовать отложенный <code>accept()</code>
+(параметр <code>TCP_DEFER_ACCEPT</code> сокета) на Linux (1.25.5).
+</dd>
+
+<dt>
+<code>bind</code>
+</dt>
+<dd>
+параметр указывает, что для данной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code> нужно делать
+<code>bind()</code> отдельно.
+Это нужно потому, что если описаны несколько директив <code>listen</code>
+с одинаковым портом, но разными адресами, и одна из директив
+<code>listen</code> слушает на всех адресах для данного порта
+(<code>*:</code><code><i>порт</i></code>), то nginx сделает
+<code>bind()</code> только на <code>*:</code><code><i>порт</i></code>.
+Необходимо заметить, что в этом случае для определения адреса, на которой
+пришло соединение, делается системный вызов <code>getsockname()</code>.
+Если же используются параметры <code>setfib</code>,
+<code>fastopen</code>,
+<code>backlog</code>, <code>rcvbuf</code>,
+<code>sndbuf</code>, <code>accept_filter</code>,
+<code>deferred</code>, <code>ipv6only</code>,
+<code>reuseport</code>, <code>multipath</code>
+или <code>so_keepalive</code>,
+то для данной пары
+<code><i>адрес</i></code>:<code><i>порт</i></code> всегда делается
+отдельный вызов <code>bind()</code>.
+</dd>
+
+<dt>
+<code>ipv6only</code>=<code>on</code>|<code>off</code>
+</dt>
+<dd>
+этот параметр определяет
+(через параметр сокета <code>IPV6_V6ONLY</code>),
+будет ли слушающий на wildcard-адресе <code>[::]</code> IPv6-сокет
+принимать только IPv6-соединения, или же одновременно IPv6- и IPv4-соединения.
+По умолчанию параметр включён.
+Установить его можно только один раз на старте.
+</dd>
+
+<dt id="reuseport">
+<code>reuseport</code>
+</dt>
+<dd>
+этот параметр (1.9.1) указывает, что нужно создавать отдельный слушающий сокет
+для каждого рабочего процесса
+(через параметр сокета
+<code>SO_REUSEPORT</code> для Linux 3.9+ и DragonFly BSD
+или <code>SO_REUSEPORT_LB</code> для FreeBSD 12+), позволяя ядру
+распределять входящие соединения между рабочими процессами.
+В настоящий момент это работает только на Linux 3.9+, DragonFly BSD
+и FreeBSD 12+ (1.15.1).
+<blockquote class="note">
+Ненадлежащее использование параметра может быть
+<a href="http://man7.org/linux/man-pages/man7/socket.7.html">небезопасно</a>.
+</blockquote>
+</dd>
+
+<dt id="multipath">
+<code>multipath</code>
+</dt>
+<dd>
+этот параметр (1.29.7) конфигурирует для слушающего сокета протокол
+<a href="https://datatracker.ietf.org/doc/html/rfc8684">Multipath TCP</a>
+(<code>IPPROTO_MPTCP</code>).
+В настоящий момент это работает только на Linux 5.6+.
+<blockquote class="note">
+Добавление или удаление этого параметра также включает
+параметр сокета <code>SO_REUSEPORT</code>, что может быть
+<a href="http://man7.org/linux/man-pages/man7/socket.7.html">небезопасно</a>.
+</blockquote>
+</dd>
+
+<dt>
+<code>so_keepalive</code>=<code>on</code>|<code>off</code>|[<code><i>keepidle</i></code>]:[<code><i>keepintvl</i></code>]:[<code><i>keepcnt</i></code>]
+</dt>
+<dd>
+этот параметр конфигурирует для слушающего сокета
+поведение “TCP keepalive”.
+Если этот параметр опущен, то для сокета будут действовать
+настройки операционной системы.
+Если он установлен в значение “<code>on</code>”, то для сокета
+включается параметр <code>SO_KEEPALIVE</code>.
+Если он установлен в значение “<code>off</code>”, то для сокета
+параметр <code>SO_KEEPALIVE</code> выключается.
+Некоторые операционные системы поддерживают настройку параметров
+“TCP keepalive” на уровне сокета посредством параметров
+<code>TCP_KEEPIDLE</code>, <code>TCP_KEEPINTVL</code> и
+<code>TCP_KEEPCNT</code>.
+На таких системах
+(в настоящий момент это Linux, NetBSD, Dragonfly, FreeBSD и macOS)
+их можно сконфигурировать с помощью параметров <code><i>keepidle</i></code>,
+<code><i>keepintvl</i></code> и <code><i>keepcnt</i></code>.
+Один или два параметра могут быть опущены, в таком случае для
+соответствующего параметра сокета будут действовать стандартные
+системные настройки.
+Например,
+<blockquote class="example"><pre>so_keepalive=30m::10</pre></blockquote>
+установит таймаут бездействия (<code>TCP_KEEPIDLE</code>) в 30 минут,
+для интервала проб (<code>TCP_KEEPINTVL</code>) будет действовать
+стандартная системная настройка, а счётчик проб (<code>TCP_KEEPCNT</code>)
+будет равен 10.
+</dd>
+
+</dl><p> 
+</p><p>
+</p> <blockquote class="note">
+До версии 1.25.5 разные серверы должны слушать на разных парах
+<code><i>адрес</i></code>:<code><i>порт</i></code>.
+</blockquote><p> 
+</p><a name="preread_buffer_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>preread_buffer_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>preread_buffer_size 16k;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.5.
+            </p></div><p>
+Задаёт <code><i>размер</i></code> буфера
+<a href="stream_processing.html#preread_phase">предварительного чтения</a>.
+</p><a name="preread_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>preread_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>preread_timeout 30s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.5.
+            </p></div><p>
+Задаёт <code><i>время</i></code> фазы
+<a href="stream_processing.html#preread_phase">предварительного чтения</a>.
+</p><a name="proxy_protocol_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>proxy_protocol_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>proxy_protocol_timeout 30s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.4.
+            </p></div><p>
+Задаёт <code><i>время</i></code> для
+завершения операции чтения заголовка протокола PROXY.
+Если по истечении этого времени заголовок полностью не получен,
+соединение закрывается.
+</p><a name="resolver"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>resolver</strong> 
+    <code><i>адрес</i></code> ...
+    [<code>valid</code>=<code><i>время</i></code>]
+    [<code>ipv4</code>=<code>on</code>|<code>off</code>]
+    [<code>ipv6</code>=<code>on</code>|<code>off</code>]
+    [<code>status_zone</code>=<code><i>зона</i></code>];</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.3.
+            </p></div><p>
+Задаёт серверы DNS, используемые для преобразования имён вышестоящих серверов
+в адреса, например:
+</p> <blockquote class="example"><pre>
+resolver 127.0.0.1 [::1]:5353;
+</pre></blockquote><p> 
+Адрес может быть указан в виде доменного имени или IP-адреса,
+и необязательного порта.
+Если порт не указан, используется порт 53.
+Серверы DNS опрашиваются циклически.
+</p><a name="resolver_ipv6"></a><p>
+По умолчанию nginx будет искать как IPv4-, так и IPv6-адреса
+при преобразовании имён в адреса.
+Если поиск IPv4- или IPv6-адресов нежелателен,
+можно указать параметр <code>ipv4=off</code> (1.23.1) или
+<code>ipv6=off</code>.
+</p><a name="resolver_valid"></a><p>
+По умолчанию nginx кэширует ответы, используя значение TTL из ответа.
+Необязательный параметр <code>valid</code> позволяет это
+переопределить:
+</p> <blockquote class="example"><pre>
+resolver 127.0.0.1 [::1]:5353 valid=30s;
+</pre></blockquote><p> 
+</p> <blockquote class="note">
+Для предотвращения DNS-спуфинга рекомендуется
+использовать DNS-серверы в защищённой доверенной локальной сети.
+</blockquote><p> 
+</p><a name="resolver_status_zone"></a><p>
+Необязательный параметр <code>status_zone</code> (1.17.1)
+включает
+<a href="../http/ngx_http_api_module.html#resolvers_">сбор информации</a>
+о запросах и ответах сервера DNS
+в указанной <code><i>зоне</i></code>.
+Параметр доступен как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</p><p>
+</p> <blockquote class="note">
+До версии 1.11.3 эта директива была доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="resolver_timeout"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>resolver_timeout</strong> <code><i>время</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>resolver_timeout 30s;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.3.
+            </p></div><p>
+Задаёт таймаут для преобразования имени в адрес, например:
+</p> <blockquote class="example"><pre>
+resolver_timeout 5s;
+</pre></blockquote><p> 
+</p> <blockquote class="note">
+До версии 1.11.3 эта директива была доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p><a name="server"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server</strong> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт конфигурацию для виртуального сервера.
+Чёткого разделения виртуальных серверов на IP-based (на основании IP-адреса)
+и name-based (через
+<a href="http://en.wikipedia.org/wiki/Server_Name_Indication">расширение
+Server Name Indication протокола TLS</a> (SNI, RFC 6066)) (1.25.5) нет.
+Вместо этого директивами <a href="#listen">listen</a> описываются все
+адреса и порты, на которых нужно принимать соединения для этого сервера,
+а в директиве <a href="#server_name">server_name</a> указываются все имена серверов.
+</p><a name="server_name"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server_name</strong> <code><i>имя</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>server_name "";</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.25.5.
+            </p></div><p>
+Задаёт имена виртуального сервера, например:
+</p> <blockquote class="example"><pre>
+server {
+    server_name example.com www.example.com;
+}
+</pre></blockquote><p> 
+</p><p>
+Первое имя становится основным именем сервера.
+</p><p>
+В именах серверов можно использовать звёздочку (“<code>*</code>”)
+для замены первой или последней части имени:
+</p> <blockquote class="example"><pre>
+server {
+    server_name example.com *.example.com www.example.*;
+}
+</pre></blockquote><p> 
+Такие имена называются именами с маской.
+</p><p>
+Два первых вышеприведённых имени можно объединить в одно:
+</p> <blockquote class="example"><pre>
+server {
+    server_name .example.com;
+}
+</pre></blockquote><p> 
+</p><p>
+В качестве имени сервера можно также использовать регулярное выражение,
+указав перед ним тильду (“<code>~</code>”):
+</p> <blockquote class="example"><pre>
+server {
+    server_name www.example.com ~^www\d+\.example\.com$;
+}
+</pre></blockquote><p> 
+</p><p>
+Регулярное выражение может содержать выделения,
+которые могут затем использоваться в других директивах
+(см. <a href="../regex_captures.html">Выделения в регулярных выражениях</a>):
+</p> <blockquote class="example"><pre>
+server {
+    server_name ~^(www\.)?(.+)$;
+
+    proxy_pass www.$2:12345;
+}
+</pre></blockquote><p> 
+</p><p>
+Именованные выделения в регулярном выражении создают переменные,
+которые могут затем использоваться в других директивах:
+</p> <blockquote class="example"><pre>
+server {
+    server_name ~^(www\.)?(?&lt;domain&gt;.+)$;
+
+    proxy_pass www.$domain:12345;
+}
+</pre></blockquote><p> 
+</p><p>
+Если параметр директивы установлен в “<code>$hostname</code>”, то
+подставляется имя хоста (hostname) машины.
+</p><p>
+Поиск производится в следующем порядке приоритета
+и прекращается на первом подходящем варианте:
+</p> <ol class="compact">
+
+<li>
+точное имя
+</li>
+
+<li>
+самое длинное имя с маской в начале,
+например “<code>*.example.com</code>”
+</li>
+
+<li>
+самое длинное имя с маской в конце,
+например “<code>mail.*</code>”
+</li>
+
+<li>
+первое подходящее регулярное выражение
+(в порядке следования в конфигурационном файле)
+</li>
+
+</ol><p> 
+</p><a name="server_names_hash_bucket_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server_names_hash_bucket_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>server_names_hash_bucket_size 32|64|128;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.25.5.
+            </p></div><p>
+Задаёт размер корзины в хэш-таблицах имён серверов.
+Значение по умолчанию зависит от размера строки кэша процессора.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p><a name="server_names_hash_max_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>server_names_hash_max_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>server_names_hash_max_size 512;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.25.5.
+            </p></div><p>
+Задаёт максимальный <code><i>размер</i></code> хэш-таблиц имён серверов.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p><a name="stream"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>stream</strong> { ... }</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            
+            —
+        
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>main</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Предоставляет контекст конфигурационного файла, в котором указываются
+директивы stream-сервера.
+</p><a name="tcp_nodelay"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>tcp_nodelay</strong> <code>on</code> | <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>tcp_nodelay on;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code>, <code>server</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.9.4.
+            </p></div><p>
+Разрешает или запрещает использование параметра <code>TCP_NODELAY</code>.
+Параметр включается как для клиентских соединений,
+так и для соединений с проксируемыми серверами.
+</p><a name="variables_hash_bucket_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>variables_hash_bucket_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>variables_hash_bucket_size 64;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.2.
+            </p></div><p>
+Задаёт размер корзины в хэш-таблице переменных.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p><a name="variables_hash_max_size"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>variables_hash_max_size</strong> <code><i>размер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>variables_hash_max_size 1024;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>stream</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.11.2.
+            </p></div><p>
+Задаёт максимальный <code><i>размер</i></code> хэш-таблицы переменных.
+Подробнее настройка хэш-таблиц обсуждается в отдельном
+<a href="../hash.html">документе</a>.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+Модуль <code>ngx_stream_core_module</code> поддерживает переменные
+начиная с версии 1.11.2.
+</p> <dl class="compact">
+
+<dt id="var_binary_remote_addr"><code>$binary_remote_addr</code></dt>
+<dd>
+адрес клиента в бинарном виде, длина значения всегда 4 байта
+для IPv4-адресов или 16 байт для IPv6-адресов
+</dd>
+
+<dt id="var_bytes_received"><code>$bytes_received</code></dt>
+<dd>
+число байт, полученных от клиента (1.11.4)
+</dd>
+
+<dt id="var_bytes_sent"><code>$bytes_sent</code></dt>
+<dd>
+число байт, переданных клиенту
+</dd>
+
+<dt id="var_connection"><code>$connection</code></dt>
+<dd>
+порядковый номер соединения
+</dd>
+
+<dt id="var_hostname"><code>$hostname</code></dt>
+<dd>
+имя хоста
+</dd>
+
+<dt id="var_msec"><code>$msec</code></dt>
+<dd>
+текущее время в секундах с точностью до миллисекунд
+</dd>
+
+<dt id="var_nginx_version"><code>$nginx_version</code></dt>
+<dd>
+версия nginx
+</dd>
+
+<dt id="var_pid"><code>$pid</code></dt>
+<dd>
+номер (PID) рабочего процесса
+</dd>
+
+<dt id="var_protocol"><code>$protocol</code></dt>
+<dd>
+протокол, используемый для работы с клиентом:
+<code>TCP</code> или <code>UDP</code> (1.11.4)
+</dd>
+
+<dt id="var_proxy_protocol_addr"><code>$proxy_protocol_addr</code></dt>
+<dd>
+адрес клиента, полученный из заголовка протокола PROXY (1.11.4)
+<p>
+Протокол PROXY должен быть предварительно включён при помощи установки
+параметра <code>proxy_protocol</code> в директиве <a href="#listen">listen</a>.
+</p>
+</dd>
+
+<dt id="var_proxy_protocol_port"><code>$proxy_protocol_port</code></dt>
+<dd>
+порт клиента, полученный из заголовка протокола PROXY (1.11.4)
+<p>
+Протокол PROXY должен быть предварительно включён при помощи установки
+параметра <code>proxy_protocol</code> в директиве <a href="#listen">listen</a>.
+</p>
+</dd>
+
+<dt id="var_proxy_protocol_server_addr"><code>$proxy_protocol_server_addr</code></dt>
+<dd>
+адрес сервера, полученный из заголовка протокола PROXY (1.17.6)
+<p>
+Протокол PROXY должен быть предварительно включён при помощи установки
+параметра <code>proxy_protocol</code> в директиве <a href="#listen">listen</a>.
+</p>
+</dd>
+
+<dt id="var_proxy_protocol_server_port"><code>$proxy_protocol_server_port</code></dt>
+<dd>
+порт сервера, полученный из заголовка протокола PROXY (1.17.6)
+<p>
+Протокол PROXY должен быть предварительно включён при помощи установки
+параметра <code>proxy_protocol</code> в директиве <a href="#listen">listen</a>.
+</p>
+</dd>
+
+<dt id="var_proxy_protocol_tlv_"><code>$proxy_protocol_tlv_</code><code><i>имя</i></code></dt>
+<dd>
+TLV, полученный из заголовка протокола PROXY (1.23.2).
+<code>Имя</code> может быть именем типа TLV или его числовым значением.
+В последнем случае значение задаётся в шестнадцатеричном виде
+и должно начинаться с <code>0x</code>:
+
+<blockquote class="example"><pre>
+$proxy_protocol_tlv_alpn
+$proxy_protocol_tlv_0x01
+</pre></blockquote>
+SSL TLV могут также быть доступны как по имени типа TLV,
+так и по его числовому значению,
+оба должны начинаться с <code>ssl_</code>:
+<blockquote class="example"><pre>
+$proxy_protocol_tlv_ssl_version
+$proxy_protocol_tlv_ssl_0x21
+</pre></blockquote>
+
+<p>
+Поддерживаются следующие имена типов TLV:
+</p> <ul class="compact">
+
+<li>
+<code>alpn</code> (<code>0x01</code>) - 
+протокол более высокого уровня, используемый поверх соединения
+</li>
+
+<li>
+<code>authority</code> (<code>0x02</code>) - 
+значение имени хоста, передаваемое клиентом
+</li>
+
+<li>
+<code>unique_id</code> (<code>0x05</code>) - 
+уникальный идентификатор соединения
+</li>
+
+<li>
+<code>netns</code> (<code>0x30</code>) - 
+имя пространства имён
+</li>
+
+<li>
+<code>ssl</code> (<code>0x20</code>) - 
+структура SSL TLV в бинарном виде
+</li>
+
+</ul><p> 
+</p>
+
+<p>
+Поддерживаются следующие имена типов SSL TLV:
+</p> <ul class="compact">
+
+<li>
+<code>ssl_version</code> (<code>0x21</code>) - 
+версия SSL, используемая в клиентском соединении
+</li>
+
+<li>
+<code>ssl_cn</code> (<code>0x22</code>) - 
+Common Name сертификата
+</li>
+
+<li>
+<code>ssl_cipher</code> (<code>0x23</code>) - 
+имя используемого шифра
+</li>
+
+<li>
+<code>ssl_sig_alg</code> (<code>0x24</code>) - 
+алгоритм, используемый для подписи сертификата
+</li>
+
+<li>
+<code>ssl_key_alg</code> (<code>0x25</code>) - 
+алгоритм публичного ключа
+</li>
+
+</ul><p> 
+</p>
+
+<p>
+Также поддерживается следующее специальное имя типа SSL TLV:
+</p> <ul class="compact">
+
+<li>
+<code>ssl_verify</code> - 
+результат проверки клиентского сертификата:
+<code>0</code>, если клиент предоставил сертификат
+и он был успешно верифицирован,
+либо ненулевое значение
+</li>
+
+</ul><p> 
+</p>
+
+<p>
+Протокол PROXY должен быть предварительно включён при помощи установки
+параметра <code>proxy_protocol</code> в директиве <a href="#listen">listen</a>.
+</p>
+</dd>
+
+<dt id="var_remote_addr"><code>$remote_addr</code></dt>
+<dd>
+адрес клиента
+</dd>
+
+<dt id="var_remote_port"><code>$remote_port</code></dt>
+<dd>
+порт клиента
+</dd>
+
+<dt id="var_server_addr"><code>$server_addr</code></dt>
+<dd>
+адрес сервера, принявшего соединение
+<p>
+Получение значения этой переменной обычно требует одного системного вызова.
+Чтобы избежать системного вызова, в директивах <a href="#listen">listen</a>
+следует указывать адреса и использовать параметр <code>bind</code>.
+</p>
+</dd>
+
+<dt id="var_server_port"><code>$server_port</code></dt>
+<dd>
+порт сервера, принявшего соединение
+</dd>
+
+<dt id="var_session_time"><code>$session_time</code></dt>
+<dd>
+длительность сессии в секундах с точностью до миллисекунд
+(1.11.4);
+</dd>
+
+<dt id="var_status"><code>$status</code></dt>
+<dd>
+статус сессии (1.11.4), может принимать одно из следующих значений:
+<dl class="compact">
+
+<dt><code>200</code></dt>
+<dd>
+сессия завершена успешно
+</dd>
+
+<dt><code>400</code></dt>
+<dd>
+невозможно разобрать данные, полученные от клиента, например
+заголовок <a href="#proxy_protocol">протокола PROXY</a>
+</dd>
+
+<dt><code>403</code></dt>
+<dd>
+доступ запрещён, например при ограничении доступа для
+<a href="ngx_stream_access_module.html">определённых адресов клиентов</a>
+</dd>
+
+<dt><code>500</code></dt>
+<dd>
+внутренняя ошибка сервера
+</dd>
+
+<dt><code>502</code></dt>
+<dd>
+плохой шлюз, например
+если невозможно выбрать сервер группы или сервер недоступен
+</dd>
+
+<dt><code>503</code></dt>
+<dd>
+сервис недоступен, например при ограничении по
+<a href="ngx_stream_limit_conn_module.html">числу соединений</a>
+</dd>
+
+</dl>
+</dd>
+
+<dt id="var_time_iso8601"><code>$time_iso8601</code></dt>
+<dd>
+локальное время в формате по стандарту ISO 8601
+</dd>
+
+<dt id="var_time_iso8601_ms"><code>$time_iso8601_ms</code></dt>
+<dd>
+локальное время в формате по стандарту ISO 8601
+с точностью до миллисекунд (1.29.3)
+<p>
+</p> <blockquote class="note">
+Переменная доступна как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>.
+</blockquote><p> 
+</p>
+</dd>
+
+<dt id="var_time_local"><code>$time_local</code></dt>
+<dd>
+локальное время в Common Log Format
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

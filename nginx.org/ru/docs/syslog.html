@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Запись в syslog</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../en/docs/syslog.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../news.html">новости</a> [en]</li><li><a href="../../ru/">об nginx</a></li><li><a href="../../ru/download.html">скачать</a></li><li><a href="../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="./">документация</a></li><li><a href="faq.html">faq</a></li><li><a href="../../en/books.html">книги</a> [en]</li><li><a href="../../ru/community.html">сообщество</a></li><li><a href="../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Запись в syslog</h2><p>
+Директивы
+<a href="ngx_core_module.html#error_log">error_log</a>
+и
+<a href="http/ngx_http_log_module.html#access_log">access_log</a>
+поддерживают запись в syslog.
+Запись в syslog настраивается при помощи следующих параметров:
+</p> <dl class="compact">
+
+<dt><code>server=</code><code><i>адрес</i></code></dt>
+<dd>
+Задаёт адрес сервера syslog.
+Адрес может быть указан в виде доменного имени или IP-адреса,
+и необязательного порта, или в виде пути UNIX-сокета, который
+указывается после префикса “<code>unix:</code>”.
+Если порт не указан, используется UDP-порт 514.
+Если доменному имени соответствует несколько IP-адресов,
+используется только первый адрес.
+</dd>
+
+<dt><code>facility=</code><code><i>строка</i></code></dt>
+<dd>
+Задаёт категорию сообщений syslog в соответствии с
+<a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1">RFC 3164</a>.
+В качестве категории может быть указано одно из следующих значений:
+“<code>kern</code>”, “<code>user</code>”,
+“<code>mail</code>”, “<code>daemon</code>”,
+“<code>auth</code>”, “<code>intern</code>”,
+“<code>lpr</code>”, “<code>news</code>”, “<code>uucp</code>”,
+“<code>clock</code>”, “<code>authpriv</code>”,
+“<code>ftp</code>”, “<code>ntp</code>”, “<code>audit</code>”,
+“<code>alert</code>”, “<code>cron</code>”,
+“<code>local0</code>”..“<code>local7</code>”.
+По умолчанию используется “<code>local7</code>”.
+</dd>
+
+<dt><code>severity=</code><code><i>строка</i></code></dt>
+<dd>
+Задаёт важность сообщений syslog для
+<a href="http/ngx_http_log_module.html#access_log">access_log</a>
+в соответствии с
+<a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1">RFC 3164</a>.
+Возможны те же самые значения, что и у второго параметра (уровень)
+директивы <a href="ngx_core_module.html#error_log">error_log</a>.
+По умолчанию используется “<code>info</code>”.
+<blockquote class="note">
+Важность сообщений об ошибках определяется самим nginx, поэтому
+в директиве <code>error_log</code> параметр игнорируется.
+</blockquote>
+</dd>
+
+<dt><code>tag=</code><code><i>строка</i></code></dt>
+<dd>
+Задаёт метку сообщений syslog.
+По умолчанию используется “<code>nginx</code>”.
+</dd>
+
+<dt><code>nohostname</code></dt>
+<dd>
+Запрещает добавление поля “hostname” в заголовок сообщения syslog (1.9.7).
+</dd>
+
+
+
+</dl><p> 
+Пример конфигурации syslog:
+</p> <blockquote class="example"><pre>
+error_log syslog:server=192.168.1.1 debug;
+
+access_log syslog:server=unix:/var/log/nginx.sock,nohostname;
+access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=info combined;
+</pre></blockquote><p> 
+</p><p>
+</p> <blockquote class="note">
+Запись в syslog доступна начиная с версии 1.7.1.
+Как часть
+<a href="https://www.f5.com/products/nginx">коммерческой подписки</a>
+запись в syslog доступна начиная с версии 1.5.3.
+</blockquote><p> 
+</p></div></div></body></html>

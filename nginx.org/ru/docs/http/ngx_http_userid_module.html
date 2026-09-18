@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Модуль ngx_http_userid_module</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/http/ngx_http_userid_module.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="../../../ru/docs/njs/">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Модуль ngx_http_userid_module</h2><table width="100%"><tr><td align="left"><a href="#example">Пример конфигурации</a><br><a href="#directives">Директивы</a><br>     <a href="#userid">userid</a><br>     <a href="#userid_domain">userid_domain</a><br>     <a href="#userid_expires">userid_expires</a><br>     <a href="#userid_flags">userid_flags</a><br>     <a href="#userid_mark">userid_mark</a><br>     <a href="#userid_name">userid_name</a><br>     <a href="#userid_p3p">userid_p3p</a><br>     <a href="#userid_path">userid_path</a><br>     <a href="#userid_service">userid_service</a><br><a href="#variables">Встроенные переменные</a><br></td></tr></table>
+
+<a name="summary"></a><p>
+Модуль <code>ngx_http_userid_module</code> выдаёт куки
+для идентификации клиентов.
+Для записи в лог полученных и выданных кук можно использовать встроенные
+переменные <a href="#var_uid_got">$uid_got</a> и
+<a href="#var_uid_set">$uid_set</a>.
+Модуль совместим с модулем
+<a href="http://www.lexa.ru/programs/mod-uid.html">mod_uid</a>
+для Apache.
+</p>
+
+
+<a name="example"></a><center><h4>Пример конфигурации</h4></center><p>
+</p> <blockquote class="example"><pre>
+userid         on;
+userid_name    uid;
+userid_domain  example.com;
+userid_path    /;
+userid_expires 365d;
+userid_p3p     'policyref="/w3c/p3p.xml", CP="CUR ADM OUR NOR STA NID"';
+</pre></blockquote><p> 
+</p>
+
+
+<a name="directives"></a><center><h4>Директивы</h4></center><a name="userid"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid</strong> 
+    <code>on</code> |
+    <code>v1</code> |
+    <code>log</code> |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Разрешает или запрещает выдачу кук и запись приходящих кук в лог:
+</p> <dl class="compact">
+
+<dt><code>on</code></dt>
+<dd>
+разрешает выдачу кук версии 2
+и запись приходящих кук в лог;
+</dd>
+
+<dt><code>v1</code></dt>
+<dd>
+разрешает выдачу кук версии 1
+и запись приходящих кук в лог;
+</dd>
+
+<dt><code>log</code></dt>
+<dd>
+запрещает выдачу кук,
+но разрешает запись приходящих кук в лог;
+</dd>
+
+<dt><code>off</code></dt>
+<dd>
+запрещает выдачу кук и запись приходящих кук в лог.
+</dd>
+
+</dl><p> 
+</p><a name="userid_domain"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_domain</strong> <code><i>имя</i></code> | <code>none</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_domain none;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт домен, для которого устанавливается кука.
+Параметр <code>none</code> запрещает выдавать домен для куки.
+</p><a name="userid_expires"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_expires</strong> <code><i>время</i></code> | <code>max</code> |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_expires off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт время, в течение которого браузер должен хранить куку.
+Параметр <code>max</code> устанавливает срок хранения куки до
+31 декабря 2037 года 23:55:55 GMT.
+Указание параметра <code>off</code> позволяет ограничить время
+действия куки сессией браузера.
+</p><a name="userid_flags"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_flags</strong> 
+    <code>off</code> |
+    <code><i>флаг</i></code> ...;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_flags off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table><p>Эта директива появилась в версии 1.19.3.
+            </p></div><p>
+Если параметр не <code>off</code>,
+задаёт один или несколько дополнительных флагов для куки:
+<code>secure</code>,
+<code>httponly</code>,
+<code>samesite=strict</code>,
+<code>samesite=lax</code>,
+<code>samesite=none</code>.
+</p><a name="userid_mark"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_mark</strong> 
+    <code><i>буква</i></code> | <code><i>цифра</i></code> |
+    <code>=</code> |
+    <code>off</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_mark off;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Если параметр не <code>off</code>, включает механизм маркировки кук
+и задаёт символ, используемый в качестве метки.
+Этот механизм позволяет добавить или изменить
+<a href="#userid_p3p">userid_p3p</a> и/или время хранения куки, но при этом оставить
+неизменным идентификатор клиента.
+Меткой может быть любая буква английского алфавита (с учётом регистра),
+цифра или знак “<code>=</code>”.
+</p><p>
+Если метка задана, то она сравнивается с первым дополняющим символом
+в base64 представлении идентификатора клиента, передаваемом в куке.
+Если они не совпадают, то кука перепосылается с заданной меткой,
+временем хранения и заголовком “P3P”.
+</p><a name="userid_name"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_name</strong> <code><i>имя</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_name uid;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт имя куки.
+</p><a name="userid_p3p"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_p3p</strong> <code><i>строка</i></code> | <code>none</code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_p3p none;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт значение для поля заголовка “P3P”, которое будет
+выдаваться вместе с кукой.
+Если задано специальное значение <code>none</code>,
+то в ответе не будет заголовка “P3P”.
+</p><a name="userid_path"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_path</strong> <code><i>путь</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_path /;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Задаёт путь, для которого устанавливается кука.
+</p><a name="userid_service"></a><div class="directive"><table cellspacing="0">
+                <tr>
+                <th>
+            Синтаксис:
+                </th>
+                <td>
+            <code><strong>userid_service</strong> <code><i>номер</i></code>;</code><br>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Умолчание:
+                </th>
+                <td>
+            <pre>userid_service IP-адрес сервера;</pre>
+                </td>
+                </tr>
+            
+                <tr>
+                <th>
+            Контекст:
+                </th>
+                <td>
+            <code>http</code>, <code>server</code>, <code>location</code><br>
+                </td>
+                </tr>
+            </table></div><p>
+Если идентификаторы выдаются несколькими серверами (сервисами),
+то каждому сервису следует назначить свой собственный <code><i>номер</i></code>,
+для обеспечения уникальности выдаваемых идентификаторов клиентов.
+По умолчанию для кук первой версии используется ноль.
+Для кук второй версии по умолчанию используется число, составленное из
+последних четырёх октетов IP-адреса сервера.
+</p>
+
+
+<a name="variables"></a><center><h4>Встроенные переменные</h4></center><p>
+Модуль <code>ngx_http_userid_module</code>
+поддерживает следующие встроенные переменные:
+</p> <dl class="compact">
+
+<dt id="var_uid_got"><code>$uid_got</code></dt>
+<dd>
+Имя куки и полученный идентификатор клиента.
+</dd>
+
+<dt id="var_uid_reset"><code>$uid_reset</code></dt>
+<dd>
+Если значением является непустая строка не равная “<code>0</code>”,
+то клиентские идентификаторы перевыдаются.
+Специальное значение “<code>log</code>” дополнительно приводит к выдаче
+сообщений о перевыданных идентификаторах в
+<a href="../ngx_core_module.html#error_log">error_log</a>.
+</dd>
+
+<dt id="var_uid_set"><code>$uid_set</code></dt>
+<dd>
+Имя куки и выданный идентификатор клиента.
+</dd>
+
+</dl><p> 
+</p>
+
+</div></div></body></html>

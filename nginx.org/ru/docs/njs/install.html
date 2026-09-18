@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Загрузка и установка</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="../../../css/style_ru.css"></head><body><div id="banner"><div id="banner-content">
+
+Join us for the first quarterly
+<a href="https://go.f5.net/nginxcommunitycall">NGINX Community Call</a>
+on July 22nd to connect and discuss NGINX development.
+
+</div></div><div id="main"><div id="menu"><input class="side-menu" type="checkbox" id="side-menu"><label class="hamb" for="side-menu"><span class="hamb-line"></span></label><nav class="nav"><h1><a href="/"><img src="/img/nginx_logo.svg" alt="NGINX" class="lightimage" style="display: block; height: auto;"><div class="darkimageWrapper" style="mso-hide: all; display: none"><img src="/img/nginx_logo_dark.svg" alt="NGINX" class="darkimage" style="display: none;"></div></a></h1><div><ul class="mobilemenu"><li><a href="../../../en/docs/njs/install.html">english</a></li><li>русский<br></li><li><br></li><li><a href="../../../news.html">новости</a> [en]</li><li><a href="../../../ru/">об nginx</a></li><li><a href="../../../ru/download.html">скачать</a></li><li><a href="../../../en/security_advisories.html">безопасность</a> [en]</li><li><a href="../../../ru/docs/">документация</a></li><li><a href="../../../ru/docs/faq.html">faq</a></li><li><a href="../../../en/books.html">книги</a> [en]</li><li><a href="../../../ru/community.html">сообщество</a></li><li><a href="../../../ru/enterprise.html">компания</a></li><li><br></li><li><a href="https://x.com/nginxorg">x.com</a></li><li><a href="https://blog.nginx.org/">blog</a></li><li><br></li><li><a href="./">njs</a></li><li><a href="https://github.com/nginx/kubernetes-ingress">ingress controller</a></li><li><a href="https://github.com/nginx/nginx-gateway-fabric">gateway fabric</a></li></ul></div></nav></div><div id="content"><h2>Загрузка и установка</h2><table width="100%"><tr><td align="left"><a href="#install_package">Установка пакета Linux</a><br><a href="#install_sources">Установка из исходных файлов</a><br>     <a href="#install_quickjs">Добавление поддержки QuickJS</a><br><a href="#cli">Сборка утилиты командной строки njs</a><br></td></tr></table><a name="install_package"></a><center><h4>Установка пакета Linux</h4></center><p>
+Для установки модулей njs на Linux могут быть использованы
+<a href="../../linux_packages.html#dynmodules">пакеты</a>:
+</p> <ul class="compact">
+
+<li>
+<code>nginx-module-njs</code> —
+<a href="../ngx_core_module.html#load_module">динамические</a> модули
+njs
+</li>
+
+<li>
+<code>nginx-module-njs-dbg</code> — debug-символы для
+пакета <code>nginx-module-njs</code>
+</li>
+
+</ul><p> 
+</p><p>
+После установки пакетов необходимо загрузить динамические модули njs при помощи
+директивы
+<a href="../ngx_core_module.html#load_module"><code>load_module</code></a>:
+</p> <blockquote class="example"><pre>
+load_module modules/ngx_http_js_module.so;
+</pre></blockquote><p> 
+или
+</p> <blockquote class="example"><pre>
+load_module modules/ngx_stream_js_module.so;
+</pre></blockquote><p> 
+</p><a name="install_sources"></a><center><h4>Установка из исходных файлов</h4></center><p>
+<a href="https://github.com/nginx/njs">Репозиторий</a>
+с исходным кодом njs можно клонировать следующей командой
+(необходим клиент <a href="https://git-scm.com/">Git</a>):
+</p> <blockquote class="example"><pre>
+git clone https://github.com/nginx/njs
+</pre></blockquote><p> 
+Затем модули необходимо собрать из
+корневого каталога <a href="../configure.html">nginx</a> с помощью
+конфигурационного параметра <code>--add-module</code>:
+</p> <blockquote class="example"><pre>
+./configure --add-module=<code><i>path-to-njs</i></code>/nginx
+</pre></blockquote><p> 
+Модули также можно собрать как
+<a href="../ngx_core_module.html#load_module">динамические</a>:
+</p> <blockquote class="example"><pre>
+./configure --add-dynamic-module=<code><i>path-to-njs</i></code>/nginx
+</pre></blockquote><p> 
+</p><a name="install_quickjs"></a><center><h4>Добавление поддержки QuickJS</h4></center><p>
+Убедитесь, что присутствует библиотека QuickJS:
+</p> <blockquote class="example"><pre>
+git clone https://github.com/bellard/quickjs
+cd quickjs
+CFLAGS='-fPIC' make libquickjs.a
+</pre></blockquote><p> 
+На этапе компиляции модулей также укажите пути
+include (<code>-I</code>) и library (<code>-L</code>)
+с помощью
+конфигурационных параметров
+<code>--with-cc-opt=</code> и
+<code>--with-ld-opt=</code>:
+</p> <blockquote class="example"><pre>
+./configure --add-module=<code><i>path-to-njs</i></code>/nginx \
+    --with-cc-opt="-I <code><i>path-to-quickjs</i></code>" \
+    --with-ld-opt="-L <code><i>path-to-quickjs</i></code>"
+</pre></blockquote><p> 
+</p><a name="cli"></a><center><h4>Сборка утилиты командной строки njs</h4></center><p>
+Чтобы собрать только <a href="cli.html">утилиту</a> командной строки njs,
+необходимо запустить
+команды <code>./configure</code> и <code>make njs</code>
+из корневого каталога njs.
+После сборки утилита доступна как <code>./build/njs</code>.
+</p></div></div></body></html>
