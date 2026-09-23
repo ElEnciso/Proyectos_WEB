@@ -11,7 +11,7 @@
     <header class="site-header">
         <div class="container header-container">
             <div>
-                <a href="#inicio">¿Qué es esto?</a>
+                <a href="index.html" class="nav-link">ElEncisoWEB</a>
             </div>
             <nav class="main_nav" id="mainaNav" role="navigation" aria-label="Navegación">
                 <ul class="nav-list">
@@ -25,40 +25,43 @@
         </div>
     </header>
     <main class="container">
-        <section id="inicio">
-            <div>
+        <section id="inicio" class="section">
+            <div class="container caja">
                 <div>
                     <span>Hola soy Mauro Alfredo Enciso Galaz</span>
-                    <h1>Desarrollador WEB</h1>
+                    <h1>Bienvenido a mi página WEB</h1>
                     <p>Alumno de IIA 4BM2</p>
                     <p>Bienvenido a mi portafolio personal, donde podrás conocer más sobre mi experiencia, habilidades y proyectos en el desarrollo de aplicaciones web.</p>
                     <div>
                         <a href="#proyectos" class="btn">Ver Proyectos</a>
                         <a href="#contacto" class="btn">Contáctame</a>
                     </div>
-                    <div>
+                    <figure>
                         <img src="../src/perro.jpg" width="300" alt="Foto de Perros">
-                    </div>
+                        <figcaption>Foto de Perros</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
-        <section id="acerca-de-mi">
-            <div>
-                <h2>Acerca de mi</h2>
-                <p>Soy un apasionado desarrollador web con experiencia en la creación de aplicaciones web interactivas y funcionales. Me especializo en tecnologías como HTML, CSS, JavaScript, Java, Python, PHP y frameworks modernos para ofrecer soluciones innovadoras y eficientes.</p>
-                <p>Mi objetivo es seguir creciendo profesionalmente y contribuir al desarrollo de proyectos que generen un impacto positivo en la sociedad.</p>
-                <p><strong>Objetivo Profesional:</strong> Contribuir al desarrollo de proyectos innovadores y de calidad que aporten valor a los usuarios y a la sociedad.</p>
+        <section id="acerca-de-mi" class="section">
+            <div class="container caja">
+                <div>
+                    <h2>Acerca de mi</h2>
+                    <p>Soy un apasionado desarrollador web con experiencia en la creación de aplicaciones web interactivas y funcionales. Me especializo en tecnologías como HTML, CSS, JavaScript, Java, Python, PHP y frameworks modernos para ofrecer soluciones innovadoras y eficientes.</p>
+                    <p>Mi objetivo es seguir creciendo profesionalmente y contribuir al desarrollo de proyectos que generen un impacto positivo en la sociedad.</p>
+                    <p><strong>Objetivo Profesional:</strong> Contribuir al desarrollo de proyectos innovadores y de calidad que aporten valor a los usuarios y a la sociedad.</p>
+                </div>
+                <aside>
+                    <ul>
+                        <li><span><strong>Experiencia:</strong></span> 5 años en desarrollo web</li>
+                        <li><span><strong>Educación:</strong></span> Licenciatura en Programación, Ingeniero en Inteligencia Artificial</li>
+                        <li><span><strong>Proyectos:</strong></span> <a href="#proyectos" class="nav-link">Ver proyectos</a></li>
+                    </ul>
+                </aside>
             </div>
-            <aside>
-                <ul>
-                    <li><span>Experiencia:</span> 5 años en desarrollo web</li>
-                    <li><span>Educación:</span> Licenciatura en Programación, Ingeniero en Inteligencia Artificial</li>
-                    <li><span>Proyectos:</span> <a href="#proyectos">Ver proyectos</a></li>
-                </ul>
-            </aside>
         </section>
-        <section id="proyectos">
-            <div>
+        <section id="proyectos" class="section">
+            <div class="container caja">
                 <h2>Proyectos</h2>
                 <p>A continuación, se presentan algunos de los proyectos en los que he trabajado, demostrando mis habilidades y experiencia en el desarrollo web.</p>
                 <div class="projects-grid">
@@ -67,7 +70,7 @@
                             <h3 class="card-title">Proyectos</h3>
                         </div>
                         <figure>
-                            <img src="../src/proyecto1.png" alt="Proyecto 1">
+                            <img src="../src/proyecto1.png" width="500" alt="Proyecto 1">
                             <figcaption>Descripción breve del proyecto 1.</figcaption>
                         </figure>
                         <div>
@@ -75,49 +78,49 @@
                             <span>CSS 3</span>
                             <span>JavaScript</span>
                         </div>
-                        <a href="../Proyecto/index.html">Ver Proyecto</a>
                     </article>
+                    <a href="../Proyecto/index.html" class="btn">Ver Proyectos</a>
                 </div>
             </div>
         </section>
-        <section id="habilidades">
-            <div>
+        <section id="habilidades" class="section">
+            <div class="container caja">
                 <h2>Habilidades</h2>
                 <p>Estas son algunas de las habilidades que he desarrollado a lo largo de mi carrera como desarrollador web:</p>
                 <div>
                     <span>HTML 5</span>
-                    <div>
-                        <div data-nivel>50%</div>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 50%">50%</div>
                     </div>
                 </div>
                 <div>
                     <span>CSS 3</span>
-                    <div>
-                        <div data-nivel>50%</div>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 70%">70%</div>
                     </div>
                 </div>
                 <div>
                     <span>JavaScript</span>
-                    <div>
-                        <div data-nivel>50%</div>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 60%">60%</div>
                     </div>
                 </div>
                 <div>
                     <span>Java</span>
-                    <div>
-                        <div data-nivel>50%</div>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 40%">40%</div>
                     </div>
                 </div>
                 <div>
                     <span>Python</span>
-                    <div>
-                        <div data-nivel>50%</div>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 55%">55%</div>
                     </div>
                 </div>
             </div>
         </section>
-        <section id="contacto">
-            <div>
+        <section id="contacto" class="section">
+            <div class="container caja">
                 <h2>Contacto</h2>
                 <p>Si deseas ponerte en contacto conmigo, puedes hacerlo a través del siguiente formulario o mediante mis redes sociales.</p>
                 <div>
@@ -135,33 +138,33 @@
                             <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
                         </div>
 
-                        <button type="submit">Enviar</button>
+                        <button type="submit" class="btn">Enviar</button>
                     </form>
                     <address>
                         <h3>Información de contacto</h3>
-                        <p>Correo electrónico:
+                        <p><strong>Correo electrónico: </strong>
                             <a href="mailto:mencisog2000@alumno.ipn.mx">mencisog2000@alumno.ipn.mx</a>
                         </p>
-                        <p>Teléfono: 
+                        <p><strong>Teléfono: </strong>
                             <a href="tel:+525581629462">+52 55 8162 9462</a>
                         </p>
                         <p><strong>Dirección: </strong>
-                            <span>Ciudad de México, México</span>
+                            <span><strong>Ciudad de México, México</strong></span>
                         </p>
-                        <div>
-                            <a href="https://github.com/ElEnciso">GitHUB</a>
-                            <a href="">LinkedIn</a>
-                            <a href="">Twitter</a>
+                        <div class="social-links">
+                            <a href="https://github.com/ElEnciso" class="nav-link">GitHUB</a>
+                            <a href="https://www.linkedin.com/in/mauro-enciso-109096297" class="nav-link">LinkedIn</a>
+                            <a href="https://x.com/MAlfrEn4" class="nav-link">Twitter</a>
                         </div>
                     </address>
                 </div>
             </div>
         </section>
     </main>
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2026 Mi Página Web. Todos los derechos reservados.</p>
         <p>Diseñado por Mauro Alfredo Enciso Galaz</p>
-        <a href="#inicio" aria-label="Volver al inicio">Volver al inicio</a>
+        <a href="#inicio" class="nav-link" aria-label="Volver al inicio">Volver al inicio</a>
     </footer>
     <script src="../estilos/js/script.js"></script>
 </body>
