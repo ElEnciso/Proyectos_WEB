@@ -1,0 +1,109 @@
+:root{
+    --color-fondo: #f8f9fa;
+    --color-texto: #0d0748;
+    --color-hover: #0d0748;
+    --color-superficie: #ffffff;
+    --color-primario: #243da2;
+    --color-primario-hover: #3156ed;
+    --color-secundario: #f8f9fa;
+    --color-texto-claro: #547677;
+    --color-borde: #e0e0e0;
+    --color-sombra: rgba(119, 0, 255, 0.1);
+    --fuente-principal: 'Roboto', sans-serif;
+    --radio-bordes: 12px;
+    --transicion: all 0.3s ease;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--fuente-principal);
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 500;
+    color: var(--color-texto);
+    letter-spacing: -0.02px;
+    border-bottom: 3px solid var(--color-primario);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+.site-header {
+    background-color: var(--color-fondo);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px var(--color-sombra);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    color: var(--color-secundario);
+    padding: 1rem 1em;
+    text-align: center;
+    border-bottom: 5px solid var(--color-borde);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    max-height: 5px;
+    margin: 0 auto;
+}
+
+.main_nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--color-texto);
+    font-weight: 450;
+    transition: var(--transicion);
+    position: relative;
+}
+
+.nav-link:hover, .nav-link:focus {
+    color: var(--color-primario);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    display: block;
+    margin-top: 5px;
+    right: 0;
+    background-color: var(--color-primario);
+    transition: var(--transicion);
+}
+
+.nav-link:hover::after, .nav-link:focus::after {
+    width: 100%;
+    left: 0;
+    background-color: var(--color-primario);
+}

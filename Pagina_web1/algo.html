@@ -4,34 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enciso Galaz Mauro Alfredo - Tecnologías para desarrollo de Aplicaciones WEB</title>
-    <link rel="stylesheet" href="../estilos/css">
+    <link rel="stylesheet" href="../estilos/inicio.css">
     <link id="favicon" rel="icon" type="image/png" href="../frame2.png">
 </head>
 <body>
-    <!--
-    HEADER
-    -->
-
-    <header>
-        <div>
+    <header class="site-header">
+        <div class="container header-container">
             <div>
-                <a href="#inicio" aria-label="Inicio">Pedro</a>
+                <a href="#inicio" aria-label="Inicio">¿Qué es esto?</a>
             </div>
-            <button id="menu-toggle" aria-label="Abrir menú de navegacion" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav id="mainaNav" role="navigation" aria-label="Navegación">
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#acerca-de-mi">Acerca de mi</a></li>
-                    <li><a href="#proyectos">Proyectos</a></li>
-                    <li><a href="#habilidades">Habilidades</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
+            <nav class="main_nav" id="mainaNav" role="navigation" aria-label="Navegación">
+                <ul class="nav-list">
+                    <li><a href="#inicio" class="nav-link">Inicio</a></li>
+                    <li><a href="#acerca-de-mi" class="nav-link">Acerca de mi</a></li>
+                    <li><a href="#proyectos" class="nav-link">Proyectos</a></li>
+                    <li><a href="#habilidades" class="nav-link">Habilidades</a></li>
+                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
                 </ul>
             </nav>
         </div>
     </header>
+    <main class="container">
+        <section id="inicio">
+            <div>
+                <div>
+                    <span>Hola soy Mauro Alfredo Enciso Galaz</span>
+                    <h1>Desarrollador WEB</h1>
+                    <p>Alumno de IIA 4BM2</p>
+                    <p>Bienvenido a mi portafolio personal, donde podrás conocer más sobre mi experiencia, habilidades y proyectos en el desarrollo de aplicaciones web.</p>
+                    <div>
+                        <a href="#proyectos" class="btn">Ver Proyectos</a>
+                        <a href="#contacto" class="btn">Contáctame</a>
+                    </div>
+                    <div>
+                        <img src="../src/perro.jpg" width="300" alt="Foto de Perros">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="acerca-de-mi">
+            <div>
+                <h2>Acerca de mi</h2>
+                <p>Soy un apasionado desarrollador web con experiencia en la creación de aplicaciones web interactivas y funcionales. Me especializo en tecnologías como HTML, CSS, JavaScript, Java, Python, PHP y frameworks modernos para ofrecer soluciones innovadoras y eficientes.</p>
+                <p>Mi objetivo es seguir creciendo profesionalmente y contribuir al desarrollo de proyectos que generen un impacto positivo en la sociedad.</p>
+                <p><strong>Objetivo Profesional:</strong> Contribuir al desarrollo de proyectos innovadores y de calidad que aporten valor a los usuarios y a la sociedad.</p>
+            </div>
+            <aside>
+                <ul>
+                    <li><span>Experiencia:</span> 5 años en desarrollo web</li>
+                    <li><span>Educación:</span> Licenciatura en Programación, Ingeniero en Inteligencia Artificial</li>
+                    <li><span>Proyectos:</span> <a href="#proyectos">Ver proyectos</a></li>
+                </ul>
+            </aside>
+        </section>
+        <section id="proyectos">
+            <div>
+                <h2>Proyectos</h2>
+                <p>A continuación, se presentan algunos de los proyectos en los que he trabajado, demostrando mis habilidades y experiencia en el desarrollo web.</p>
+                <div class="projects-grid">
+                    <article class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Proyectos</h3>
+                        </div>
+                        <figure>
+                            <img src="../src/proyecto1.png" alt="Imagen del Proyecto 1">
+                            <figcaption>Descripción breve del proyecto 1.</figcaption>
+                        </figure>
+                        <div>
+                            <span>HTML 5</span>
+                            <span>CSS 3</span>
+                            <span>JavaScript</span>
+                        </div>
+                        <a href="../Proyecto/index.html">Ver Proyecto</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <section id="habilidades">
+            <div>
+                <h2>Habilidades</h2>
+                <p>Estas son algunas de las habilidades que he desarrollado a lo largo de mi carrera como desarrollador web:</p>
+                <div>
+                    <span>HTML 5</span>
+                    <div>
+                        <div data-nivel>50%</div>
+                    </div>
+                </div>
+                <div>
+                    <span>CSS 3</span>
+                    <div>
+                        <div data-nivel>50%</div>
+                    </div>
+                </div>
+                <div>
+                    <span>JavaScript</span>
+                    <div>
+                        <div data-nivel>50%</div>
+                    </div>
+                </div>
+                <div>
+                    <span>Java</span>
+                    <div>
+                        <div data-nivel>50%</div>
+                    </div>
+                </div>
+                <div>
+                    <span>Python</span>
+                    <div>
+                        <div data-nivel>50%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="contacto">
+            <div>
+                <h2>Contacto</h2>
+                <p>Si deseas ponerte en contacto conmigo, puedes hacerlo a través del siguiente formulario o mediante mis redes sociales.</p>
+                <div>
+                    <form id="contactoForm" action="mailto:mencisog2000@alumno.ipn.mx" method="post" enctype="text/plain">
+                        <div>
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre">
+                        </div>
+                        <div>
+                            <label for="email">Correo electrónico:</label>
+                            <input type="email" id="email" name="email" required placeholder="PedroPicapiedra@mail.com">
+                        </div>
+                        <div>
+                            <label for="mensaje">Mensaje:</label>
+                            <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                        </div>
+
+                        <button type="submit">Enviar</button>
+                    </form>
+                    <address>
+                        <h3>Información de contacto</h3>
+                        <p>Correo electrónico:
+                            <a href="mailto:mencisog2000@alumno.ipn.mx">mencisog2000@alumno.ipn.mx</a>
+                        </p>
+                        <p>Teléfono: 
+                            <a href="tel:+525581629462">+52 55 8162 9462</a>
+                        </p>
+                        <p><strong>Dirección: </strong>
+                            <span>Ciudad de México, México</span>
+                        </p>
+                        <div>
+                            <a href="https://github.com/ElEnciso">GitHUB</a>
+                            <a href="">LinkedIn</a>
+                            <a href="">Twitter</a>
+                        </div>
+                    </address>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 Mi Página Web. Todos los derechos reservados.</p>
+        <p>Diseñado por Mauro Alfredo Enciso Galaz</p>
+        <a href="#inicio" aria-label="Volver al inicio">Volver al inicio</a>
+    </footer>
+    <script src="../estilos/js/script.js"></script>
 </body>
 </html>
