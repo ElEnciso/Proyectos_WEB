@@ -9,6 +9,7 @@
     --color-texto-dos: #8cafe8;
     --color-borde: #e0e0e06b;
     --color-sombra: rgba(119, 0, 255, 0.1);
+    --color-caja: #57636678;
     --fuente-principal: 'Roboto', sans-serif;
     --radio-bordes: 12px;
     --transicion: all 0.3s ease;
@@ -122,6 +123,7 @@ span {
     text-decoration: none;
     border-radius: var(--radio-bordes);
     transition: var(--transicion);
+    border: 2px solid var(--color-borde);
 }
 
 figcaption {
@@ -136,6 +138,7 @@ img {
     max-width: 100%;
     height: auto;
     margin: 0 auto;
+    border-radius: var(--radio-bordes);
 }
 
 .card {
@@ -169,12 +172,19 @@ img {
 }
 
 .caja {
-    background-color: var(--color-superficie);
+    background-color: var(--color-caja);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 3rem;
     border-radius: var(--radio-bordes);
-    box-shadow: 0 4px 6px var(--color-sombra);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.2);
     transition: var(--transicion);
+}
+
+.caja:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px var(--color-sombra);
 }
 
 form {
@@ -232,22 +242,24 @@ label {
 .site-header {
     background-color: var(--color-superficie);
     backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px var(--color-sombra);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.2);
     position: sticky;
     top: 0;
     z-index: 100;
     padding: 1rem 1em;
     text-align: center;
-    border-bottom: 5px solid var(--color-borde);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .site-footer {
     background-color: var(--color-superficie);
     backdrop-filter: blur(10px);
-    box-shadow: 0 -4px 6px var(--color-sombra);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 -8px 24px rgba(0, 0, 0, 0.2);
     text-align: center;
     padding: 1rem 1em;
-    border-top: 5px solid var(--color-borde);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .header-container {

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ejercicio 22: Formulario para CURP.">
+    <title>Ejercicio 22: Formulario para CURP</title>
+    <link rel="stylesheet" href="../estilos/css.css?v=2">
+    <link id="favicon" rel="icon" type="image/png" href="../frame3.png">
+</head>
+<body>
+
+    <header>
+        <h1>Ejercicio 22: Formulario para CURP</h1>
+        <p>Formulario para ingresar y validar el CURP</p>
+    </header>
+
+    <main class="container">
+        <article class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ejecución del Código</h3>
+                <span class="card-badge">JS Básico</span>
+            </div>
+            <p class="card-description" style="margin-bottom: 1rem; font-weight: bold;">
+                Ejercicio: Crear el código en JS para mostrar la CURP de una persona, dado un formulario.
+            </p>
+            <p class="card-description">
+                Ingrese los datos requeridos.
+            </p>
+            <form action="" class="form" id="curpForm">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+
+                <label for="apellidoPaterno">Apellido Paterno:</label>
+                <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
+
+                <label for="apellidoMaterno">Apellido Materno:</label>
+                <input type="text" id="apellidoMaterno" name="apellidoMaterno" required>
+
+                <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+                <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+
+                <label for="sexo">Sexo:</label>
+                <select id="sexo" name="sexo" required>
+                    <option value="">Seleccione</option>
+                    <option value="H">Hombre</option>
+                    <option value="M">Mujer</option>
+                </select>
+
+                <label for="entidadNacimiento">Entidad de Nacimiento:</label>
+                <select id="entidadNacimiento" name="entidadNacimiento" required>
+                    <option value="">Seleccione</option>
+                    <option value="AS">Aguascalientes</option>
+                    <option value="BC">Baja California</option>
+                    <option value="BS">Baja California Sur</option>
+                    <option value="CC">Campeche</option>
+                    <option value="CS">Chiapas</option>
+                    <option value="CH">Chihuahua</option>
+                    <option value="DF">Ciudad de México</option>
+                    <option value="CL">Coahuila</option>
+                    <option value="CM">Colima</option>
+                    <option value="DG">Durango</option>
+                    <option value="GT">Guanajuato</option>
+                    <option value="GR">Guerrero</option>
+                    <option value="HG">Hidalgo</option>
+                    <option value="JC">Jalisco</option>
+                    <option value="MC">México</option>
+                    <option value="MN">Michoacán</option>
+                    <option value="MS">Morelos</option>
+                    <option value="NT">Nayarit</option>
+                    <option value="NL">Nuevo León</option>
+                    <option value="OC">Oaxaca</option>
+                    <option value="PL">Puebla</option>
+                    <option value="QT">Querétaro</option>
+                    <option value="QR">Quintana Roo</option>
+                    <option value="SP">San Luis Potosí</option>
+                    <option value="SL">Sinaloa</option>
+                    <option value="SR">Sonora</option>
+                    <option value="TC">Tabasco</option>
+                    <option value="TS">Tamaulipas</option>
+                    <option value="TL">Tlaxcala</option>
+                    <option value="VZ">Veracruz</option>
+                    <option value="YN">Yucatán</option>
+                    <option value="ZS">Zacatecas</option>
+                    <option value="NE">Nacido en el Extranjero</option>
+                </select>
+
+                <div id="curpResultado" style="background-color: #f1f5f9; padding: 1.5rem; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--border-color);">
+                    La CURP aparecerá aquí.
+                </div>
+
+                <button type="submit">Generar CURP</button>
+            </form>
+        </article>
+        <div style="margin-top: 2rem;">
+            <a href="algo.html" class="btn" style="background-color: var(--text-secondary);">
+                ⬅ Regresar
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ElEnciso WEB</p>
+    </footer>
+
+    <script>
+        const curpForm = document.getElementById('curpForm');
+        const curpResultado = document.getElementById('curpResultado');
+
+        function limpiarTexto(texto) {
+            return texto
+                .toUpperCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^A-ZÑ]/g, '');
+        }
+
+        function primeraVocalInterna(texto) {
+            const vocal = texto.slice(1).match(/[AEIOU]/);
+            return vocal ? vocal[0] : 'X';
+        }
+
+        function primeraConsonanteInterna(texto) {
+            const consonante = texto.slice(1).match(/[^AEIOU]/);
+            return consonante ? consonante[0] : 'X';
+        }
+
+        function obtenerPrimerNombre(nombre) {
+            const nombres = nombre.trim().split(/\s+/);
+            const nombresComunes = ['JOSE', 'MARIA', 'JOSEFA', 'MARIA'];
+
+            if (nombres.length > 1 && nombresComunes.includes(nombres[0])) {
+                return nombres[1];
+            }
+
+            return nombres[0];
+        }
+
+        function calcularDigitoVerificador(curpBase) {
+            const caracteres = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let suma = 0;
+
+            for (let indice = 0; indice < 17; indice++) {
+                suma += caracteres.indexOf(curpBase[indice]) * (18 - indice);
+            }
+
+            return (10 - (suma % 10)) % 10;
+        }
+
+        function generarCurp(datos) {
+            const nombre = limpiarTexto(datos.nombre);
+            const apellidoPaterno = limpiarTexto(datos.apellidoPaterno);
+            const apellidoMaterno = limpiarTexto(datos.apellidoMaterno) || 'X';
+            const primerNombre = limpiarTexto(obtenerPrimerNombre(datos.nombre));
+            const fecha = datos.fechaNacimiento.replace(/-/g, '').slice(2);
+
+            const letrasIniciales = [
+                apellidoPaterno[0] || 'X',
+                primeraVocalInterna(apellidoPaterno),
+                apellidoMaterno[0],
+                primerNombre[0] || nombre[0] || 'X'
+            ].join('');
+
+            const consonantes = [
+                primeraConsonanteInterna(apellidoPaterno),
+                primeraConsonanteInterna(apellidoMaterno),
+                primeraConsonanteInterna(primerNombre)
+            ].join('');
+
+            const base = `${letrasIniciales}${fecha}${datos.sexo}${datos.entidadNacimiento}${consonantes}0`;
+            return `${base}${calcularDigitoVerificador(base)}`;
+        }
+
+        curpForm.addEventListener('submit', function (evento) {
+            evento.preventDefault();
+
+            if (!curpForm.checkValidity()) {
+                curpForm.reportValidity();
+                return;
+            }
+
+            const datos = Object.fromEntries(new FormData(curpForm));
+            curpResultado.textContent = `CURP generada: ${generarCurp(datos)}`;
+        });
+    </script>
+</body>
+</html>
