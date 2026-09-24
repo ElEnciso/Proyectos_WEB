@@ -3,238 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página 1 | Desarrollo Web</title>
-    <link rel="stylesheet" href="../estilos/css.css">
+    <title>Enciso Galaz Mauro Alfredo - Tecnologías para desarrollo de Aplicaciones WEB</title>
+    <link rel="stylesheet" href="../estilos/inicio.css">
     <link id="favicon" rel="icon" type="image/png" href="../frame2.png">
 </head>
 <body>
-
-    <header>
-        <h1>Página 1</h1>
-        <p>Ejercicios de la primera sección</p>
+    <header class="site-header">
+        <div class="container header-container">
+            <div>
+                <a href="algo.html" class="nav-link">ElEncisoWEB</a>
+            </div>
+            <nav class="main_nav" id="mainaNav" role="navigation" aria-label="Navegación">
+                <ul class="nav-list">
+                    <li><a href="#inicio" class="nav-link">Inicio</a></li>
+                    <li><a href="#acerca-de-mi" class="nav-link">Acerca de mi</a></li>
+                    <li><a href="#proyectos" class="nav-link">Proyectos</a></li>
+                    <li><a href="#habilidades" class="nav-link">Habilidades</a></li>
+                    <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
-
     <main class="container">
-        <div class="practices-grid">
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Inicio</h3>
+        <section id="inicio" class="section">
+            <div class="container caja">
+                <div>
+                    <span>Hola soy Mauro Alfredo Enciso Galaz</span>
+                    <h1>Bienvenido a mi página WEB</h1>
+                    <p>Alumno de IIA 4BM2</p>
+                    <p>Bienvenido a mi portafolio personal, donde podrás conocer más sobre mi experiencia, habilidades y proyectos en el desarrollo de aplicaciones web.</p>
+                    <div>
+                        <a href="#proyectos" class="btn">Ver Proyectos</a>
+                        <a href="#contacto" class="btn">Contáctame</a>
+                    </div>
+                    <figure>
+                        <img src="../src/perro.jpg" width="300" alt="Foto de Perros">
+                        <figcaption>Foto de Perros</figcaption>
+                    </figure>
                 </div>
-                <p class="card-description">
-                    Página de inicio.
-                </p>
-                <a href="algo.html" class="btn">Ver inicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 1</h3>
+            </div>
+        </section>
+        <section id="acerca-de-mi" class="section">
+            <div class="container caja">
+                <div>
+                    <h2>Acerca de mi</h2>
+                    <p>Soy un apasionado desarrollador web con experiencia en la creación de aplicaciones web interactivas y funcionales. Me especializo en tecnologías como HTML, CSS, JavaScript, Java, Python, PHP y frameworks modernos para ofrecer soluciones innovadoras y eficientes.</p>
+                    <p>Mi objetivo es seguir creciendo profesionalmente y contribuir al desarrollo de proyectos que generen un impacto positivo en la sociedad.</p>
+                    <p><strong>Objetivo Profesional:</strong> Contribuir al desarrollo de proyectos innovadores y de calidad que aporten valor a los usuarios y a la sociedad.</p>
                 </div>
-                <p class="card-description">
-                    Desarrollo del primer ejercicio de esta unidad.
-                </p>
-                <a href="pagina1.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 2</h3>
+                <aside>
+                    <ul>
+                        <li><span><strong>Experiencia:</strong></span> 5 años en desarrollo web</li>
+                        <li><span><strong>Educación:</strong></span> Licenciatura en Programación, Ingeniero en Inteligencia Artificial</li>
+                        <li><span><strong>Proyectos:</strong></span> <a href="#proyectos" class="nav-link">Ver proyectos</a></li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
+        <section id="proyectos" class="section">
+            <div class="container caja">
+                <h2>Proyectos</h2>
+                <p>A continuación, se presentan algunos de los proyectos en los que he trabajado, demostrando mis habilidades y experiencia en el desarrollo web.</p>
+                <div class="projects-grid">
+                    <article class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Proyectos</h3>
+                        </div>
+                        <figure>
+                            <img src="../src/proyecto1.png" width="500" alt="Proyecto 1">
+                            <figcaption>Descripción breve del proyecto 1.</figcaption>
+                        </figure>
+                        <div>
+                            <span>HTML 5</span>
+                            <span>CSS 3</span>
+                            <span>JavaScript</span>
+                        </div>
+                    </article>
+                    <a href="../Proyecto/index.html" class="btn">Ver Proyectos</a>
                 </div>
-                <p class="card-description">
-                    Desarrollo del segundo ejercicio de esta unidad.
-                </p>
-                <a href="pagina2.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 3</h3>
+            </div>
+        </section>
+        <section id="habilidades" class="section">
+            <div class="container caja">
+                <h2>Habilidades</h2>
+                <p>Estas son algunas de las habilidades que he desarrollado a lo largo de mi carrera como desarrollador web:</p>
+                <div>
+                    <span>HTML 5</span>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 50%">50%</div>
+                    </div>
                 </div>
-                <p class="card-description">
-                    Desarrollo del tercer ejercicio de esta unidad.
-                </p>
-                <a href="pagina3.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 4</h3>
+                <div>
+                    <span>CSS 3</span>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 70%">70%</div>
+                    </div>
                 </div>
-                <p class="card-description">
-                    Desarrollo del cuarto ejercicio de esta unidad.
-                </p>
-                <a href="pagina4.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 5</h3>
+                <div>
+                    <span>JavaScript</span>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 60%">60%</div>
+                    </div>
                 </div>
-                <p class="card-description">
-                    Desarrollo del quinto ejercicio de esta unidad.
-                </p>
-                <a href="pagina5.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 6</h3>
+                <div>
+                    <span>Java</span>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 40%">40%</div>
+                    </div>
                 </div>
-                <p class="card-description">
-                    Desarrollo del sexto ejercicio de esta unidad.
-                </p>
-                <a href="pagina6.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 7</h3>
+                <div>
+                    <span>Python</span>
+                    <div class="nivel-limite">
+                        <div data-nivel style="--nivel: 55%">55%</div>
+                    </div>
                 </div>
-                <p class="card-description">
-                    Desarrollo del septimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina7.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 8</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del octavo ejercicio de esta unidad.
-                </p>
-                <a href="pagina8.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 9</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del noveno ejercicio de esta unidad.
-                </p>
-                <a href="pagina9.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 10</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del décimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina10.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 11</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del undécimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina11.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 12</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del duodécimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina12.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 13</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimotercer ejercicio de esta unidad.
-                </p>
-                <a href="pagina13.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 14</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimocuarto ejercicio de esta unidad.
-                </p>
-                <a href="pagina14.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 15</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimoquinto ejercicio de esta unidad.
-                </p>
-                <a href="pagina15.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 16</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimosexto ejercicio de esta unidad.
-                </p>
-                <a href="pagina16.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 17</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimoseptimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina17.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 18</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimoctavo ejercicio de esta unidad.
-                </p>
-                <a href="pagina18.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 19</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del decimonoveno ejercicio de esta unidad.
-                </p>
-                <a href="pagina19.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 20</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del vigésimo ejercicio de esta unidad.
-                </p>
-                <a href="pagina20.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 21</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del vigésimo primer ejercicio de esta unidad.
-                </p>
-                <a href="pagina21.html" class="btn">Ver Ejercicio</a>
-            </article>
-            <article class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Ejercicio 22</h3>
-                </div>
-                <p class="card-description">
-                    Desarrollo del vigésimo segundo ejercicio de esta unidad.
-                </p>
-                <a href="pagina22.html" class="btn">Ver Ejercicio</a>
-            </article>
+            </div>
+        </section>
+        <section id="contacto" class="section">
+            <div class="container caja">
+                <h2>Contacto</h2>
+                <p>Si deseas ponerte en contacto conmigo, puedes hacerlo a través del siguiente formulario o mediante mis redes sociales.</p>
+                <div>
+                    <form id="contactoForm" action="mailto:mencisog2000@alumno.ipn.mx" method="post" enctype="text/plain">
+                        <div>
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre">
+                        </div>
+                        <div>
+                            <label for="email">Correo electrónico:</label>
+                            <input type="email" id="email" name="email" required placeholder="PedroPicapiedra@mail.com">
+                        </div>
+                        <div>
+                            <label for="mensaje">Mensaje:</label>
+                            <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                        </div>
 
-        </div>
-        <div style="margin-top: 3rem; text-align: center;">
-            <a href="../index.html" class="btn" style="background-color: var(--text-secondary);">
-                ⬅ Regresar al Menú Principal
-            </a>
-        </div>
-
+                        <button type="submit" class="btn">Enviar</button>
+                    </form>
+                    <address>
+                        <h3>Información de contacto</h3>
+                        <p><strong>Correo electrónico: </strong>
+                            <a href="mailto:mencisog2000@alumno.ipn.mx">mencisog2000@alumno.ipn.mx</a>
+                        </p>
+                        <p><strong>Teléfono: </strong>
+                            <a href="tel:+525581629462">+52 55 8162 9462</a>
+                        </p>
+                        <p><strong>Dirección: </strong>
+                            <span><strong>Ciudad de México, México</strong></span>
+                        </p>
+                        <div class="social-links">
+                            <a href="https://github.com/ElEnciso" class="nav-link">GitHUB</a>
+                            <a href="https://www.linkedin.com/in/mauro-enciso-109096297" class="nav-link">LinkedIn</a>
+                            <a href="https://x.com/MAlfrEn4" class="nav-link">Twitter</a>
+                        </div>
+                    </address>
+                </div>
+            </div>
+        </section>
     </main>
-
-    <footer>
-        <p>&copy; 2026 ElEnciso WEB</p>
+    <footer class="site-footer">
+        <p>&copy; 2026 Mi Página Web. Todos los derechos reservados.</p>
+        <p>Diseñado por Mauro Alfredo Enciso Galaz</p>
+        <a href="#inicio" class="nav-link" aria-label="Volver al inicio">Volver al inicio</a>
     </footer>
+    <script src="../estilos/js/script.js"></script>
 </body>
 </html>
