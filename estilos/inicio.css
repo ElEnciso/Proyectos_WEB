@@ -6,6 +6,7 @@
     --color-superficie-dos: #b5d1ed68;
     --color-primario: #a26724;
     --color-secundario: #9f6bdb;
+    --color-negritas: rgb(89, 62, 121);
     --color-texto-dos: #8cafe8;
     --color-borde: #e0e0e06b;
     --color-sombra: rgba(119, 0, 255, 0.1);
@@ -82,7 +83,6 @@ h3 {
 ul {
     list-style: disc;
     padding: 1rem;
-    margin-left: 3rem;
     color: var(--color-texto-dos);
 }
 
@@ -112,6 +112,11 @@ span {
     font-weight: 250;
 }
 
+.negritas {
+    color: var(--color-negritas);
+    font-weight: 500;
+}
+
 .btn {
     display: inline-block;
     align-self: flex-start;
@@ -119,6 +124,20 @@ span {
     padding: 0.5rem 1rem;
     margin: 0.5rem 0.5rem 0.5rem 0;
     background-color: var(--color-primario);
+    color: var(--color-texto);
+    text-decoration: none;
+    border-radius: var(--radio-bordes);
+    transition: var(--transicion);
+    border: 2px solid var(--color-borde);
+}
+
+.btn-secundario{
+    display: inline-block;
+    align-self: flex-start;
+    width: fit-content;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    background-color: var(--color-secundario);
     color: var(--color-texto);
     text-decoration: none;
     border-radius: var(--radio-bordes);
@@ -139,6 +158,20 @@ img {
     height: auto;
     margin: 0 auto;
     border-radius: var(--radio-bordes);
+}
+
+aside {
+    background-color: var(--color-superficie);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: var(--radio-bordes);
+    box-shadow: 0 4px 6px var(--color-sombra);
+    transition: var(--transicion);
+}
+
+aside:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px var(--color-sombra);
 }
 
 .card {
@@ -247,7 +280,7 @@ label {
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 1rem 1em;
+    padding: .5rem .5em;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -261,6 +294,19 @@ label {
     padding: 1rem 1em;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     position: sticky;
+}
+
+.acerca-de-mi {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5rem;
+}
+
+.p-footer {
+    color: var(--color-texto-dos);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
 }
 
 .header-container {
