@@ -1,8 +1,11 @@
 package com.ipn.mx.tareas4bm2;
 
+import com.ipn.mx.tareas4bm2.repository.TareaRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.sql.Connection;
@@ -11,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 @SpringBootApplication
-public class Tareas4bm2Application {
+public class Tareas4bm2Application implements CommandLineRunner {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -83,10 +86,10 @@ public class Tareas4bm2Application {
             try {
                 ps = con.prepareStatement(TareaDAO.SQL_UPDATE);
 
-                ps.setInt(1, t.getIdTarea());
-                ps.setString(2, t.getNombre());
-                ps.setString(3, t.getDescripcion());
-                ps.setBoolean(4, t.isActivo());
+                ps.setString(1, t.getNombre());
+                ps.setString(2, t.getDescripcion());
+                ps.setBoolean(3, t.isActivo());
+                ps.setInt(4, t.getIdTarea());
 
                 ps.executeUpdate();
             } finally {
@@ -96,6 +99,19 @@ public class Tareas4bm2Application {
         }
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+        com.ipn.mx.tareas4bm2.domain.Tarea t1 = new com.ipn.mx.tareas4bm2.domain.Tarea();
+        t1.setNombre("Estudiar para el segundo parcial 1");
+        t1.setDescripcion("Lo mismo que el nombre");
+        t1.setActivo(true);
+        t1.setIdTarea(3L);
+
+        repository.save(t1);
+    }
+
+    @Autowired
+    private TareaRepository repository ;
     public static void main(String[] args) {
         SpringApplication.run(Tareas4bm2Application.class, args);
 

@@ -19,3 +19,5 @@ update Tarea set nombre='Aprender Java', descripcion='Requiero aprender Java', a
 select * from Tarea;
 
 delete from Tarea where idTarea=1;
+
+select * from Tarea;
