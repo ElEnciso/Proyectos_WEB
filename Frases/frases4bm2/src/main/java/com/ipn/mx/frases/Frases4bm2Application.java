@@ -19,20 +19,7 @@ public class Frases4bm2Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Prueba 1
-        Frase f1 = new Frase();
-        f1.setTextoFrase("Pienso, luego existo.");
-        f1.setAutorFrase("René Descartes");
-        f1.setOrigenFrase("Discurso del método (1637)");
-        repository.save(f1);
 
-        // Prueba 2
-        Frase f2 = new Frase();
-        f2.setTextoFrase("La imaginación es más importante que el conocimiento.");
-        f2.setAutorFrase("Albert Einstein");
-        f2.setOrigenFrase("Entrevista en The Saturday Evening Post (1929)");
-        repository.save(f2);
-
-        System.out.println("¡Frases guardadas correctamente con el nuevo esquema!");
+        System.out.println("¡API Funcionando!");
     }
 }
