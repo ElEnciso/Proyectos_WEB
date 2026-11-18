@@ -31,7 +31,7 @@ public class FraseController {
         return service.save(frase);
     }
 
-    @PostMapping("/frases/{id}")
+    @PutMapping("/frases/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Frase update(@RequestBody Frase frase, @PathVariable Long id){
         Frase f = service.findById(id);
